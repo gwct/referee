@@ -22,6 +22,9 @@ def init():
     global fastq_lnlen;
     fastq_lnlen = 100;
 
+    global correct_opt;
+    correct_opt = False;
+
 # 	global v;
 # 	v = "";
 
@@ -52,8 +55,8 @@ def init():
 # 	global orth_file_name;
 # 	orth_file_name = "";
 
-# 	global stats;
-# 	stats = "";
+    global stats;
+    stats = False;
 
     global startdatetime;
     startdatetime = RC.getOutTime();

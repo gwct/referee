@@ -15,25 +15,22 @@ def optParse(errorflag):
 	parser.add_argument("-ref", dest="ref_file", help="The FASTA assembly to which you have mapped your reads.", default=False);
 	parser.add_argument("-gl", dest="gl_file", help="The file containing the genotype likelihood calculations.", default=False);
 	parser.add_argument("-i", dest="input_list", help="A file containing the paths to multiple input files containing genotype likelihoods and their reference FASTA files. Each line should contain one genotype likelihood file path and one FASTA file path separated by a tab.", default=False);
-
-
-	parser.add_argument("-o", dest="out_dest", help="A name for the output location. If input is specified with -ref and -gl, this will be the name of a single file. If input is specified by -i, this will be the name of a directory which will be made for you. Default: referee-out", default=False);
+	# Inputs
+	parser.add_argument("-o", dest="out_dest", help="A name for the output location. If input is specified with -ref and -gl, this will be the name of a single file. If input is specified by -i, this will be the name of a directory which will be made for you. Default: referee-out-[date]-[time]", default=False);
+	# Output
 	parser.add_argument("--fastq", dest="fastq_flag", help="Set this option to output in FASTQ format instead of the default tab delimited format.", action="store_true", default=False);
 	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score below a cut-off set by -c.", action="store_true", default=False);
 	parser.add_argument("-c", dest="score_cutoff", help="The cut-off score for --correct. Sites that score below this cut-off will have an alternate reference base suggested. If --correct isn't set, this option is ignored. Default: 1", default=False);
 	parser.add_argument("-p", dest="processes", help="The number of processes Referee should use. Default: 1.", default=False);
-
 	parser.add_argument("-v", dest="verbosity", help="An option to control the amount of output printed to the screen. -1: print nothing. 0: print only some log info. 1 (default): print some detailed output for each reconciliation (this detailed output is also available by default in the _det output file).", type=int, default=1);
-	parser.add_argument("--tests", dest="test_opt", help="Use 'grampa.py --tests' the first time you run grampa to run through all the options with pre-set input files.", action="store_true");
+	# Options
 	parser.add_argument("--stats", dest="stats_opt", help=argparse.SUPPRESS, action="store_true");
 
 	args = parser.parse_args();
 	# The input options and help messages
 
-	if args.test_opt:
-		RC.testPrep();
-		sys.exit();
-	# Call of the tests script if --tests is set.
+	if args.stats_opt:
+		globs.stats = True;
 
 	if args.processes and not args.processes.isdigit():
 		RC.errorOut(1, "-p must be an integer value greater than 1.");
@@ -45,7 +42,11 @@ def optParse(errorflag):
 	if args.fastq_flag:
 		globs.fastq = True;
 		out_ext = ".fq";
-	# Checking the fastq option.		
+	# Checking the fastq option.
+
+	if args.correct_flag:
+		globs.correct_opt = True;
+	# Checking the correct option.
 
 	file_paths = {};
 

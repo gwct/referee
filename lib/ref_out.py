@@ -1,6 +1,6 @@
 import global_vars as globs
 
-def outputScores(outfile, scaff, pos, ref, score, fq_seq, fq_scores, fq_curlen, fq_lastpos, final=False):
+def outputScores(outfile, scaff, pos, ref, score, fq_seq, fq_scores, fq_curlen, fq_lastpos, final=False, cor_base="", cor_score=""):
     if globs.fastq:
         fq_seq.append(ref);
         score = str(unichr(int(round(score)+35)));
@@ -19,6 +19,6 @@ def outputScores(outfile, scaff, pos, ref, score, fq_seq, fq_scores, fq_curlen, 
             outfile.write("".join(fq_scores) + "\n");
             fq_lastpos = pos;
     else:
-        outfile.write("\t".join([scaff, str(pos), str(int(round(score)))]) + "\n");
+        outfile.write("\t".join([scaff, str(pos), str(int(round(score))), cor_base, cor_score]) + "\n");
 
     return fq_seq, fq_scores, fq_curlen, fq_lastpos;

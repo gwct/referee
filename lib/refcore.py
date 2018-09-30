@@ -128,23 +128,23 @@ def printStep(step, msg):
 
 #############################################################################
 
-def report_stats(msg="", procs="", step_start=0, prog_start=0, outdir="", stat_start=False):
+def report_stats(msg="", procs="", step_start=0, prog_start=0, stat_start=False):
 	import timeit, psutil
-	func_v = -2 if globs.v == -2 else 1;
+	#func_v = -2 if globs.v == -2 else 1;
 	# func_v = 1;
 	cur_time = timeit.default_timer();
-	logfilename = os.path.join(outdir, "grampa_stats.log");
+	#logfilename = os.path.join(outdir, "grampa_stats.log");
 	if stat_start:
-		printWrite(logfilename, func_v, "# --stats : Reporting GRAMPA time and memory usage.");
-		printWrite(logfilename, func_v, "# " + "-" * 120);
-		printWrite(logfilename, func_v, "# Step" + " " * 13 + "Step time (sec)" + " " * 6 + "Elapsed time (sec)" + " " * 4 + "Current mem usage (MB)" + " " * 4 + "Virtual mem usage (MB)");
-		printWrite(logfilename, func_v, "# " + "-" * 120);
+		printWrite(globs.logfilename, globs.log_v, "# --stats : Reporting Referee time and memory usage.");
+		printWrite(globs.logfilename, globs.log_v, "# " + "-" * 120);
+		printWrite(globs.logfilename, globs.log_v, "# Step" + " " * 13 + "Step time (sec)" + " " * 6 + "Elapsed time (sec)" + " " * 4 + "Current mem usage (MB)" + " " * 4 + "Virtual mem usage (MB)");
+		printWrite(globs.logfilename, globs.log_v, "# " + "-" * 120);
 	else:
 		prog_elapsed = cur_time - prog_start;
 		step_elapsed = cur_time - step_start;
 		mem = sum([p.memory_info()[0] for p in procs]) / float(2 ** 20);
 		vmem = sum([p.memory_info()[1] for p in procs]) / float(2 ** 20);
-		printWrite(logfilename, func_v, msg + " " * (19-len(msg)) + str(step_elapsed) + " " * (21-len(str(step_elapsed))) + str(prog_elapsed) + " " * (22-len(str(prog_elapsed))) + str(mem) + " " * (26-len(str(mem))) + str(vmem));
+		printWrite(globs.logfilename, globs.log_v, msg + " " * (19-len(msg)) + str(step_elapsed) + " " * (21-len(str(step_elapsed))) + str(prog_elapsed) + " " * (22-len(str(prog_elapsed))) + str(mem) + " " * (26-len(str(mem))) + str(vmem));
 	return cur_time
 
 #############################################################################
