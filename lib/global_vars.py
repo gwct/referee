@@ -13,8 +13,14 @@ def init():
 # 	global lca_opt;
 # 	lca_opt = "";
 
-# 	global num_procs;
-# 	num_procs = "";
+    global num_procs;
+    num_procs = 1;
+
+    global fastq;
+    fastq = False;
+
+    global fastq_lnlen;
+    fastq_lnlen = 100;
 
 # 	global v;
 # 	v = "";
