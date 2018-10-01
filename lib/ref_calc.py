@@ -1,4 +1,4 @@
-import gzip, math, global_vars as globs, ref_out as OUT
+import gzip, math, ref_out as OUT, sys
 from Bio import SeqIO
 #############################################################################
 def calcScore(ref, gls):
@@ -30,16 +30,17 @@ def calcScore(ref, gls):
             if score < 0:
                 score = 0;
             # Scale the scores so the max score is 91 and the all negative scores are 0.
-    return score;
+    return score, lr, l_match, l_mismatch;
 #############################################################################
 def refCalc(file_item):
-    gl_file, ref_file, outfilename = file_item[0], file_item[1][0], file_item[1][1];
+    gl_file, ref_file, outfilename, start_pos, stop_pos, globs = file_item[1];
 
     genotypes = ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"]
-    last_scaff, cor_ref, cor_score = "", "", "";
+    last_scaff, cor_ref, cor_score, scaff_pos = "", "", "", start_pos;
 
-    fq_seq, fq_scores, fq_curlen, fq_lastpos = [], [], 0, 1;
-    # Variables for FASTQ output. If FASTQ is not specified, these will remain unchanged and just be passed back and forth.
+    if globs['fastq']:
+        fq_seq, fq_scores, fq_curlen, fq_lastpos = [], [], 0, 1;
+    # Variables for FASTQ output.
 
     with open(outfilename, "w") as outfile:
         try:
@@ -52,42 +53,47 @@ def refCalc(file_item):
         for line in reader(gl_file):
             line = line.strip().split("\t");
             scaff, pos, gl_list = line[0], int(line[1]), line[2:];
+            if pos < start_pos:
+                continue;
+            if stop_pos and pos > stop_pos:
+                break;
             gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
             # Parse the info from the current line -- scaffold, position, genotype likelihoods.
 
             if scaff != last_scaff:
-                #if globs.fastq:
-                #    outfile.write("@" + scaff + "\n");
-                for record in SeqIO.parse(ref_file, "fasta"):
-                    if record.id == scaff:
-                        seq = record.seq;
-                        break;
-                scaff_pos = 1;
+                seq, seqlen = RC.getFastaInfo(ref_file);
             last_scaff = scaff;
             # If the scaffold of the current line is different from the last scaffold, retrieve the sequence.
 
-            while scaff_pos != pos:
-                scaff_ref = seq[scaff_pos-1];
-                fq_seq, fq_scores, fq_curlen, fq_lastpos = OUT.outputScores(outfile, scaff, str(pos), scaff_ref, -2, fq_seq, fq_scores, fq_curlen, fq_lastpos);
-                scaff_pos += 1;
+            if not globs['mapped']:
+                while scaff_pos != pos:
+                    scaff_ref = seq[scaff_pos-1];
+                    if globs['fastq']:
+                        fq_seq, fq_scores, fq_curlen, fq_lastpos = OUT.outputFastq(outfile, scaff, scaff_pos, scaff_ref, -2, fq_seq, fq_scores, fq_curlen, fq_lastpos, globs);
+                    else:
+                        OUT.outputTab(outfile, scaff, str(scaff_pos), scaff_ref, -2, "NA", "NA", "NA", "NA", globs, cor_base=cor_ref, cor_score=cor_score);
+                    scaff_pos += 1;
             # If the current position has skipped ahead from where we are in the scaffold, that means there are
             # intervening positions with no reads mapped. This fills in those scores as -2.
 
             ref = seq[pos-1];
             # Gets the called reference base at the current position.
 
-            rq = calcScore(ref, gls);
+            rq, lr, l_match, l_mismatch = calcScore(ref, gls);
             # Call the scoring function.
 
-            if globs.correct_opt:
+            if globs['correct-opt']:
                 cor_ref, cor_score = correctRef(rq, ref, gls);        
 
-            fq_seq, fq_scores, fq_curlen, fq_lastpos = OUT.outputScores(outfile, scaff, str(pos), scaff_ref, rq, fq_seq, fq_scores, fq_curlen, fq_lastpos, cor_base=cor_ref, cor_score=cor_score);
+            if globs['fastq']:
+                fq_seq, fq_scores, fq_curlen, fq_lastpos = OUT.outputFastq(outfile, scaff, pos, ref, rq, fq_seq, fq_scores, fq_curlen, fq_lastpos, globs);
+            else:
+                OUT.outputTab(outfile, scaff, str(pos), ref, rq, lr, l_match, l_mismatch, gls, globs, cor_base=cor_ref, cor_score=cor_score);
             scaff_pos += 1;
             # Write the score to the output file and iterate the scaff_pos.
 
-        if globs.fastq:
-            fq_seq, fq_scores, fq_curlen, fq_lastpos = OUT.outputScores(outfile, scaff, str(pos), scaff_ref, rq, fq_seq, fq_scores, fq_curlen, fq_lastpos, final=True);
+        if globs['fastq']:
+            fq_seq, fq_scores, fq_curlen, fq_lastpos = OUT.outputFastq(outfile, scaff, pos, ref, rq, fq_seq, fq_scores, fq_curlen, fq_lastpos, globs, final=True);
 #############################################################################
 def correctRef(max_score, ref, gls):
     max_base = ref;
@@ -95,7 +101,7 @@ def correctRef(max_score, ref, gls):
     for base in bases:
         if base == max_base:
             continue;
-        score = calcScore(base, gls);
+        score, lr, l_match, l_mismatch = calcScore(base, gls);
         if score > max_score:
             max_base, max_score = base, score;
 
