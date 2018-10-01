@@ -144,8 +144,8 @@ def getFileLen(i_name):
 
 #############################################################################
 
-def getFastaInfo(ref_name, scaff_id):
-	for record in SeqIO.parse(ref_name, "fasta"):
+def getFastaInfo(ref_file, scaff_id):
+	for record in SeqIO.parse(ref_file, "fasta"):
 		if record.id == scaff_id:
 			seq = record.seq;
 			seqlen = len(record.seq);
@@ -156,20 +156,27 @@ def getFastaInfo(ref_name, scaff_id):
 
 def getScaffLens(ref_file):
 	cur_lens = {};
-	for record in SeqIO.parse(ref_name, "fasta"):
+	for record in SeqIO.parse(ref_file, "fasta"):
 		cur_lens[record.id] = len(record.seq);
 	return cur_lens;
 
 #############################################################################
 
-def getNumPos(i_name, ref_file, start_pos, end_pos, mapped):
+def getNumPos(i_name, ref_file, scaff_lens, start_pos, end_pos, mapped):
 	num_pos, last_scaff = 0,0;
 	if not mapped and end_pos:
 		num_pos = end_pos - start_pos;
 	else:
+		last_pos = 1;
 		for line in open(i_name):
-			line = line.strip().split("\t")[1];
-			if not mapped:
+			
+			if mapped and end_pos:
+				num_pos += 1;
+
+			elif not mapped and not end_pos:
+				pos = line.strip().split("\t")[1];
+
+
 
 
 			scaff, pos = line[0], int(line[1]);
@@ -192,7 +199,6 @@ def getNumPos(i_name, ref_file, start_pos, end_pos, mapped):
 	for line in open(i_name):
 		pass;
 	return float(line.split("\t")[1]); 
-
 
 
 

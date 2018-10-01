@@ -166,17 +166,11 @@ def multiPrep(files):
 	os.system("mkdir " + globs['tmpdir']);
 	# Make the temporary directory to store the split files and split outputs.
 
-	scaffs = [];
-	for line in open(infilename):
-		scaff = line.split("\t")[0];
-		if scaff not in scaffs:
-			scaffs.append(scaff);
-
-	if len(scaffs) == 1:
+	if len(globs['scaff-lens']) == 1:
 		new_files = {};
 		tmpfiles = [os.path.join(globs['tmpdir'], str(i) + ".txt") for i in range(globs['num-procs'])];
 
-		num_pos = RC.getNumPos(infilename, reffilename, start_pos, end_pos, globs['mapped']);
+		num_pos = RC.getNumPos(infilename, reffilename, globs['scaff-lens'], start_pos, end_pos, globs['mapped']);
 
 		pospersplit = int(math.ceil(num_pos / float(globs['num-procs'])));
 		with open(infilename, "r") as infile:
