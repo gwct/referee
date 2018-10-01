@@ -36,9 +36,11 @@ def referee(globs):
 			CALC.refCalc(f);
 	# A serial version.
 	else:
-		if len(files) != 1:
+		if len(files) == 1:
+			if globs['stats']:
+				step_start_time = RC.report_stats(globs, "Splitting files", pids, step_start_time, prog_start_time);
 			files = OP.multiPrep(files);
-		print files;
+		#print files;
 		pool = mp.Pool(processes = globs['num-procs']);
 		for result in pool.imap_unordered(CALC.refCalc, files.iteritems()):
 			continue;

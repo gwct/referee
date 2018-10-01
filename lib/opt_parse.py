@@ -171,8 +171,10 @@ def multiPrep(files):
 		tmpfiles = [os.path.join(globs['tmpdir'], str(i) + ".txt") for i in range(globs['num-procs'])];
 
 		num_pos = RC.getNumPos(infilename, reffilename, globs['scaff-lens'], start_pos, end_pos, globs['mapped']);
-
 		pospersplit = int(math.ceil(num_pos / float(globs['num-procs'])));
+		print num_pos, pospersplit;
+		sys.exit();
+
 		with open(infilename, "r") as infile:
 			file_num, startpos, lastpos, numpos = 0, 1, 1, 1;
 			endpos = startpos + pospersplit;

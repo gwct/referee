@@ -1,4 +1,4 @@
-import gzip, math, ref_out as OUT, sys
+import gzip, math, ref_out as OUT, sys, refcore as RC
 from Bio import SeqIO
 #############################################################################
 def calcScore(ref, gls):
@@ -55,18 +55,18 @@ def refCalc(file_item):
             scaff, pos, gl_list = line[0], int(line[1]), line[2:];
             if pos < start_pos:
                 continue;
-            if stop_pos and pos > stop_pos:
-                break;
-            gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
-            # Parse the info from the current line -- scaffold, position, genotype likelihoods.
 
             if scaff != last_scaff:
-                seq, seqlen = RC.getFastaInfo(ref_file);
+                seq, seqlen = RC.getFastaInfo(ref_file, scaff);
+                if not stop_pos:
+                    cur_stop = seqlen;
+                else:
+                    cur_stop = stop_pos;
             last_scaff = scaff;
             # If the scaffold of the current line is different from the last scaffold, retrieve the sequence.
 
             if not globs['mapped']:
-                while scaff_pos != pos:
+                while scaff_pos != pos and scaff_pos <= cur_stop:
                     scaff_ref = seq[scaff_pos-1];
                     if globs['fastq']:
                         fq_seq, fq_scores, fq_curlen, fq_lastpos = OUT.outputFastq(outfile, scaff, scaff_pos, scaff_ref, -2, fq_seq, fq_scores, fq_curlen, fq_lastpos, globs);
@@ -75,6 +75,12 @@ def refCalc(file_item):
                     scaff_pos += 1;
             # If the current position has skipped ahead from where we are in the scaffold, that means there are
             # intervening positions with no reads mapped. This fills in those scores as -2.
+
+            if cur_stop and pos > cur_stop:
+                continue;
+
+            gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
+            # Parse the info from the current line -- scaffold, position, genotype likelihoods.
 
             ref = seq[pos-1];
             # Gets the called reference base at the current position.

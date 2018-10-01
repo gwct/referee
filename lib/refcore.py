@@ -165,41 +165,29 @@ def getScaffLens(ref_file):
 def getNumPos(i_name, ref_file, scaff_lens, start_pos, end_pos, mapped):
 	num_pos, last_scaff = 0,0;
 	if not mapped and end_pos:
-		num_pos = end_pos - start_pos;
+		num_pos = (end_pos - start_pos) + 1;
 	else:
 		last_pos = 1;
 		for line in open(i_name):
-			
-			if mapped and end_pos:
-				num_pos += 1;
-
-			elif not mapped and not end_pos:
-				pos = line.strip().split("\t")[1];
-
-
-
-
+			line = line.strip().split("\t");
 			scaff, pos = line[0], int(line[1]);
 
+			if not mapped and not end_pos:
+				if scaff != last_scaff:
+					num_pos += scaff_lens[ref_file][scaff];
+					last_scaff = scaff;
+				else:
+					continue;
+			
+			elif mapped and not end_pos:
+				num_pos += 1;
 
+			elif mapped and end_pos:
+				if pos > end_pos:
+					break;
+				num_pos += 1;
 
-
-			if not end_pos and scaff != last_scaff:
-				seq, end_pos = getFastaInfo(ref_file, scaff);
-
-
-
-			if pos < start_pos:
-				continue;
-		
-
-
-
-
-	for line in open(i_name):
-		pass;
-	return float(line.split("\t")[1]); 
-
+	return float(num_pos);
 
 
 

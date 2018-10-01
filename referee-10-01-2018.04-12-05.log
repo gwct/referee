@@ -1,7 +1,7 @@
 # =========================================================================
 # Welcome to Referee -- Reference genome quality score calculator.
-# The date and time at the start is: 09.30.2018 | 11:34:24
-# The program was called as: .\referee.py -ref .\data\rpgc_assembly.fasta -gl .\data\angsd-output-snippet.txt
+# The date and time at the start is: 10.01.2018 | 04:12:05
+# The program was called as: .\referee.py -ref .\data\rpgc_assembly.fasta -gl .\data\angsd-output-snippet.txt -p 4 --mapped -e 25
 #
 # ----------------------------------------
 #
@@ -13,4 +13,5 @@
 # ----------------------------------------
 #
 # Output format is tab delimited.
-# Calculating scores for every reference position specified.
+# --mapped : Only calculating scores for positions with reads mapped to them.
++ Making tmp directory: referee.tmp.10-01-2018.04-12-05
