@@ -7,7 +7,7 @@ def init():
     globs = {
         'starttime' : timeit.default_timer(),
         'startdatetime' : RC.getOutTime(),
-        'start-pos' : 1,
+        'start-pos' : False,
         'end-pos' : False,
         'num-procs' : 1,
         'fastq' : False,
@@ -18,7 +18,10 @@ def init():
         'mapped' : False,
         'stats' : False,
         'debug' : False,
-        'scaff-lens' : {}
+        'scaff-lens' : {},
+        'progstarttime' : 0,
+        'stepstarttime' : 0,
+        'pids' : ""
     }
 
     globs['logfilename'] = "referee-" + globs['startdatetime'] + ".log";

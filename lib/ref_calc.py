@@ -33,10 +33,10 @@ def calcScore(ref, gls):
     return score, lr, l_match, l_mismatch;
 #############################################################################
 def refCalc(file_item):
-    gl_file, ref_file, outfilename, start_pos, stop_pos, globs = file_item[1];
+    gl_file, ref_file, outfilename, scaffs, globs = file_item[1];
 
     genotypes = ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"]
-    last_scaff, cor_ref, cor_score, scaff_pos = "", "", "", start_pos;
+    last_scaff, cor_ref, cor_score, scaff_pos = "", "", "", 1;
 
     if globs['fastq']:
         fq_seq, fq_scores, fq_curlen, fq_lastpos = [], [], 0, 1;
@@ -53,31 +53,27 @@ def refCalc(file_item):
         for line in reader(gl_file):
             line = line.strip().split("\t");
             scaff, pos, gl_list = line[0], int(line[1]), line[2:];
-            if pos < start_pos:
-                continue;
 
             if scaff != last_scaff:
                 seq, seqlen = RC.getFastaInfo(ref_file, scaff);
-                if not stop_pos:
-                    cur_stop = seqlen;
-                else:
-                    cur_stop = stop_pos;
             last_scaff = scaff;
             # If the scaffold of the current line is different from the last scaffold, retrieve the sequence.
 
             if not globs['mapped']:
-                while scaff_pos != pos and scaff_pos <= cur_stop:
+                while scaff_pos != pos:
                     scaff_ref = seq[scaff_pos-1];
                     if globs['fastq']:
                         fq_seq, fq_scores, fq_curlen, fq_lastpos = OUT.outputFastq(outfile, scaff, scaff_pos, scaff_ref, -2, fq_seq, fq_scores, fq_curlen, fq_lastpos, globs);
                     else:
                         OUT.outputTab(outfile, scaff, str(scaff_pos), scaff_ref, -2, "NA", "NA", "NA", "NA", globs, cor_base=cor_ref, cor_score=cor_score);
                     scaff_pos += 1;
+                    if scaff_pos == seqlen:
+                        break;
             # If the current position has skipped ahead from where we are in the scaffold, that means there are
             # intervening positions with no reads mapped. This fills in those scores as -2.
 
-            if cur_stop and pos > cur_stop:
-                continue;
+            if scaff_pos == seqlen:
+                break;
 
             gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
             # Parse the info from the current line -- scaffold, position, genotype likelihoods.

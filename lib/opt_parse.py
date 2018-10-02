@@ -22,8 +22,8 @@ def optParse(globs):
 	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score below a cut-off set by -c.", action="store_true", default=False);
 	parser.add_argument("--mapped", dest="mapped_flag", help="Set this to calculate scores only for positions that have reads mapped to them.", action="store_true", default=False);
 	# User options	
-	parser.add_argument("-s", dest="startpos", help="Set the starting position for the input file(s). Default: 1", default=False);
-	parser.add_argument("-e", dest="endpos", help="Set the end position for the input file(s). Default: last position in assembly/scaffold", default=False);
+	#parser.add_argument("-s", dest="startpos", help="Set the starting position for the input file(s). Default: 1", default=False);
+	#parser.add_argument("-e", dest="endpos", help="Set the end position for the input file(s). Default: last position in assembly/scaffold", default=False);
 	parser.add_argument("-c", dest="score_cutoff", help="The cut-off score for --correct. Sites that score below this cut-off will have an alternate reference base suggested. If --correct isn't set, this option is ignored. Default: 1", default=False);
 	parser.add_argument("-p", dest="processes", help="The number of processes Referee should use. Not that 1 process is always reserved for the main script, so to see any benefit you must enter 3 or above. Default: 1.", default=False);
 	# User params
@@ -65,25 +65,24 @@ def optParse(globs):
 		globs['correct-opt'] = True;
 	# Checking the correct option.
 
-	if args.startpos and not args.startpos.isdigit():
-		RC.errorOut(3, "-s must be an integer value greater than 1.", globs);
-	elif args.startpos:
-		globs['start-pos'] = int(args.startpos);
-
-	if args.endpos and not args.endpos.isdigit():
-		RC.errorOut(4, "-e must be an integer value greater than 1.", globs);
-	elif args.endpos:
-		globs['end-pos'] = int(args.endpos);
-	# Checking the start and end position params.
-
 	if args.stats_opt:
-		globs.stats = True;
+		import psutil
+		globs['stats'] = True;
+		globs['pids'] = [psutil.Process(os.getpid())];		
+		globs['progstarttime'] = RC.report_stats(globs, stat_start=True);
+		globs['stepstarttime'] = globs['progstarttime'];
+	# Initializing if --stats is set.
+
 	if args.debug_opt:
 		RC.printWrite(globs['logfilename'], globs['log-v'], "# --debug : Using tab delimited output and reporting extra columns.");
 		globs['debug'] = True;
 		globs['fastq'] = False;
 		out_ext = ".txt";
 	# Parse debug and stats options. Note: debug only compatible with tab delimited output.
+
+	if globs['stats']:
+		globs['stepstartime'] = RC.report_stats(globs, "Get scaff lengths");
+	globs['scaff-lens'] = RC.getScaffLens(args.ref_file);
 
 	file_paths, file_num = {}, 1;
 
@@ -112,11 +111,8 @@ def optParse(globs):
 			if line.strip():
 				continue;
 			tmpline = line.strip().split("\t");
-			if len(line) == 4:
-				cur_gl_fil, cur_ref_file, cur_start, cur_end = tmpline;
-			elif len(line) == 2 :
+			if len(line) == 2:
 				cur_gl_file, cur_ref_file = tmpline;
-				cur_start, cur_end = 1, False;
 			else:
 				RC.errorOut(5, "Could not read the following line of the input file: " + line, globs);
 
@@ -125,9 +121,10 @@ def optParse(globs):
 			if not SeqIO.parse(cur_ref_file, "fasta"):
 				RC.errorOut(7, "Cannot read the following as FASTA file: " + cur_ref_file, globs);
 			cur_outfile = cur_gl_file + "-referee-out" + out_ext;
-			file_paths[file_num] = [cur_gl_file, cur_ref_file, cur_outfile, cur_start, cur_end];
 
-			globs['scaff-lens'][cur_ref_file] = RC.getScaffLens(cur_ref_file);
+			if globs['stats']:
+				globs['stepstartime'] = RC.report_stats(globs, "Get scaff ids");
+			file_paths[file_num] = [cur_gl_file, cur_ref_file, cur_outfile, RC.getScaffs(cur_gl_file)];
 		# Read the input file and get all the file paths. Also specify output file paths.
 
 	else:
@@ -148,10 +145,10 @@ def optParse(globs):
 			outfile = args.out_dest;
 		# Specify the output file.
 
-		file_paths[file_num] = [args.gl_file, args.ref_file, outfile, globs['start-pos'], globs['end-pos']];
-
-		globs['scaff-lens'][args.ref_file] = RC.getScaffLens(args.ref_file);
-		# Get the file paths for the current files.
+		if globs['stats']:
+			globs['stepstartime'] = RC.report_stats(globs, "Get scaff ids");
+		file_paths[file_num] = [args.gl_file, args.ref_file, outfile, RC.getScaffs(args.gl_file)];
+	# Get the file paths for the current files.
 
 	file_paths = { i : file_paths[i] + [globs] for i in file_paths };
 	return file_paths;
@@ -161,32 +158,39 @@ def optParse(globs):
 def multiPrep(files):
 	import math
 
-	infilename, reffilename, outfilename, start_pos, end_pos, globs = files[1];
+	infilename, reffilename, outfilename, scaffs, globs = files[1];
 	RC.printWrite(globs['logfilename'], globs['log-v'],"+ Making tmp directory: " + globs['tmpdir']);
 	os.system("mkdir " + globs['tmpdir']);
 	# Make the temporary directory to store the split files and split outputs.
 
-	if len(globs['scaff-lens']) == 1:
+	if len(scaffs) == 1:
 		new_files = {};
 		tmpfiles = [os.path.join(globs['tmpdir'], str(i) + ".txt") for i in range(globs['num-procs'])];
 
-		num_pos = RC.getNumPos(infilename, reffilename, globs['scaff-lens'], start_pos, end_pos, globs['mapped']);
+		num_pos = RC.getNumPos(infilename, globs['scaff-lens'], scaffs, globs['mapped']);
 		pospersplit = int(math.ceil(num_pos / float(globs['num-procs'])));
 		print num_pos, pospersplit;
 		sys.exit();
-
 		with open(infilename, "r") as infile:
-			file_num, startpos, lastpos, numpos = 0, 1, 1, 1;
+			cur_scaffs = [];
+			file_num, startpos, lastpos, numpos = 0, start_pos, end_pos, 1;
 			endpos = startpos + pospersplit;
+			print startpos, lastpos, endpos;
 			tmpfile = open(tmpfiles[file_num], "w");
 			for line in infile:
+				print tmpfiles[file_num];
+				tmpline = line.strip().split("\t");
+				scaff, pos = tmpline[0], int(tmpline[1]);
+				if scaff not in cur_scaffs:
+					cur_scaffs.append(scaff);
+
 				tmpfile.write(line);
 				curpos = int(line.split("\t")[1]);
 				numpos = numpos + (curpos - lastpos) ;
 				if numpos >= pospersplit:
 					tmpfile.close();
 					newoutfile = os.path.join(globs['tmpdir'], str(file_num) + "-out.txt");
-					new_files[file_num] = [tmpfiles[file_num], reffilename, newoutfile, startpos, curpos, globs];
+					new_files[file_num] = [tmpfiles[file_num], reffilename, newoutfile, cur_scaffs, globs];
 					startpos = curpos + 1;
 					numpos = 0;
 					file_num += 1;
@@ -197,29 +201,29 @@ def multiPrep(files):
 		if len(new_files) != len(tmpfiles):
 			tmpfile.close();
 			newoutfile = os.path.join(globs['tmpdir'], str(file_num) + "-out.txt");
-			new_files[file_num] = [tmpfiles[file_num], reffilename, newoutfile, startpos, curpos, globs];
+			new_files[file_num] = [tmpfiles[file_num], reffilename, newoutfile, cur_scaffs, globs];
 
-	else:
-		new_files = {};
-		tmpfiles = { scaff : os.path.join(globs['tmpdir'], scaff + ".txt") for scaff in scaffs };
+	# else:
+	# 	new_files = {};
+	# 	tmpfiles = { scaff : os.path.join(globs['tmpdir'], scaff + ".txt") for scaff in scaffs };
 
-		last_scaff = scaffs[0];
-		tmpfile = open(tmpfiles[last_scaff], "w");
-		file_num = 1;
-		with open(infilename, "r") as infile:
-			for line in infile:
-				cur_scaff = line.split("\t")[0];
-				if cur_scaff != last_scaff:
-					tmpfile.close();
-					newoutfile = os.path.join(globs['tmpdir'], last_scaff + "-out.txt");
-					new_files[file_num] = [tmpfiles[last_scaff], reffilename, newoutfile, 1, False, globs];					
-					file_num += 1;
-					tmpfile = open(tmpfiles[cur_scaff], "w");
-				tmpfile.write(line);
-				last_scaff = cur_scaff;
+	# 	last_scaff = scaffs[0];
+	# 	tmpfile = open(tmpfiles[last_scaff], "w");
+	# 	file_num = 1;
+	# 	with open(infilename, "r") as infile:
+	# 		for line in infile:
+	# 			cur_scaff = line.split("\t")[0];
+	# 			if cur_scaff != last_scaff:
+	# 				tmpfile.close();
+	# 				newoutfile = os.path.join(globs['tmpdir'], last_scaff + "-out.txt");
+	# 				new_files[file_num] = [tmpfiles[last_scaff], reffilename, newoutfile, 1, False, globs];					
+	# 				file_num += 1;
+	# 				tmpfile = open(tmpfiles[cur_scaff], "w");
+	# 			tmpfile.write(line);
+	# 			last_scaff = cur_scaff;
 
-		tmpfile.close();
-		newoutfile = os.path.join(globs['tmpdir'], last_scaff + "-out.txt");
-		new_files[file_num] = [tmpfiles[last_scaff], reffilename, newoutfile, 1, False, globs];	
-
+	# 	tmpfile.close();
+	# 	newoutfile = os.path.join(globs['tmpdir'], last_scaff + "-out.txt");
+	# 	new_files[file_num] = [tmpfiles[last_scaff], reffilename, newoutfile, start_pos, False, globs];
+	sys.exit();
 	return new_files;
