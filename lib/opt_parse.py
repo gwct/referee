@@ -54,14 +54,14 @@ def optParse(globs):
 		RC.printWrite(globs['logfilename'], globs['log-v'], "# --mapped : Only calculating scores for positions with reads mapped to them.");
 	else:
 		RC.printWrite(globs['logfilename'], globs['log-v'], "# Calculating scores for every reference position specified.");
-	# Checking the fastq option.
+	# Checking the mapped option.
 
 	if args.correct_flag:
 		if args.score_cutoff and not args.score_cutoff.isdigit():
 			RC.errorOut(2, "-c must be an integer value greater than 1.", globs);
 		elif args.score_cutoff:
 			globs['correct-cutoff'] = int(args.score_cutoff);
-		RC.printWrite(globs['logfilename'], globs['log-v'], "# --correct : Suggesting higher scoring alternative base when reference scores below: " + str(globs.correct_cutoff) +".");
+		RC.printWrite(globs['logfilename'], globs['log-v'], "# --correct : Suggesting higher scoring alternative base when reference scores below: " + str(globs['correct-cutoff']) +".");
 		globs['correct-opt'] = True;
 	# Checking the correct option.
 
@@ -69,8 +69,7 @@ def optParse(globs):
 		import psutil
 		globs['stats'] = True;
 		globs['pids'] = [psutil.Process(os.getpid())];		
-		globs['progstarttime'] = RC.report_stats(globs, stat_start=True);
-		globs['stepstarttime'] = globs['progstarttime'];
+		step_start_time = RC.report_stats(globs, stat_start=True);
 	# Initializing if --stats is set.
 
 	if args.debug_opt:
@@ -81,80 +80,83 @@ def optParse(globs):
 	# Parse debug and stats options. Note: debug only compatible with tab delimited output.
 
 	if globs['stats']:
-		globs['stepstartime'] = RC.report_stats(globs, "Get scaff lengths");
-	globs['scaff-lens'] = RC.getScaffLens(args.ref_file);
+		step_start_time = RC.report_stats(globs, "Index ref fasta", step_start=step_start_time);
+	if not args.ref_file:
+		RC.errorOut(2, "A reference genome in FASTA format must be provided with -ref", globs);
+	elif not os.path.isfile(args.ref_file):
+		RC.errorOut(2, "Cannot find reference genome FASTA file: " + args.ref_file, globs);
+	else:
+		globs['reffile'] = args.ref_file;
+		try:
+			globs['ref'] = SeqIO.index(globs['reffile'], "fasta");
+		except:
+			RC.errorOut(3, "Cannot index reference genome as a FASTA file.", globs);
+	# Check and read the reference genome file.
+
+	if globs['stats']:
+		step_start_time  = RC.report_stats(globs, "Get scaff lengths", step_start=step_start_time);
+	globs['scaff-lens'] = RC.getScaffLens(globs['reffile']);
+	# Get the scaffold lengths.
 
 	file_paths, file_num = {}, 1;
 
-	if not args.input_list and (not args.gl_file and not args.ref_file):
-		RC.errorOut(3, "No input method specified. Make sure one input method (either just -i or both -gl and -ref) is specified.", globs);
-	# Make sure at least one input method has been specified (either -i or -gl + -ref).
+	if not args.input_list and not args.gl_file:
+		RC.errorOut(3, "No input method specified. Make sure one input method (either just -i or -gl) is specified.", globs);
+	# Make sure at least one input method has been specified (either -i or -gl).
 
 	if args.input_list:
 	# If the input method is -i
-		if args.gl_file or args.ref_file:
-			RC.errorOut(4, "With -i specified, -gl and -ref should not be specified.", globs);
+		if args.gl_file:
+			RC.errorOut(4, "With -i specified, -gl should not be specified.", globs);
 		if not os.path.isfile(args.input_list):
 			RC.errorOut(5, "Cannot find file specified by -i.", globs);
 		# Make sure only -i is specified and that we can find the file.
 
 		if not args.out_dest:
-			outdir = "referee-out-" + globs['startdatetime'];
+			globs['out'] = "referee-out-" + globs['startdatetime'];
 		else:
-			outdir = args.out_dest;
-		if not os.path.isdir(outdir):
-			RC.printWrite(globs['logfilename'], globs['log-v'], "+ Making output directory: " + outdir);
-			os.system("mkdir \"" + outdir + "\"");
+			globs['out'] = args.out_dest;
+		if not os.path.isdir(globs['out']):
+			RC.printWrite(globs['logfilename'], globs['log-v'], "+ Making output directory: " + globs['out']);
+			os.system("mkdir \"" + globs['out'] + "\"");
 		# Specifiy and create the output directory, if necessary.
 
 		for line in open(args.input_list):
 			if line.strip():
 				continue;
-			tmpline = line.strip().split("\t");
-			if len(line) == 2:
-				cur_gl_file, cur_ref_file = tmpline;
-			else:
-				RC.errorOut(5, "Could not read the following line of the input file: " + line, globs);
+			cur_gl_file = line.strip();
 
-			if not os.path.isfile(cur_gl_file) or not os.path.isfile(cur_ref_file):
-				RC.errorOut(6, "Invalid file path found in input file on following line: " + line.strip(), globs);
-			if not SeqIO.parse(cur_ref_file, "fasta"):
-				RC.errorOut(7, "Cannot read the following as FASTA file: " + cur_ref_file, globs);
-			cur_outfile = cur_gl_file + "-referee-out" + out_ext;
+			if not os.path.isfile(cur_gl_file):
+				RC.errorOut(6, "Invalid file path found in input file: " + cur_gl_file, globs);
+			cur_outfile = os.path.join(globs['out'], cur_gl_file + "-referee-out" + out_ext);
 
 			if globs['stats']:
-				globs['stepstartime'] = RC.report_stats(globs, "Get scaff ids");
-			file_paths[file_num] = { 'in' : cur_gl_file, 'ref' : cur_ref_file, 'out' : cur_outfile,
+				step_start_time  = RC.report_stats(globs, "Get scaff ids", step_start=step_start_time);
+			file_paths[file_num] = { 'in' : cur_gl_file, 'out' : cur_outfile,
 										'scaffs' : RC.getScaffs(cur_gl_file), 'start' : False, 'stop' : False };
 		# Read the input file and get all the file paths. Also specify output file paths.
 
 	else:
-	# If the input method is -gl and -ref
-		if not os.path.isfile(args.ref_file):
-			RC.errorOut(8, "Cannot find reference genome file specified by -ref.", globs);
-		if not SeqIO.parse(args.ref_file, "fasta"):
-			RC.errorOut(9, "Cannot read file specified by -ref as FASTA file.", globs);
-		# Check if the reference file is a valid FASTA file.
-
+	# If the input method is -gl
 		if not os.path.isfile(args.gl_file):
 			RC.errorOut(10, "Cannot find genotype likelihood file specified by -gl.", globs);
 		# Check if the genotype likelihood file is a valid file.
 
 		if not args.out_dest:
-			outfile = "referee-out-" + globs['startdatetime'] + out_ext;
+			globs['out'] = "referee-out-" + globs['startdatetime'] + out_ext;
 		else:
-			outfile = args.out_dest;
+			globs['out'] = args.out_dest;
 		# Specify the output file.
 
 		if globs['stats']:
-			globs['stepstartime'] = RC.report_stats(globs, "Get scaff ids");
-		file_paths[file_num] = { 'in' : args.gl_file, 'ref' : args.ref_file, 'out' : outfile,
+			step_start_time  = RC.report_stats(globs, "Get scaff ids", step_start=step_start_time);
+		file_paths[file_num] = { 'in' : args.gl_file, 'out' : globs['out'],
 								'scaffs' : RC.getScaffs(args.gl_file), 'start' : False, 'stop' : False };
 	# Get the file paths for the current files.
 
 	for i in file_paths:
 		file_paths[i]['globs'] = globs;
-	return file_paths;
+	return file_paths, globs, step_start_time ;
 
 #############################################################################
 

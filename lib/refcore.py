@@ -99,23 +99,23 @@ def printWrite(o_name, v, o_line1, o_line2="", pad=0):
 
 #############################################################################
 
-def report_stats(globs, msg="", stat_start=False, stat_end=False):
+def report_stats(globs, msg="", step_start=0, stat_start=False, stat_end=False):
 	import timeit, psutil
 	cur_time = timeit.default_timer();
 	if stat_start:
+		globs['progstarttime'] = cur_time;
 		printWrite(globs['logfilename'], globs['log-v'], "# --stats : Reporting Referee time and memory usage.");
 		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 120);
-		printWrite(globs['logfilename'], globs['log-v'], "# Step" + " " * 15 + "Step time (sec)" + " " * 6 + "Elapsed time (sec)" + " " * 4 + "Current mem usage (MB)" + " " * 4 + "Virtual mem usage (MB)");
+		printWrite(globs['logfilename'], globs['log-v'], "# Step" + " " * 15 + "Time since prev (sec)" + " " * 6 + "Elapsed time (sec)" + " " * 4 + "Current mem usage (MB)" + " " * 4 + "Virtual mem usage (MB)");
 		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 120);
 	else:
 		prog_elapsed = cur_time - globs['progstarttime'];
-		step_elapsed = cur_time - globs['stepstarttime'];
+		step_elapsed = cur_time - step_start;
 		mem = sum([p.memory_info()[0] for p in globs['pids']]) / float(2 ** 20);
 		vmem = sum([p.memory_info()[1] for p in globs['pids']]) / float(2 ** 20);
-		printWrite(globs['logfilename'], globs['log-v'], "# " + msg + " " * (19-len(msg)) + str(step_elapsed) + " " * (21-len(str(step_elapsed))) + str(prog_elapsed) + " " * (22-len(str(prog_elapsed))) + str(mem) + " " * (26-len(str(mem))) + str(vmem));
+		printWrite(globs['logfilename'], globs['log-v'], "# " + msg + " " * (19-len(msg)) + str(step_elapsed) + " " * (27-len(str(step_elapsed))) + str(prog_elapsed) + " " * (22-len(str(prog_elapsed))) + str(mem) + " " * (26-len(str(mem))) + str(vmem));
 		if stat_end:
 			printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 120);
-
 	return cur_time;
 
 #############################################################################

@@ -21,7 +21,10 @@ def init():
         'scaff-lens' : {},
         'progstarttime' : 0,
         'stepstarttime' : 0,
-        'pids' : ""
+        'pids' : "",
+        'reffile' : "",
+        'ref' : "",
+        'out' : ""
     }
 
     globs['logfilename'] = "referee-" + globs['startdatetime'] + ".log";
