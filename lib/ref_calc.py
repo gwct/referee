@@ -123,3 +123,50 @@ def correctRef(max_score, ref, gls):
     else:
         return max_base, str(round(max_score));
 #############################################################################
+
+def refCalc2(line, scaff_pos, last_scaff, first, ref_file, globs):
+    genotypes = ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"];
+    
+    outlines = [];
+    line = line.strip().split("\t");
+    scaff, pos, gl_list = line[0], int(line[1]), line[2:];
+
+    seq, seqlen = RC.getFastaInfo(ref_file, scaff);
+
+    cor_ref, cor_score = "NA", "NA";
+
+    if last_scaff != scaff and not globs['mapped']:
+        outlines += unmappedPos(scaff_pos, seqlen, last_scaff, seq);
+
+        
+        scaff_pos, scaff_pos, stop = 1, 1, seqlen;
+
+    if not globs['mapped'] and scaff_pos != pos:
+        outlines += unmappedPos(scaff_pos, pos, scaff, seq);
+
+    gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
+    # Parse the info from the current line -- scaffold, position, genotype likelihoods.
+
+    ref = seq[pos-1];
+    # Gets the called reference base at the current position.
+
+    rq, lr, l_match, l_mismatch = calcScore(ref, gls);
+    # Call the scoring function.
+
+    if globs['correct-opt']:
+        cor_ref, cor_score = correctRef(rq, ref, gls); 
+
+    outlines += [scaff, pos, ref, rq, lr, l_match, l_mismatch, gls, cor_ref, cor_score];
+
+    return outlines;
+
+#############################################################################
+
+def unmappedPos(cur_pos, stop_pos, scaff, seq):
+    outinfo = [];
+    while cur_pos <= stop_pos:
+        cur_ref = seq[cur_pos-1];
+        outinfo.append(scaff, cur_pos, cur_ref, -2, "NA", "NA", "NA", "NA", "NA", "NA");
+    return outinfo;
+
+#############################################################################

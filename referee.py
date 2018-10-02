@@ -18,30 +18,37 @@ except:
 #############################################################################
 
 def referee(globs):
-	files = OP.optParse(globs);
+	files, globs = OP.optParse(globs);
 	# Getting the input parameters from optParse.
 
-	if globs['num-procs'] == 1:
-		if globs['stats']:
-			globs['stepstartime'] = RC.report_stats(globs, "Calculating scores");
-		for f in files.iteritems():
-			CALC.refCalc(f);
-	# A serial version.
-	else:
-		if len(files) == 1:
-			if globs['stats']:
-				globs['stepstartime'] = RC.report_stats(globs, "Splitting files");
-			files = OP.multiPrep(files);
-		pool = mp.Pool(processes = globs['num-procs']);
-		
-		if globs['stats']:
-			globs['stepstartime'] = RC.report_stats(globs, "Calculating scores");
-			for result in pool.imap_unordered(RC.getSubPID, range(globs['num-procs'])):
-				globs['pids'].append(result);
+	for file_num in files:
+		if globs['num-procs'] == 1:
+			start, last_scaff, first = 1, "", True;
+			for line in open(files[file_num]['in']):
+				result = RC.refCalc2(line, start, last_scaff, first, files[file_num]['ref'], globs);
 
-		for result in pool.imap_unordered(CALC.refCalc, files.iteritems()):
-			continue;
-	# The parallel version
+
+	# if globs['num-procs'] == 1:
+	# 	if globs['stats']:
+	# 		globs['stepstartime'] = RC.report_stats(globs, "Calculating scores");
+	# 	for f in files.iteritems():
+	# 		CALC.refCalc(f);
+	# # A serial version.
+	# else:
+	# 	if len(files) == 1:
+	# 		if globs['stats']:
+	# 			globs['stepstartime'] = RC.report_stats(globs, "Splitting files");
+	# 		files = OP.multiPrep(files);
+	# 	pool = mp.Pool(processes = globs['num-procs']);
+
+	# 	if globs['stats']:
+	# 		globs['stepstartime'] = RC.report_stats(globs, "Calculating scores");
+	# 		for result in pool.imap_unordered(RC.getSubPID, range(globs['num-procs'])):
+	# 			globs['pids'].append(result);
+
+	# 	for result in pool.imap_unordered(CALC.refCalc, files.iteritems()):
+	# 		continue;
+	# # The parallel version
 
 	if globs['stats']:
 		globs['stepstartime'] = RC.report_stats(globs, "End program", stat_end=True);
