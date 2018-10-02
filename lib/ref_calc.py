@@ -33,7 +33,9 @@ def calcScore(ref, gls):
     return score, lr, l_match, l_mismatch;
 #############################################################################
 def refCalc(file_item):
-    gl_file, ref_file, outfilename, scaffs, globs = file_item[1];
+    gl_file, ref_file, outfilename = file_item[1]['in'], file_item[1]['ref'], file_item[1]['out'];
+    scaffs, start, stop = file_item[1]['scaffs'], file_item[1]['start'], file_item[1]['stop'];
+    globs = file_item[1]['globs'];
 
     genotypes = ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"]
     last_scaff, cor_ref, cor_score, scaff_pos = "", "", "", 1;
@@ -54,6 +56,14 @@ def refCalc(file_item):
             line = line.strip().split("\t");
             scaff, pos, gl_list = line[0], int(line[1]), line[2:];
 
+            if start:
+                start_scaff, start_pos = start;
+                if start_scaff == scaff and pos < start_pos:
+                    continue;
+
+            if stop:
+                stop_scaff, stop_pos = stop;
+
             if scaff != last_scaff:
                 seq, seqlen = RC.getFastaInfo(ref_file, scaff);
             last_scaff = scaff;
@@ -67,12 +77,13 @@ def refCalc(file_item):
                     else:
                         OUT.outputTab(outfile, scaff, str(scaff_pos), scaff_ref, -2, "NA", "NA", "NA", "NA", globs, cor_base=cor_ref, cor_score=cor_score);
                     scaff_pos += 1;
-                    if scaff_pos == seqlen:
+
+                    if stop and stop_scaff == scaff and scaff_pos == stop_pos:
                         break;
             # If the current position has skipped ahead from where we are in the scaffold, that means there are
             # intervening positions with no reads mapped. This fills in those scores as -2.
 
-            if scaff_pos == seqlen:
+            if stop and stop_scaff == scaff and scaff_pos == stop_pos:
                 break;
 
             gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };

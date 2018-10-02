@@ -124,7 +124,8 @@ def optParse(globs):
 
 			if globs['stats']:
 				globs['stepstartime'] = RC.report_stats(globs, "Get scaff ids");
-			file_paths[file_num] = [cur_gl_file, cur_ref_file, cur_outfile, RC.getScaffs(cur_gl_file)];
+			file_paths[file_num] = { 'in' : cur_gl_file, 'ref' : cur_ref_file, 'out' : cur_outfile,
+										'scaffs' : RC.getScaffs(cur_gl_file), 'start' : False, 'stop' : False };
 		# Read the input file and get all the file paths. Also specify output file paths.
 
 	else:
@@ -147,10 +148,12 @@ def optParse(globs):
 
 		if globs['stats']:
 			globs['stepstartime'] = RC.report_stats(globs, "Get scaff ids");
-		file_paths[file_num] = [args.gl_file, args.ref_file, outfile, RC.getScaffs(args.gl_file)];
+		file_paths[file_num] = { 'in' : args.gl_file, 'ref' : args.ref_file, 'out' : outfile,
+								'scaffs' : RC.getScaffs(args.gl_file), 'start' : False, 'stop' : False };
 	# Get the file paths for the current files.
 
-	file_paths = { i : file_paths[i] + [globs] for i in file_paths };
+	for i in file_paths:
+		file_paths[i]['globs'] = globs;
 	return file_paths;
 
 #############################################################################
@@ -158,72 +161,69 @@ def optParse(globs):
 def multiPrep(files):
 	import math
 
-	infilename, reffilename, outfilename, scaffs, globs = files[1];
+	file_info = files[1];
+	globs = file_info['globs'];
+	#infilename, reffilename, outfilename, scaffs, globs = files[1];
 	RC.printWrite(globs['logfilename'], globs['log-v'],"+ Making tmp directory: " + globs['tmpdir']);
 	os.system("mkdir " + globs['tmpdir']);
 	# Make the temporary directory to store the split files and split outputs.
 
-	if len(scaffs) == 1:
+	if len(file_info['scaffs']) == 1:
 		new_files = {};
 		tmpfiles = [os.path.join(globs['tmpdir'], str(i) + ".txt") for i in range(globs['num-procs'])];
+		num_pos = RC.getFileLen(file_info['in']);
 
-		num_pos = RC.getNumPos(infilename, globs['scaff-lens'], scaffs, globs['mapped']);
 		pospersplit = int(math.ceil(num_pos / float(globs['num-procs'])));
-		print num_pos, pospersplit;
-		sys.exit();
-		with open(infilename, "r") as infile:
+		with open(file_info['in'], "r") as infile:
 			cur_scaffs = [];
-			file_num, startpos, lastpos, numpos = 0, start_pos, end_pos, 1;
-			endpos = startpos + pospersplit;
-			print startpos, lastpos, endpos;
+			file_num, file_pos = 0, 0;
 			tmpfile = open(tmpfiles[file_num], "w");
 			for line in infile:
-				print tmpfiles[file_num];
 				tmpline = line.strip().split("\t");
 				scaff, pos = tmpline[0], int(tmpline[1]);
 				if scaff not in cur_scaffs:
 					cur_scaffs.append(scaff);
-
 				tmpfile.write(line);
-				curpos = int(line.split("\t")[1]);
-				numpos = numpos + (curpos - lastpos) ;
-				if numpos >= pospersplit:
+				file_pos += 1;
+				if file_pos >= pospersplit:
 					tmpfile.close();
 					newoutfile = os.path.join(globs['tmpdir'], str(file_num) + "-out.txt");
-					new_files[file_num] = [tmpfiles[file_num], reffilename, newoutfile, cur_scaffs, globs];
-					startpos = curpos + 1;
-					numpos = 0;
+					new_files[file_num] = { 'in' : tmpfiles[file_num], 'ref' : file_info['ref'], 'out' : newoutfile, 
+											'scaffs' : cur_scaffs, 'start' : False, 'stop' : False, 'globs' : globs };
+					file_pos = 0;
 					file_num += 1;
 					if file_num != len(tmpfiles):
 						tmpfile = open(tmpfiles[file_num], "w");
-				lastpos = curpos;
 
 		if len(new_files) != len(tmpfiles):
 			tmpfile.close();
 			newoutfile = os.path.join(globs['tmpdir'], str(file_num) + "-out.txt");
-			new_files[file_num] = [tmpfiles[file_num], reffilename, newoutfile, cur_scaffs, globs];
+			new_files[file_num] = { 'in' : tmpfiles[file_num], 'ref' : file_info['ref'], 'out' : newoutfile, 
+									'scaffs' : cur_scaffs, 'start' : False, 'stop' : False, 'globs' : globs };
 
-	# else:
-	# 	new_files = {};
-	# 	tmpfiles = { scaff : os.path.join(globs['tmpdir'], scaff + ".txt") for scaff in scaffs };
+	else:
+		new_files = {};
+		tmpfiles = { scaff : os.path.join(globs['tmpdir'], scaff + ".txt") for scaff in file_info['scaffs'] };
 
-	# 	last_scaff = scaffs[0];
-	# 	tmpfile = open(tmpfiles[last_scaff], "w");
-	# 	file_num = 1;
-	# 	with open(infilename, "r") as infile:
-	# 		for line in infile:
-	# 			cur_scaff = line.split("\t")[0];
-	# 			if cur_scaff != last_scaff:
-	# 				tmpfile.close();
-	# 				newoutfile = os.path.join(globs['tmpdir'], last_scaff + "-out.txt");
-	# 				new_files[file_num] = [tmpfiles[last_scaff], reffilename, newoutfile, 1, False, globs];					
-	# 				file_num += 1;
-	# 				tmpfile = open(tmpfiles[cur_scaff], "w");
-	# 			tmpfile.write(line);
-	# 			last_scaff = cur_scaff;
+		last_scaff = file_info['scaffs'][0];
+		tmpfile = open(tmpfiles[last_scaff], "w");
+		file_num = 1;
+		with open(file_info['in'], "r") as infile:
+			for line in infile:
+				cur_scaff = line.split("\t")[0];
+				if cur_scaff != last_scaff:
+					tmpfile.close();
+					newoutfile = os.path.join(globs['tmpdir'], last_scaff + "-out.txt");
+					new_files[file_num] = { 'in' : tmpfiles[file_num], 'ref' : file_info['ref'], 'out' : newoutfile, 
+											'scaffs' : cur_scaffs, 'start' : False, 'stop' : False, 'globs' : globs };					
+					file_num += 1;
+					tmpfile = open(tmpfiles[cur_scaff], "w");
+				tmpfile.write(line);
+				last_scaff = cur_scaff;
 
-	# 	tmpfile.close();
-	# 	newoutfile = os.path.join(globs['tmpdir'], last_scaff + "-out.txt");
-	# 	new_files[file_num] = [tmpfiles[last_scaff], reffilename, newoutfile, start_pos, False, globs];
-	sys.exit();
+		tmpfile.close();
+		newoutfile = os.path.join(globs['tmpdir'], last_scaff + "-out.txt");
+		new_files[file_num] = { 'in' : tmpfiles[file_num], 'ref' : file_info['ref'], 'out' : newoutfile, 
+								'scaffs' : cur_scaffs, 'start' : False, 'stop' : False, 'globs' : globs };
+
 	return new_files;

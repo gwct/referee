@@ -32,10 +32,13 @@ def referee(globs):
 			if globs['stats']:
 				globs['stepstartime'] = RC.report_stats(globs, "Splitting files");
 			files = OP.multiPrep(files);
-		#print files;
+		pool = mp.Pool(processes = globs['num-procs']);
+		
 		if globs['stats']:
 			globs['stepstartime'] = RC.report_stats(globs, "Calculating scores");
-		pool = mp.Pool(processes = globs['num-procs']);
+			for result in pool.imap_unordered(RC.getSubPID, range(globs['num-procs'])):
+				globs['pids'].append(result);
+
 		for result in pool.imap_unordered(CALC.refCalc, files.iteritems()):
 			continue;
 	# The parallel version
