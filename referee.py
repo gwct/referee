@@ -3,7 +3,7 @@
 # Reference genome quality score annotation
 # This is the main interface.
 #
-# Gregg Thomas
+# Gres Thomagg
 # Fall 2018
 #############################################################################
 
@@ -21,22 +21,45 @@ def referee(globs):
 	files, globs, step_start_time = OP.optParse(globs);
 	# Getting the input parameters from optParse.
 
+	if globs['stats']:
+		step_start_time  = RC.report_stats(globs, "Index ref fasta", step_start=step_start_time);
+	globs['ref'] = RC.fastaReadInd(globs['reffile']);
+	# Index the reference FASTA file.
+
 	for file_num in files:
 		if globs['stats']:
-			step_start_time  = RC.report_stats(globs, "Calc " + str(file_num), step_start=step_start_time);
+			step_start_time  = RC.report_stats(globs, "Calcs " + str(file_num), step_start=step_start_time);
 
-		if globs['fastq']:
-			fq_seq, fq_scores, fq_curlen, fq_lastpos = [], [], 0, 1;
-		# Variables for FASTQ output.
-		with open(files[file_num]['out'], "w") as outfile:
+		with open(files[file_num]['in'], "r") as infile, open(files[file_num]['out'], "w") as outfile:
 			if globs['num-procs'] == 1:
-				for line in open(files[file_num]['in']):
-					outdict = CALC.refCalc2(line, globs);
-					if globs['fastq']:
-						fq_seq, fq_scores, fq_curlen, fq_lastpos = OUT.outputFastq(outdict, outfile, fq_seq, fq_scores, fq_curlen, fq_lastpos, globs);
-					else:
-						OUT.outputTab(outdict, outfile,  globs);
+				for line in infile:
+					outdict = CALC.refCalc2((line, globs));
+					OUT.outputTab(outdict, outfile, globs);
+			# A serial version.
+			else:
+				pool = mp.Pool(processes = globs['num-procs']);
 
+				if globs['stats']:
+					for result in pool.map(RC.getSubPID, range(globs['num-procs'])):
+						globs['pids'].append(result);
+				for outdict in pool.map(CALC.refCalc2, ((line, globs) for line in infile)):
+					OUT.outputTab(outdict, outfile,  globs);
+			# The parallel version.
+		# Do the calculations on each input file.
+
+	if not globs['mapped']:
+		for file_num in files:
+			if globs['stats']:
+				step_start_time  = RC.report_stats(globs, "Add unmapped " + str(file_num), step_start=step_start_time);
+			OUT.addUnmapped(files[file_num], globs);
+
+
+
+		# if globs['fastq']:
+		# 	fq_seq, fq_scores, fq_curlen, fq_lastpos = [], [], 0, 1;
+		# if globs['fastq']:
+		# 	fq_seq, fq_scores, fq_curlen, fq_lastpos = OUT.outputFastq(outdict, outfile, fq_seq, fq_scores, fq_curlen, fq_lastpos, globs);
+		# else:
 
 	# if globs['num-procs'] == 1:
 	# 	if globs['stats']:

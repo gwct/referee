@@ -18,13 +18,12 @@ def init():
         'mapped' : False,
         'stats' : False,
         'debug' : False,
-        'scaff-lens' : {},
         'progstarttime' : 0,
         'stepstarttime' : 0,
         'pids' : "",
         'reffile' : "",
         'ref' : "",
-        'out' : ""
+        'outdir' : ""
     }
 
     globs['logfilename'] = "referee-" + globs['startdatetime'] + ".log";

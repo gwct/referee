@@ -241,8 +241,65 @@ def getNumPos(i_name, scaff_lens, scaffs, mapped):
 
 
 
+#############################################################################
 
+def fastaReadInd(i_name):
+#fastaGetFileInd reads a FASTA file and returns a dictionary containing file indexes for each title
+#and sequence with the key:value format as [title start index]:[sequence start index]
 
+	with open(i_name, "rb") as infile:
+		fasta, first, curlist = {}, False, [];
+		line = "derp";
+
+		while line != '':
+			line = infile.readline();
+			if line[:1] == '>':
+				if first:
+					curseqend = infile.tell() - len(line) - 1;
+					curlist.append(curseqend);
+					fasta[cur_title] = curlist;
+					#indList.append(curlist);
+					curlist = [];
+
+				cur_title = line[1:].strip();
+				curtitlestart = infile.tell() - len(line);
+				curtitleend = infile.tell() - 1;
+				curseqstart = infile.tell();
+
+				curlist.append(curtitlestart);
+				curlist.append(curtitleend);
+				curlist.append(curseqstart);
+
+				first = True;
+
+		curseqend = infile.tell() - len(line) - 1;
+		curlist.append(curseqend);
+		#indList.append(curlist);
+		fasta[cur_title] = curlist;
+
+	return fasta;
+		
+#############################################################################
+
+def fastaGet(i_name, inds):
+#This takes the file index for a corresponding FASTA title and sequence (as retrieved by
+#fastaGetFileInd and returns the actual text of the title and the sequence.
+
+	titlestart, titleend, seqstart, seqend = inds;
+
+	with open(i_name, "rb") as infile:
+		infile.seek(titlestart);
+		title = infile.read(titleend - titlestart);
+
+		infile.seek(seqstart);
+		seq = infile.read(seqend - seqstart);
+
+	title = title.replace("\n", "");
+	seq = seq.replace("\n", "");
+
+	return title, seq;
+
+#############################################################################
 
 
 

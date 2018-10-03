@@ -124,7 +124,8 @@ def correctRef(max_score, ref, gls):
         return max_base, str(round(max_score));
 #############################################################################
 
-def refCalc2(line, globs):
+def refCalc2(line_item):
+    line, globs = line_item;
     genotypes = ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"];
 
     line = line.strip().split("\t");
@@ -135,7 +136,9 @@ def refCalc2(line, globs):
     gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
     # Parse the info from the current line -- scaffold, position, genotype likelihoods.
 
-    ref = globs['ref'][scaff].seq[pos-1];
+
+    ref = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1][pos-1];
+    #ref = ref_ind[scaff].seq[pos-1];
     # Gets the called reference base at the current position.
 
     rq, lr, l_match, l_mismatch = calcScore(ref, gls);
@@ -160,3 +163,10 @@ def unmappedPos(cur_pos, stop_pos, scaff, seq):
     return outinfo;
 
 #############################################################################
+def testFunc2(x):
+    return 3;
+
+def testFunc(it):
+    x, c = it;
+    y = testFunc2(x)
+    return {1 : x, 2 : c, 3 : y};
