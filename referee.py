@@ -52,6 +52,8 @@ def referee(globs):
 			if globs['stats']:
 				step_start_time  = RC.report_stats(globs, "Add unmapped " + str(file_num), step_start=step_start_time);
 			OUT.addUnmapped(files[file_num], globs);
+			RC.printWrite(globs['logfilename'], globs['log-v'], "+ Renaming tmp file to output file: " + files[file_num]['tmpfile'] + " -> " + files[file_num]['out']);
+			os.rename(files[file_num]['tmpfile'], files[file_num]['out']);
 
 
 

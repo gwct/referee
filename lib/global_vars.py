@@ -13,7 +13,7 @@ def init():
         'fastq' : False,
         'fastq-len' : 100,
         'correct-opt' : False,
-        'correct-cutoff' : 1,
+        #'correct-cutoff' : 1,
         'log-v' : 1,
         'mapped' : False,
         'stats' : False,
@@ -26,7 +26,6 @@ def init():
         'outdir' : ""
     }
 
-    globs['logfilename'] = "referee-" + globs['startdatetime'] + ".log";
-    globs['tmpdir'] = "referee.tmp." + globs['startdatetime'];
+    globs['logfilename'] = "referee-log-" + globs['startdatetime'] + ".log";
 
     return globs;

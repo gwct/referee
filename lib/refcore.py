@@ -272,7 +272,8 @@ def fastaReadInd(i_name):
 
 				first = True;
 
-		curseqend = infile.tell() - len(line) - 1;
+		curseqend = infile.tell() - len(line);# - 1;
+		# CHECK THAT LAST BASE WITH - 1 ON WINDOWS.
 		curlist.append(curseqend);
 		#indList.append(curlist);
 		fasta[cur_title] = curlist;

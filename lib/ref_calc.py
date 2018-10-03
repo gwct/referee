@@ -121,7 +121,7 @@ def correctRef(max_score, ref, gls):
     if max_base == ref:
         return "", "";
     else:
-        return max_base, str(round(max_score));
+        return max_base, max_score;
 #############################################################################
 
 def refCalc2(line_item):
@@ -136,20 +136,27 @@ def refCalc2(line_item):
     gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
     # Parse the info from the current line -- scaffold, position, genotype likelihoods.
 
-
+    print pos, len(RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1]), globs['reffile']
+    
+    print RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1]
+    print RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1][pos-1];
     ref = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1][pos-1];
+
+
     #ref = ref_ind[scaff].seq[pos-1];
     # Gets the called reference base at the current position.
 
     rq, lr, l_match, l_mismatch = calcScore(ref, gls);
     # Call the scoring function.
 
-    if globs['correct-opt']:
-        cor_ref, cor_score = correctRef(rq, ref, gls); 
+    if globs['correct-opt'] and rq in [0,-1,-3]:
+        cor_ref, cor_score = correctRef(rq, ref, gls);
+    # With --correct, suggest a better/corrected reference base if the score is negative (0), the reference is undetermined (-1), or no reads support the matching base (-3)
 
     outdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : ref, 'rq' : rq, 'lr' : lr,  
                 'l_match' : l_match, 'l_mismatch' : l_mismatch, 'gls' : gls, 
                 'cor_ref' : cor_ref, 'cor_score' : cor_score };
+    # Store the info from the current site to be written once returned.
 
     return outdict;
 

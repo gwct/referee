@@ -16,7 +16,7 @@ def optParse(globs):
 	parser.add_argument("-gl", dest="gl_file", help="The file containing the genotype likelihood calculations.", default=False);
 	parser.add_argument("-i", dest="input_list", help="A file containing the paths to multiple input files containing genotype likelihoods and their reference FASTA files. Each line should contain one genotype likelihood file path and one FASTA file path separated by a tab.", default=False);
 	# Inputs
-	parser.add_argument("-o", dest="out_dest", help="A name for the output location. If input is specified with -ref and -gl, this will be the name of a single file. If input is specified by -i, this will be the name of a directory which will be made for you. Default: referee-out-[date]-[time]", default=False);
+	parser.add_argument("-o", dest="out_dest", help="A PREFIX name for the output files/directories. Default: referee-out-[date]-[time]", default=False);
 	# Output
 	parser.add_argument("--fastq", dest="fastq_flag", help="Set this option to output in FASTQ format instead of the default tab delimited format.", action="store_true", default=False);
 	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score below a cut-off set by -c.", action="store_true", default=False);
@@ -24,7 +24,7 @@ def optParse(globs):
 	# User options	
 	#parser.add_argument("-s", dest="startpos", help="Set the starting position for the input file(s). Default: 1", default=False);
 	#parser.add_argument("-e", dest="endpos", help="Set the end position for the input file(s). Default: last position in assembly/scaffold", default=False);
-	parser.add_argument("-c", dest="score_cutoff", help="The cut-off score for --correct. Sites that score below this cut-off will have an alternate reference base suggested. If --correct isn't set, this option is ignored. Default: 1", default=False);
+	#parser.add_argument("-c", dest="score_cutoff", help="The cut-off score for --correct. Sites that score below this cut-off will have an alternate reference base suggested. If --correct isn't set, this option is ignored. Default: 1", default=False);
 	parser.add_argument("-p", dest="processes", help="The number of processes Referee should use. Not that 1 process is always reserved for the main script, so to see any benefit you must enter 3 or above. Default: 1.", default=False);
 	# User params
 	parser.add_argument("--stats", dest="stats_opt", help=argparse.SUPPRESS, action="store_true", default=False);
@@ -59,11 +59,7 @@ def optParse(globs):
 	# Checking the mapped option.
 
 	if args.correct_flag:
-		if args.score_cutoff and not args.score_cutoff.isdigit():
-			RC.errorOut(2, "-c must be an integer value greater than 1.", globs);
-		elif args.score_cutoff:
-			globs['correct-cutoff'] = int(args.score_cutoff);
-		RC.printWrite(globs['logfilename'], globs['log-v'], "# --correct : Suggesting higher scoring alternative base when reference scores below: " + str(globs['correct-cutoff']) +".");
+		RC.printWrite(globs['logfilename'], globs['log-v'], "# --correct : Suggesting higher scoring alternative base when reference score is negative or reference base is N.");
 		globs['correct-opt'] = True;
 	# Checking the correct option.
 
@@ -125,7 +121,7 @@ def optParse(globs):
 
 			if globs['stats']:
 				step_start_time  = RC.report_stats(globs, "Get scaff ids", step_start=step_start_time);
-			file_paths[file_num] = { 'in' : cur_gl_file, 'out' : cur_outfiletab, 'outtmp' : cur_outfiletmp, 'outfq' : cur_outfilefq };
+			file_paths[file_num] = { 'in' : cur_gl_file, 'out' : cur_outfiletab, 'tmpfile' : cur_outfiletmp, 'outfq' : cur_outfilefq };
 			file_num += 1;
 		# Read the input file and get all the file paths. Also specify output file paths.
 
