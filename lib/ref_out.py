@@ -38,7 +38,7 @@ def outputTab(outdict, outfile, globs):
                 if outdict['gls'][gt] > max_gl:
                     max_gt = gt;
                     max_gl = outdict['gls'][gt];
-        outline += [str(outdict['lr']), str(outdict['l_match']), str(outdict['l_mismatch']), str(outdict['ref']), max_gt, max_gl];
+        outline += [str(outdict['lr']), str(outdict['l_match']), str(outdict['l_mismatch']), str(outdict['ref']), max_gt, str(max_gl)];
     # Add the extra columns if --allcalcs.
 
     if globs['correct-opt']:
