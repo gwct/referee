@@ -29,7 +29,7 @@ def referee(globs):
 		# Step update for --stats.
 
 		try:
-			gzip_check = gzip.open(i_name).read(1);
+			gzip_check = gzip.open(files[file_num]['in']).read(1);
 			reader = gzip.open;
 		except:
 			reader = open;
