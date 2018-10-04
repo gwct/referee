@@ -8,7 +8,6 @@ from __future__ import print_function
 #############################################################################
 
 import sys, os, timeit, subprocess, datetime, time, opt_parse as OP, gzip
-from Bio import SeqIO
 
 #############################################################################
 

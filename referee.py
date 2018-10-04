@@ -7,7 +7,7 @@
 # Fall 2018
 #############################################################################
 
-import sys, os, multiprocessing as mp, shutil, lib.refcore as RC, lib.ref_calc as CALC, \
+import sys, os, multiprocessing as mp, shutil, gzip, lib.refcore as RC, lib.ref_calc as CALC, \
 	lib.opt_parse as OP, lib.ref_out as OUT, lib.global_vars as GV
 
 #############################################################################
@@ -28,7 +28,14 @@ def referee(globs):
 			step_start_time  = RC.report_stats(globs, "Calcs " + str(file_num), step_start=step_start_time);
 		# Step update for --stats.
 
-		with open(files[file_num]['in'], "r") as infile, open(files[file_num]['out'], "w") as outfile:
+		try:
+			gzip_check = gzip.open(i_name).read(1);
+			reader = gzip.open;
+		except:
+			reader = open;
+		# Check if the genotype likelihood file is gzipped, and if so set gzip as the file reader. Otherwise, read as a normal text file.
+
+		with reader(files[file_num]['in'], "r") as infile, open(files[file_num]['out'], "w") as outfile:
 			if globs['num-procs'] == 1:
 				for line in infile:
 					outdict = CALC.refCalc((line, globs));
