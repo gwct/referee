@@ -21,8 +21,6 @@ def referee(globs):
 	globs['ref'] = RC.fastaReadInd(globs['reffile']);
 	# Index the reference FASTA file.
 
-	print files;
-
 	for file_num in files:
 	# Do calculations for each file in the files dictionary. If input mode is -gl this is just a single 
 	# file. If input mode is -i this should be multiple files.
