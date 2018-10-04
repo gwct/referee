@@ -1,5 +1,5 @@
 # This file holds some global variables for some of the input options.
-# Global variables are exclusively read only.
+# Global variables are exclusively read only -- they are not modified anywhere else in the code.
 
 import timeit, refcore as RC
 
@@ -17,7 +17,7 @@ def init():
         'log-v' : 1,
         'mapped' : False,
         'stats' : False,
-        'debug' : False,
+        'allcalc' : False,
         'progstarttime' : 0,
         'stepstarttime' : 0,
         'pids' : "",
