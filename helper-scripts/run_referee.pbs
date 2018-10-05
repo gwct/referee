@@ -7,7 +7,7 @@
 #PBS -j oe
 
 #module load r/3.4.4
-cd /N/u/grthomas/bin/referee/
+cd /N/u/grthomas/Carbonate/bin/referee/
 time -p python referee.py -gl /N/dc2/scratch/grthomas/qtip/angsd-doglf4/angsdput.glf.gz -ref data/rpgc_assembly.fasta --stats -o ref-test-1
 #Rscript qtip_scores.r
 
