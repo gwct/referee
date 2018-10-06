@@ -55,9 +55,9 @@ def referee(globs):
 				pool = mp.Pool(processes = globs['num-procs']);
 
 				if globs['stats']:
-					for result in pool.map(RC.getSubPID, range(globs['num-procs'])):
+					for result in pool.imap(RC.getSubPID, range(globs['num-procs'])):
 						globs['pids'].append(result);
-				for outdict in pool.map(CALC.refCalc, ((line, globs) for line in infile)):
+				for outdict in pool.imap(CALC.refCalc, ((line, globs) for line in infile)):
 					OUT.outputTab(outdict, outfile,  globs);
 					if globs['stats']:
 						line_start_time = RC.report_stats(globs, outdict['scaff'] + "-" + str(outdict['pos']), line_start_time);
