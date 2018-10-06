@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -k o
-#PBS -l nodes=1:ppn=1,walltime=4:00:00,vmem=48GB
+#PBS -l nodes=1:ppn=3,walltime=4:00:00,vmem=48GB
 #PBS -M grthomas@indiana.edu
 #PBS -m abe
 #PBS -N referee-tests
@@ -9,7 +9,7 @@
 module load biopython/1.70
 #module load r/3.4.4
 cd /N/u/grthomas/Carbonate/bin/referee/
-time -p python referee.py -gl /N/dc2/scratch/grthomas/qtip/angsd-doglf4/angsdput.glf.gz -ref data/rpgc_assembly.fasta --stats -o ref-test-2 -f 3 -p 2
+time -p python referee.py -gl /N/dc2/scratch/grthomas/qtip/angsd-doglf4/angsdput.glf.gz -ref data/rpgc_assembly.fasta -o ref-test-2 -f 3 -p 2
 #Rscript qtip_scores.r
 
 #awk -v max=0 -v l=1 '{if($3>max&&$3!=9999){l=$0; max=$3}}END{print l} ' qtip-returns.txt

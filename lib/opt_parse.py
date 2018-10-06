@@ -87,6 +87,8 @@ def optParse(globs):
 		globs['stats'] = True;
 		globs['pids'] = [psutil.Process(os.getpid())];		
 		step_start_time = RC.report_stats(globs, stat_start=True);
+	else:
+		step_start_time = False;
 	# Initializing the stats options if --stats is set.
 
 	if args.allcalc_opt:
@@ -154,6 +156,6 @@ def optParse(globs):
 		file_paths[file_num] = { 'in' : args.gl_file, 'out' : outfiletab, 'tmpfile' : outfiletmp, 'outfq' : outfilefq };
 	# Get the file paths for the current files.
 
-	return file_paths, globs, step_start_time ;
+	return file_paths, globs, step_start_time
 
 #############################################################################
