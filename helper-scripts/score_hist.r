@@ -10,15 +10,21 @@ cat("----------\n")
 
 args = commandArgs(trailingOnly=TRUE)
 # Command line entry of input files
-print(args)
-#this.dir <- dirname(parent.frame(2)$ofile)
-#setwd(this.dir)
-#args = c("../ref-out.txt", "../data/pileup-snippet.txt")
+
+
+this.dir <- dirname(parent.frame(2)$ofile)
+setwd(this.dir)
+args = c("../ref-out.txt", T, "../data/pileup-snippet.txt")
 # Manual entry of input files
 
-if(!length(args) %in% c(1,2) || "-h" %in% args){
-  stop("\n\nUsage: Rscript [referee tabbed output file (required)] [genome pileup file (optional)] [-h]\n\n")
+if(!length(args) %in% c(1,2,3) || "-h" %in% args){
+  stop("\n\nUsage: Rscript [referee tabbed output file (required)] [barplot opt (T/F - Default: F)] [genome pileup file (optional)] [-h]\n\n")
 }
+
+outdir = paste(basename(tools::file_path_sans_ext(args[1])), "-plots", sep="")
+dir.create(file.path(getwd(), outdir))
+
+print(args)
 
 in_data = read.table(args[1], header=F)
 if(length(in_data[1,])==3){
@@ -31,8 +37,12 @@ if(length(in_data[1,])==3){
   names(in_data) = c("scaff", "pos", "score", "lr", "l.match", "l.mismatch", "ref", "max.gt", "max.gl", "core.base", "core.score")
 }
 
-if(length(args)==2){
-  pileup_data = read.table(args[2], header=F)
+if(length(args>=2)){
+  barp = args[2]
+}
+
+if(length(args)==3){
+  pileup_data = read.table(args[3], header=F)
   names(pileup_data) = c("scaff", "pos", "base", "depth")
 }
   
@@ -63,10 +73,10 @@ score_p = ggplot(in_data, aes(x=score)) +
         legend.position="none"
   )
 
-outfile = paste(args[1], "-score-hist.png")
+outfile = paste(outdir, "/score-hist.png", sep="")
 ggsave(file=outfile, score_p, width=8, height=6, units="in")
 
-if(length(args)==2){
+if(length(args)==3){
   in_combo = merge(in_data, pileup_data, by=c("scaff", "pos"))
   depth_p = ggplot(in_combo, aes(x=score, y=depth)) +
     geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
@@ -83,6 +93,30 @@ if(length(args)==2){
           legend.position="none"
     )
   
-  outfile = paste(args[1], "-score-v-depth.png")
+  outfile = paste(outdir, "/score-v-depth.png", sep="")
   ggsave(file=outfile, depth_p, width=8, height=6, units="in")
+}
+
+if(barp){
+  scaff_scores = split(in_data, in_data[,"scaff"])
+  for(df in scaff_scores){
+    bar_p = ggplot(df, aes(x=pos, y=score)) +
+      geom_bar(stat="identity") +
+      labs(x="Position", y="Referee score") +
+      theme_classic() +
+      theme(axis.text=element_text(size=10), 
+            axis.title=element_text(size=12), 
+            axis.title.y=element_text(margin=margin(t=0,r=20,b=0,l=0),color="black"), 
+            axis.title.x=element_text(margin=margin(t=20,r=0,b=0,l=0),color="black"),
+            axis.line=element_line(colour='#595959',size=0.75),
+            axis.ticks=element_line(colour="#595959",size = 1),
+            axis.ticks.length=unit(0.2,"cm"),
+            legend.position="none"
+      )
+    
+    outfile = paste(outdir, "/", df[1,1], "-scores.png", sep="")
+    print(outfile)
+    ggsave(file=outfile, bar_p, width=8, height=6, units="in")
+  }
+  
 }

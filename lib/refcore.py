@@ -174,11 +174,31 @@ def fastaGet(i_name, inds):
 
 #############################################################################
 
+def fastaRead(i_name, globs):
+	import gzip
 
+	try:
+		gzip_check = gzip.open(i_name).read(1);
+		reader = gzip.open;
+	except:
+		reader = open;
+	# Check if the reference file is gzipped, and if so set gzip as the file reader. Otherwise, read as a normal text file.
 
+	seqdict = {};
+	for line in reader(i_name):
+		line = line.strip();
+		if line[0] == '>':
+			curkey = line[1:];
+			seqdict[curkey] = "";
+		else:
+			seqdict[curkey] = seqdict[curkey] + line;
 
+	if len(seqdict) == 0:
+		errorOut(10, "Failed to read reference genome as FASTA file.", globs);
+	else:
+		return seqdict;
 
-
+#############################################################################
 
 
 

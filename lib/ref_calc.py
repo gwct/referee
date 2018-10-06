@@ -73,7 +73,8 @@ def refCalc(line_item):
     gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
     # Parse the info from the current line -- scaffold, position, genotype likelihoods.
 
-    ref = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1][pos-1];
+    #ref = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1][pos-1];
+    ref = globs['ref'][scaff][pos-1];
     # Gets the called reference base at the current position.
 
     rq, lr, l_match, l_mismatch = calcScore(ref, gls);

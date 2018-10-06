@@ -18,7 +18,8 @@ def referee(globs):
 
 	if globs['stats']:
 		step_start_time  = RC.report_stats(globs, "Index ref fasta", step_start=step_start_time);
-	globs['ref'] = RC.fastaReadInd(globs['reffile']);
+	#globs['ref'] = RC.fastaReadInd(globs['reffile']);
+	globs['ref'] = RC.fastaRead(globs['reffile'], globs);
 	# Index the reference FASTA file.
 
 	for file_num in files:

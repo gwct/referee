@@ -80,7 +80,8 @@ def addUnmapped(file_info, globs):
                 # If this is not the first scaffold, fill in all positions from the last position on the last scaffold.
                 # until the end of that scaffold.
 
-                seq = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1];
+                #seq = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1];
+                seq = globs['ref'][scaff];
                 seqlen = len(seq);
                 scaff_pos = 1;
                 last_scaff = scaff;
