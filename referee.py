@@ -35,6 +35,7 @@ def referee(globs):
 	# file. If input mode is -i this should be multiple files.
 		if globs['stats']:
 			step_start_time  = RC.report_stats(globs, "Calcs " + str(file_num), step_start=step_start_time);
+			line_start_time = step_start_time;
 		# Step update for --stats.
 
 		try:
@@ -58,6 +59,12 @@ def referee(globs):
 						globs['pids'].append(result);
 				for outdict in pool.map(CALC.refCalc, ((line, globs) for line in infile)):
 					OUT.outputTab(outdict, outfile,  globs);
+					if globs['stats']:
+						line_start_time = RC.report_stats(globs, outdict['scaff'] + "-" + str(outdict['pos']), line_start_time);
+					del outdict;
+				pool.terminate();
+			if globs['stats']:
+				globs['pids'] = [globs['pids'][0]];
 			# The parallel version.
 		# Do the calculations on each input file.
 
