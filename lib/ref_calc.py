@@ -64,6 +64,7 @@ def correctRef(max_score, ref, gls):
 def refCalc(line_item):
 # Parses a line to get it ready to calculate a quality score and stores the output.
     line, globs = line_item;
+    print line;
     genotypes = ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"];
 
     line = line.strip().split("\t");
