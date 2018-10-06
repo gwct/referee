@@ -1,5 +1,4 @@
-import math, refcore as RC
-from Bio import SeqIO
+import math, refcore as RC, ref_out as OUT
 #############################################################################
 
 def calcScore(ref, gls):
@@ -61,39 +60,44 @@ def correctRef(max_score, ref, gls):
         return max_base, max_score;
 #############################################################################
 
-def refCalc(line_item):
-# Parses a line to get it ready to calculate a quality score and stores the output.
-    line, globs = line_item;
+def refCalc(file_item):
+# Reads through a genotype likelihood file and calculates a quality scores for each line.
+    file_num, file_info, globs = file_item;
     genotypes = ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"];
 
-    line = line.strip().split("\t");
-    scaff, pos, gl_list = line[0], int(line[1]), line[2:];
+    with open(file_info['out'], "w") as outfile:
+        for line in RC.getFileReader(file_info['in'])(file_info['in']):
+            line = line.strip().split("\t");
+            scaff, pos, gl_list = line[0], int(line[1]), line[2:];
 
-    cor_ref, cor_score = "NA", "NA";
+            cor_ref, cor_score = "NA", "NA";
 
-    gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
-    # Parse the info from the current line -- scaffold, position, genotype likelihoods.
+            gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
+            # Parse the info from the current line -- scaffold, position, genotype likelihoods.
 
-    if globs['fasta'] == 1:
-        ref = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1][pos-1];
-    elif globs['fasta'] == 2:
-        ref = globs['ref'][scaff][pos-1];
-    elif globs['fasta'] == 3:
-        ref = globs['ref'][scaff][pos-1];
-    # Gets the called reference base at the current position.
+            if globs['fasta'] == 1:
+                ref = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1][pos-1];
+            elif globs['fasta'] == 2:
+                ref = globs['ref'][scaff][pos-1];
+            elif globs['fasta'] == 3:
+                ref = globs['ref'][scaff][pos-1];
+            # Gets the called reference base at the current position.
 
-    rq, lr, l_match, l_mismatch = calcScore(ref, gls);
-    # Call the scoring function.
+            rq, lr, l_match, l_mismatch = calcScore(ref, gls);
+            # Call the scoring function.
 
-    if globs['correct-opt'] and rq in [0,-1,-3]:
-        cor_ref, cor_score = correctRef(rq, ref, gls);
-    # With --correct, suggest a better/corrected reference base if the score is negative (0), the reference is undetermined (-1), or no reads support the matching base (-3)
+            if globs['correct-opt'] and rq in [0,-1,-3]:
+                cor_ref, cor_score = correctRef(rq, ref, gls);
+            # With --correct, suggest a better/corrected reference base if the score is negative (0), the reference is undetermined (-1), or no reads support the matching base (-3)
 
-    outdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : ref, 'rq' : rq, 'lr' : lr,  
-                'l_match' : l_match, 'l_mismatch' : l_mismatch, 'gls' : gls, 
-                'cor_ref' : cor_ref, 'cor_score' : cor_score };
-    # Store the info from the current site to be written once returned.
+            outdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : ref, 'rq' : rq, 'lr' : lr,  
+                        'l_match' : l_match, 'l_mismatch' : l_mismatch, 'gls' : gls, 
+                        'cor_ref' : cor_ref, 'cor_score' : cor_score };
+            # Store the info from the current site to be written once returned.
 
-    return outdict;
+            OUT.outputTab(outdict, outfile, globs);
+            # Writes the output to the current output file.
+
+    return file_num;
 
 #############################################################################

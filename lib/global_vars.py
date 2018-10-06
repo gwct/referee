@@ -27,5 +27,6 @@ def init():
     }
 
     globs['logfilename'] = "referee-log-" + globs['startdatetime'] + ".log";
+    globs['tmpdir'] = "referee-tmpdir-" + globs['startdatetime'] + "-" + RC.getRandStr();
 
     return globs;

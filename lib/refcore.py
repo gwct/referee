@@ -7,7 +7,7 @@ from __future__ import print_function
 # Updated for Referee October 2018
 #############################################################################
 
-import sys, os, timeit, subprocess, datetime, time, opt_parse as OP, gzip
+import sys, os, timeit, datetime, time, gzip, string, random
 
 #############################################################################
 
@@ -34,6 +34,26 @@ def startProg(globs):
 	printWrite(globs['logfilename'], globs['log-v'], "# ** Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order.");
 	printWrite(globs['logfilename'], globs['log-v'], "# ** Failure to do so will result in inaccurate calculations!!");
 	printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40 + "\n#");
+
+	if globs['fastq']:
+		printWrite(globs['logfilename'], globs['log-v'], "# --fastq : Output format is FASTQ.");
+	else:
+		printWrite(globs['logfilename'], globs['log-v'], "# Output format is tab delimited.");
+	# Reporting the fastq option.
+
+	if globs['mapped']:
+		printWrite(globs['logfilename'], globs['log-v'], "# --mapped : Only calculating scores for positions with reads mapped to them.");
+	else:
+		printWrite(globs['logfilename'], globs['log-v'], "# Calculating scores for every reference position specified.");
+	# Reporting the mapped option.
+
+	if globs['correct-opt']:
+		printWrite(globs['logfilename'], globs['log-v'], "# --correct : Suggesting higher scoring alternative base when reference score is negative or reference base is N.");
+	# Reporting the correct option.
+
+	if globs['allcalc']:
+		printWrite(globs['logfilename'], globs['log-v'], "# --allcalcs : Using tab delimited output and reporting extra columns.");
+	# Reporting the allcalc option.
 
 #############################################################################
 
@@ -109,6 +129,31 @@ def getSubPID(n):
 	import psutil
 	return psutil.Process(os.getpid());
 
+#############################################################################
+
+def getFileLen(i_name):
+# Gets the numebr of lines in a file.
+	num_lines = 0;
+	for line in getFileReader(i_name)(i_name).readlines(): num_lines += 1;
+	return float(num_lines);
+
+#############################################################################
+
+def getFileReader(i_name):
+# Check if the genotype likelihood file is gzipped, and if so set gzip as the file reader. Otherwise, read as a normal text file.
+	try:
+		gzip_check = gzip.open(i_name).read(1);
+		reader = gzip.open;
+	except:
+		reader = open;
+	return reader;
+
+#############################################################################
+
+def getRandStr(strlen=6):
+# This function generates a random string to add onto the end of tmp files to avoid possible overwrites.
+	return ''.join(random.choice(string.ascii_letters) for m in xrange(strlen));
+	
 #############################################################################
 
 def fastaReadInd(i_name):

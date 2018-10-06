@@ -1,5 +1,4 @@
 import refcore as RC
-from Bio import SeqIO
 #############################################################################
 
 def outputFastq(outdict, fq_vars, globs, final=False):

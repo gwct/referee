@@ -250,4 +250,67 @@
 #             #print result;   
 
 #############################################################################
+# THE LINE-BY-LINE PARALLELIZATION WHICH TURNED OUT TO BE TOO SLOW.
 
+	# 	with reader(files[file_num]['in'], "r") as infile, open(files[file_num]['out'], "w") as outfile:
+	# 		if globs['num-procs'] == 1:
+	# 			for line in infile:
+	# 				outdict = CALC.refCalc((line, globs));
+	# 				OUT.outputTab(outdict, outfile, globs);
+	# 		# A serial version.
+	# 		else:
+	# 			pool = mp.Pool(processes = globs['num-procs']);
+
+	# 			if globs['stats']:
+	# 				for result in pool.imap(RC.getSubPID, range(globs['num-procs'])):
+	# 					globs['pids'].append(result);
+	# 			for outdict in pool.imap(CALC.refCalc, ((line, globs) for line in infile)):
+	# 				OUT.outputTab(outdict, outfile,  globs);
+	# 				if globs['stats']:
+	# 					line_start_time = RC.report_stats(globs, outdict['scaff'] + "-" + str(outdict['pos']), line_start_time);
+	# 				del outdict;
+	# 			pool.terminate();
+	# 		if globs['stats']:
+	# 			globs['pids'] = [globs['pids'][0]];
+	# 		# The parallel version.
+	# 	# Do the calculations on each input file.
+
+#############################################################################
+# THE REF CALC FUNCTION FOR THE LINE BY LINE PARALLELIZATION
+
+# def refCalc(line_item):
+# # Parses a line to get it ready to calculate a quality score and stores the output.
+#     line, globs = line_item;
+#     genotypes = ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"];
+
+#     line = line.strip().split("\t");
+#     scaff, pos, gl_list = line[0], int(line[1]), line[2:];
+
+#     cor_ref, cor_score = "NA", "NA";
+
+#     gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
+#     # Parse the info from the current line -- scaffold, position, genotype likelihoods.
+
+#     if globs['fasta'] == 1:
+#         ref = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1][pos-1];
+#     elif globs['fasta'] == 2:
+#         ref = globs['ref'][scaff][pos-1];
+#     elif globs['fasta'] == 3:
+#         ref = globs['ref'][scaff][pos-1];
+#     # Gets the called reference base at the current position.
+
+#     rq, lr, l_match, l_mismatch = calcScore(ref, gls);
+#     # Call the scoring function.
+
+#     if globs['correct-opt'] and rq in [0,-1,-3]:
+#         cor_ref, cor_score = correctRef(rq, ref, gls);
+#     # With --correct, suggest a better/corrected reference base if the score is negative (0), the reference is undetermined (-1), or no reads support the matching base (-3)
+
+#     outdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : ref, 'rq' : rq, 'lr' : lr,  
+#                 'l_match' : l_match, 'l_mismatch' : l_mismatch, 'gls' : gls, 
+#                 'cor_ref' : cor_ref, 'cor_score' : cor_score };
+#     # Store the info from the current site to be written once returned.
+
+#     return outdict;
+
+#############################################################################

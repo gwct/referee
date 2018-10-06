@@ -4,6 +4,11 @@ import sys, os, refcore as RC
 def optParse(globs):
 # This function handles the command line options and prepares the output directory and files.
 	try:
+		from Bio import SeqIO
+	except:
+		sys.exit("\n*** ERROR: Your installation of Python is missing the Biopython module. Please install the module with: pip install biopython\n")
+	# First check if the argparse module is installed. If not, the input options cannot be parsed.
+	try:
 		import argparse;
 	except:
 		sys.exit("\n*** ERROR: Your installation of Python is missing the argparse module. Please try a different version of Python (2.7 or later) or install the module.\n")
@@ -33,6 +38,8 @@ def optParse(globs):
 
 	args = parser.parse_args();
 	# The input options and help messages
+	if args.out_dest:
+		globs['logfilename'] = args.out_dest + "-log.log";
 
 	if args.fasta_opt in [1,2,3,4]:
 		globs['fasta'] = args.fasta_opt;
@@ -53,46 +60,32 @@ def optParse(globs):
 		globs['reffile'] = args.ref_file;
 	# Check and read the reference genome file.
 
-	if args.mapped_flag and args.fastq_flag:
-		RC.errorOut(5, "Cannot output to --fastq when only doing --mapped positions. Pick one.", globs);
-	# Raise error if both --fastq and --mapped are selected. FASTQ output without all positions would be confusing.
-
 	if args.processes and not args.processes.isdigit():
-		RC.errorOut(6, "-p must be an integer value greater than 1.", globs);
+		RC.errorOut(5, "-p must be an integer value greater than 1.", globs);
 	elif args.processes:
 		globs['num-procs'] = int(args.processes);
 	# Checking the number of processors option.
 
 	if args.fastq_flag:
 		globs['fastq'] = True;
-		RC.printWrite(globs['logfilename'], globs['log-v'], "# --fastq : Output format is FASTQ.");
-	else:
-		RC.printWrite(globs['logfilename'], globs['log-v'], "# Output format is tab delimited.");
 	# Checking the fastq option.
 
 	if args.mapped_flag:
-		globs['mapped'] = True;
-		RC.printWrite(globs['logfilename'], globs['log-v'], "# --mapped : Only calculating scores for positions with reads mapped to them.");
-	else:
-		RC.printWrite(globs['logfilename'], globs['log-v'], "# Calculating scores for every reference position specified.");
+		if args.fastq_flag:
+			RC.errorOut(6, "Cannot output to --fastq when only doing --mapped positions. Pick one.", globs);
+			# Raise error if both --fastq and --mapped are selected. FASTQ output without all positions would be confusing.
+		else:
+			globs['mapped'] = True;
 	# Checking the mapped option.
 
 	if args.correct_flag:
 		globs['correct-opt'] = True;
-		RC.printWrite(globs['logfilename'], globs['log-v'], "# --correct : Suggesting higher scoring alternative base when reference score is negative or reference base is N.");
 	# Checking the correct option.
 
 	if args.stats_opt:
-		import psutil
 		globs['stats'] = True;
-		globs['pids'] = [psutil.Process(os.getpid())];		
-		step_start_time = RC.report_stats(globs, stat_start=True);
-	else:
-		step_start_time = False;
 	# Initializing the stats options if --stats is set.
-
 	if args.allcalc_opt:
-		RC.printWrite(globs['logfilename'], globs['log-v'], "# --allcalcs : Using tab delimited output and reporting extra columns.");
 		globs['allcalc'] = True;
 		globs['fastq'] = False;
 	# Parse performance options.
@@ -106,12 +99,11 @@ def optParse(globs):
 		# Make sure we can find the input file.
 
 		if not args.out_dest:
-			globs['outdir'] = "referee-out-" + globs['startdatetime'];
+			globs['outdir'] = "referee-out-" + globs['startdatetime'] + RC.getRandStr();
 		else:
 			globs['outdir'] = args.out_dest;
 		if not os.path.isdir(globs['outdir']):
 			RC.printWrite(globs['logfilename'], globs['log-v'], "+ Making output directory: " + globs['outdir']);
-			#os.system("mkdir \"" + globs['outdir'] + "\"");
 			os.makedirs(globs['outdir']);
 		# Specifiy and create the output directory, if necessary.
 
@@ -144,18 +136,83 @@ def optParse(globs):
 		# Check if the genotype likelihood file is a valid file.
 
 		if not args.out_dest:
-			outfiletab = "referee-out-" + globs['startdatetime'] + ".txt";
-			outfiletmp = "referee-tmp-" + globs['startdatetime'] + ".tmp";
-			outfilefq = "referee-out-" + globs['startdatetime'] + ".fq";
+			outfiletab = "referee-out-" + globs['startdatetime'] + RC.getRandStr() + ".txt";
+			outfiletmp = "referee-tmp-" + globs['startdatetime'] + RC.getRandStr() + ".tmp";
+			outfilefq = "referee-out-" + globs['startdatetime'] + RC.getRandStr() + ".fq";
 		else:
 			outfiletab = args.out_dest + ".txt";
-			outfiletmp = args.out_dest + "-tmp-" + globs['startdatetime'] + ".tmp";
+			outfiletmp = args.out_dest + "-tmp-" + globs['startdatetime'] + RC.getRandStr() + ".tmp";
 			outfilefq = args.out_dest + ".fq";
 		# Specify the output files.
 
 		file_paths[file_num] = { 'in' : args.gl_file, 'out' : outfiletab, 'tmpfile' : outfiletmp, 'outfq' : outfilefq };
 	# Get the file paths for the current files.
 
-	return file_paths, globs, step_start_time
+	return file_paths, globs
+
+#############################################################################
+
+def multiSplit(files, globs):
+# Given a file and a number of splits (in this case, the number of processors), this function splits
+# the file into files with equal numbers of lines.
+	import math
+
+	file_info = files[1];
+	#infilename, reffilename, outfilename, scaffs, globs = files[1];
+	RC.printWrite(globs['logfilename'], globs['log-v'],"+ Making tmp directory: " + globs['tmpdir']);
+	os.makedirs(globs['tmpdir']);
+	# Make the temporary directory to store the split files and split outputs.
+
+	new_files = {};
+	# The dictionary for the new temporary files.
+
+	tmpfiles = [os.path.join(globs['tmpdir'], str(i) + "-chunk.txt") for i in range(globs['num-procs'])];
+	# Generate the names of the tmp input files.
+
+	num_lines = RC.getFileLen(file_info['in']);
+	linespersplit = int(math.ceil(num_lines / float(globs['num-procs'])));
+	# Count the number of lines in the input file and get the number of lines per split.
+
+	with RC.getFileReader(file_info['in'])(file_info['in'], "r") as infile:
+		file_lines, file_num = 0, 0;
+		tmpfile = open(tmpfiles[file_num], "w");
+		for line in infile:
+			tmpfile.write(line);
+			file_lines += 1;
+			if file_lines == linespersplit:
+				tmpfile.close();
+				newoutfile = os.path.join(globs['tmpdir'], str(file_num) + "-chunk-out.txt");
+				new_files[file_num] = { 'in' : tmpfiles[file_num], 'out' : newoutfile };
+				file_lines = 0;
+				file_num += 1;
+				if file_num != len(tmpfiles):
+					tmpfile = open(tmpfiles[file_num], "w");
+	# Read through every line in the input file and write it to one of the sub-files, updating the
+	# subfile if we've reached the number of lines per split in that file.
+
+	if len(new_files) != len(tmpfiles):
+		tmpfile.close();
+		newoutfile = os.path.join(globs['tmpdir'], str(file_num) + "-out.txt");
+		new_files[file_num] = { 'in' : tmpfiles[file_num], 'out' : newoutfile };
+	# If the last file has fewer lines than the rest it won't get added in the loop so we add it here.
+
+	return new_files;
+
+#############################################################################
+
+def mergeFiles(outfile, files, globs):
+# This function merges the tmp output files back into the main output file.
+	import shutil
+	with open(outfile, "w") as out:
+		for file_num in sorted(files.keys()):
+			with open(files[file_num]['out']) as infile:
+				for line in infile:
+					out.write(line);
+	try:
+		RC.printWrite(globs['logfilename'], globs['log-v'],"+ Removing tmp directory and files: " + globs['tmpdir']);
+		shutil.rmtree(globs['tmpdir']);
+	except:
+		RC.printWrite(globs['logfilename'], globs['log-v'],"+ Could not remove tmp directory and files. User can remove manually: " + globs['tmpdir']);
+	# Try to remove the tmp directory and files.
 
 #############################################################################
