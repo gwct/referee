@@ -1,7 +1,10 @@
+root version 6.14 loaded.
+biopython version 1.70 loaded.
+#
 # =========================================================================
 # Welcome to Referee -- Reference genome quality score calculator.
-# The date and time at the start is: 10.06.2018 | 12:44:08
-# The program was called as: referee.py -gl .\data\angsd-output-snippet-2.txt -ref .\data\rpgc_assembly.fasta -o ref-test --stats --mapped -f 2
+# The date and time at the start is: 10.06.2018 | 01:50:38
+# The program was called as: referee.py -gl /N/dc2/scratch/grthomas/qtip/angsd-doglf4/angsdput.glf.gz -ref data/rpgc_assembly.fasta --stats -o ref-test-2 -f 3 -p 2
 #
 # ----------------------------------------
 #
@@ -13,9 +16,11 @@
 # ----------------------------------------
 #
 # Output format is tab delimited.
-# --mapped : Only calculating scores for positions with reads mapped to them.
+# Calculating scores for every reference position specified.
 # --stats : Reporting Referee time and memory usage.
 # ------------------------------------------------------------------------------------------------------------------------
 # Step               Time since prev (sec)      Elapsed time (sec)    Current mem usage (MB)    Virtual mem usage (MB)
 # ------------------------------------------------------------------------------------------------------------------------
-# Index ref fasta    0.0262841894596            0.0262841894596       17.2109375                10.01953125
+# Index ref fasta    0.00236797332764           0.00236797332764      17.70703125               162.51171875
+# Calcs 1            1.8045270443               1.80689501762         115.30078125              261.98046875
+=>> PBS: job killed: vmem 53317517312 exceeded limit 51539607552

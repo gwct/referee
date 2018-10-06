@@ -1,7 +1,7 @@
 # =========================================================================
 # Welcome to Referee -- Reference genome quality score calculator.
-# The date and time at the start is: 10.06.2018 | 12:36:51
-# The program was called as: referee.py -gl .\data\angsd-output-snippet.txt -ref .\data\assembly-snippet.fa -o ref-test --stats -f 2
+# The date and time at the start is: 10.06.2018 | 01:50:38
+# The program was called as: referee.py -gl /N/dc2/scratch/grthomas/qtip/angsd-doglf4/angsdput.glf.gz -ref data/rpgc_assembly.fasta --stats -o ref-test-2 -f 3 -p 2
 #
 # ----------------------------------------
 #
@@ -18,13 +18,5 @@
 # ------------------------------------------------------------------------------------------------------------------------
 # Step               Time since prev (sec)      Elapsed time (sec)    Current mem usage (MB)    Virtual mem usage (MB)
 # ------------------------------------------------------------------------------------------------------------------------
-# Index ref fasta    0.0209079557312            0.0209079557312       17.14453125               9.921875
-# Calcs 1            0.00545278048614           0.0263607362173       17.1640625                9.921875
-# Add unmapped 1     0.0110030618703            0.0373637980876       17.1640625                9.921875
-+ Renaming tmp file to output file: ref-test-tmp-10-06-2018.12-36-51.tmp -> ref-test.txt
-# End program        0.0278040060895            0.0651678041771       17.1953125                9.921875
-# ------------------------------------------------------------------------------------------------------------------------
-#
-# The date and time at the end is: 10.06.2018 | 12:36:51
-# Total execution time: 0.221 seconds.
-# =========================================================================
+# Index ref fasta    0.00236797332764           0.00236797332764      17.70703125               162.51171875
+# Calcs 1            1.8045270443               1.80689501762         115.30078125              261.98046875

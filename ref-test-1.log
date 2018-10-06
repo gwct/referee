@@ -1,7 +1,7 @@
 # =========================================================================
 # Welcome to Referee -- Reference genome quality score calculator.
-# The date and time at the start is: 10.06.2018 | 12:37:13
-# The program was called as: referee.py -gl .\data\angsd-output-snippet.txt -ref .\data\assembly-snippet.fa -o ref-test --stats -f 3
+# The date and time at the start is: 10.06.2018 | 12:58:59
+# The program was called as: referee.py -gl /N/dc2/scratch/grthomas/qtip/angsd-doglf4/angsdput.glf.gz -ref data/rpgc_assembly.fasta --stats -o ref-test-1 -f 3
 #
 # ----------------------------------------
 #
@@ -18,13 +18,13 @@
 # ------------------------------------------------------------------------------------------------------------------------
 # Step               Time since prev (sec)      Elapsed time (sec)    Current mem usage (MB)    Virtual mem usage (MB)
 # ------------------------------------------------------------------------------------------------------------------------
-# Index ref fasta    0.0265903764903            0.0265903764903       17.09375                  9.875
-# Calcs 1            0.0175527274593            0.0441431039496       17.5390625                10.30078125
-# Add unmapped 1     0.00948581105352           0.0536289150032       17.55078125               10.30078125
-+ Renaming tmp file to output file: ref-test-tmp-10-06-2018.12-37-13.tmp -> ref-test.txt
-# End program        0.0266023502848            0.080231265288        17.5625                   10.30078125
+# Index ref fasta    0.644670963287             0.644670963287        17.71484375               162.51953125
+# Calcs 1            1.70112419128              2.34579515457         115.24609375              261.98828125
+# Add unmapped 1     1578.41913676              1580.76493192         115.4609375               262.24609375
++ Renaming tmp file to output file: ref-test-1-tmp-10-06-2018.12-58-59.tmp -> ref-test-1.txt
+# End program        162.585996151              1743.35092807         115.4609375               262.24609375
 # ------------------------------------------------------------------------------------------------------------------------
 #
-# The date and time at the end is: 10.06.2018 | 12:37:13
-# Total execution time: 0.205 seconds.
+# The date and time at the end is: 10.06.2018 | 01:28:03
+# Total execution time: 1743.764 seconds.
 # =========================================================================
