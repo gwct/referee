@@ -1,4 +1,5 @@
 import refcore as RC
+from Bio import SeqIO
 #############################################################################
 
 def outputFastq(outdict, fq_vars, globs, final=False):
@@ -80,8 +81,13 @@ def addUnmapped(file_info, globs):
                 # If this is not the first scaffold, fill in all positions from the last position on the last scaffold.
                 # until the end of that scaffold.
 
-                #seq = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1];
-                seq = globs['ref'][scaff];
+                if globs['fasta'] == 1:
+                    seq = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1];
+                elif globs['fasta'] == 2:
+                    seq = globs['ref'][scaff];
+                elif globs['fasta'] == 3:
+                    seq = globs['ref'][scaff];
+
                 seqlen = len(seq);
                 scaff_pos = 1;
                 last_scaff = scaff;

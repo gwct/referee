@@ -1,0 +1,28 @@
+# =========================================================================
+# Welcome to Referee -- Reference genome quality score calculator.
+# The date and time at the start is: 10.06.2018 | 12:38:42
+# The program was called as: referee.py -gl .\data\angsd-output-snippet-2.txt -ref .\data\rpgc_assembly.fasta -o ref-test --stats --mapped -f 1
+#
+# ----------------------------------------
+#
+# ** IMPORTANT!
+# ** Input columns: Scaffold	Position	AA	AC	AG	AT	CC	CG	CT	GG	GT	TT
+# ** Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order.
+# ** Failure to do so will result in inaccurate calculations!!
+#
+# ----------------------------------------
+#
+# Output format is tab delimited.
+# --mapped : Only calculating scores for positions with reads mapped to them.
+# --stats : Reporting Referee time and memory usage.
+# ------------------------------------------------------------------------------------------------------------------------
+# Step               Time since prev (sec)      Elapsed time (sec)    Current mem usage (MB)    Virtual mem usage (MB)
+# ------------------------------------------------------------------------------------------------------------------------
+# Index ref fasta    0.0941251432579            0.0941251432579       17.1640625                9.98046875
+# Calcs 1            4.23063794667              4.32476308992         17.203125                 9.98046875
+# End program        224.30279417               228.62755726          17.18359375               9.91015625
+# ------------------------------------------------------------------------------------------------------------------------
+#
+# The date and time at the end is: 10.06.2018 | 12:42:31
+# Total execution time: 229.0 seconds.
+# =========================================================================

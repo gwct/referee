@@ -1,0 +1,30 @@
+# =========================================================================
+# Welcome to Referee -- Reference genome quality score calculator.
+# The date and time at the start is: 10.06.2018 | 12:36:54
+# The program was called as: referee.py -gl .\data\angsd-output-snippet.txt -ref .\data\assembly-snippet.fa -o ref-test --stats -f 3
+#
+# ----------------------------------------
+#
+# ** IMPORTANT!
+# ** Input columns: Scaffold	Position	AA	AC	AG	AT	CC	CG	CT	GG	GT	TT
+# ** Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order.
+# ** Failure to do so will result in inaccurate calculations!!
+#
+# ----------------------------------------
+#
+# Output format is tab delimited.
+# Calculating scores for every reference position specified.
+# --stats : Reporting Referee time and memory usage.
+# ------------------------------------------------------------------------------------------------------------------------
+# Step               Time since prev (sec)      Elapsed time (sec)    Current mem usage (MB)    Virtual mem usage (MB)
+# ------------------------------------------------------------------------------------------------------------------------
+# Index ref fasta    0.0227839927473            0.0227839927473       17.125                    9.92578125
+# Calcs 1            0.676374848189             0.699158840937        17.53125                  10.31640625
+# Add unmapped 1     0.00918261747148           0.708341458408        17.54296875               10.31640625
++ Renaming tmp file to output file: ref-test-tmp-10-06-2018.12-36-54.tmp -> ref-test.txt
+# End program        0.0194586989617            0.72780015737         17.5625                   10.31640625
+# ------------------------------------------------------------------------------------------------------------------------
+#
+# The date and time at the end is: 10.06.2018 | 12:36:55
+# Total execution time: 0.856 seconds.
+# =========================================================================

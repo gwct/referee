@@ -1,0 +1,30 @@
+# =========================================================================
+# Welcome to Referee -- Reference genome quality score calculator.
+# The date and time at the start is: 10.06.2018 | 12:36:51
+# The program was called as: referee.py -gl .\data\angsd-output-snippet.txt -ref .\data\assembly-snippet.fa -o ref-test --stats -f 2
+#
+# ----------------------------------------
+#
+# ** IMPORTANT!
+# ** Input columns: Scaffold	Position	AA	AC	AG	AT	CC	CG	CT	GG	GT	TT
+# ** Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order.
+# ** Failure to do so will result in inaccurate calculations!!
+#
+# ----------------------------------------
+#
+# Output format is tab delimited.
+# Calculating scores for every reference position specified.
+# --stats : Reporting Referee time and memory usage.
+# ------------------------------------------------------------------------------------------------------------------------
+# Step               Time since prev (sec)      Elapsed time (sec)    Current mem usage (MB)    Virtual mem usage (MB)
+# ------------------------------------------------------------------------------------------------------------------------
+# Index ref fasta    0.0209079557312            0.0209079557312       17.14453125               9.921875
+# Calcs 1            0.00545278048614           0.0263607362173       17.1640625                9.921875
+# Add unmapped 1     0.0110030618703            0.0373637980876       17.1640625                9.921875
++ Renaming tmp file to output file: ref-test-tmp-10-06-2018.12-36-51.tmp -> ref-test.txt
+# End program        0.0278040060895            0.0651678041771       17.1953125                9.921875
+# ------------------------------------------------------------------------------------------------------------------------
+#
+# The date and time at the end is: 10.06.2018 | 12:36:51
+# Total execution time: 0.221 seconds.
+# =========================================================================

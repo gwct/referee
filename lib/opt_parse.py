@@ -28,10 +28,16 @@ def optParse(globs):
 	# User params
 	parser.add_argument("--stats", dest="stats_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--allcalcs", dest="allcalc_opt", help=argparse.SUPPRESS, action="store_true", default=False);
+	parser.add_argument("-f", dest="fasta_opt", help=argparse.SUPPRESS, type=int, default=1);
 	# Performance tests
 
 	args = parser.parse_args();
 	# The input options and help messages
+
+	if args.fasta_opt in [1,2,3,4]:
+		globs['fasta'] = args.fasta_opt;
+	else:
+		RC.errorOut(0, "Invalid fasta opt.", globs);
 
 	if not args.input_list and not args.gl_file:
 		RC.errorOut(1, "No input method specified. Make sure one input method (either just -i or -gl) is specified.", globs);
