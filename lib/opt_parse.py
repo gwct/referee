@@ -41,7 +41,7 @@ def optParse(globs):
 	if args.out_dest:
 		globs['logfilename'] = args.out_dest + "-log.log";
 
-	if args.fasta_opt in [1,2,3,4]:
+	if args.fasta_opt in [1,2,3]:
 		globs['fasta'] = args.fasta_opt;
 	else:
 		RC.errorOut(0, "Invalid fasta opt.", globs);
@@ -141,7 +141,7 @@ def optParse(globs):
 			outfilefq = "referee-out-" + globs['startdatetime'] + RC.getRandStr() + ".fq";
 		else:
 			outfiletab = args.out_dest + ".txt";
-			outfiletmp = args.out_dest + "-tmp-" + globs['startdatetime'] + RC.getRandStr() + ".tmp";
+			outfiletmp = args.out_dest + "-tmp-" + globs['startdatetime'] + "-" + RC.getRandStr() + ".tmp";
 			outfilefq = args.out_dest + ".fq";
 		# Specify the output files.
 

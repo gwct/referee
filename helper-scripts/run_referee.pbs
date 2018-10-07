@@ -6,23 +6,8 @@
 #PBS -N referee-tests
 #PBS -j oe
 
-module load biopython/1.70
-#module load r/3.4.4
+#module load biopython/1.70
+# Biopython needed for -f 3
 cd /N/u/grthomas/Carbonate/bin/referee/
 time -p python referee.py -gl /N/dc2/scratch/grthomas/qtip/angsd-doglf4/angsdput.glf.gz -ref data/rpgc_assembly.fasta --stats --fastq --correct -o ref-test-1-1 -f 1
-#Rscript qtip_scores.r
 
-#awk -v max=0 -v l=1 '{if($3>max&&$3!=9999){l=$0; max=$3}}END{print l} ' qtip-returns.txt
-# Extract line with max score
-
-#awk -v max=0 -v l=1 '{if($3<max&&$3!=-9999&&$3!=-9998){l=$0; max=$3}}END{print l} ' qtip-returns.txt
-# Extract line with min score
-
-#grep -P "9999$" qtip-returns.txt | c
-# Count number of lines with score 9999 (sum(l_unmatch) = 0)
-
-#grep '\-9999' qtip-returns.txt | c
-# Count number of lines with score -9999 (sum(l_match) = 0)
-
-#grep '\-9998' qtip-returns.txt | c
-# Count number of lines with score -9998 (ref = N)

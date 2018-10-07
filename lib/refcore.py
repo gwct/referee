@@ -24,17 +24,17 @@ def errorOut(errnum, errmsg, globs):
 def startProg(globs):
 # A nice way to start the program.
 	print("#");
-	printWrite(globs['logfilename'], globs['log-v'], "# =========================================================================");
+	printWrite(globs['logfilename'], globs['log-v'], "# =================================================");
 	print(welcome());
 	print("    Reference genome quality score calculator.\n")
 	printWrite(globs['logfilename'], 0, "# Welcome to Referee -- Reference genome quality score calculator.");
 	printWrite(globs['logfilename'], globs['log-v'], "# The date and time at the start is: " + getDateTime());
 	printWrite(globs['logfilename'], globs['log-v'], "# The program was called as: " + " ".join(sys.argv));
 	printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40 + "\n#");
-	printWrite(globs['logfilename'], globs['log-v'], "# ** IMPORTANT!");
-	printWrite(globs['logfilename'], globs['log-v'], "# ** Input columns: Scaffold\tPosition\tAA\tAC\tAG\tAT\tCC\tCG\tCT\tGG\tGT\tTT");
-	printWrite(globs['logfilename'], globs['log-v'], "# ** Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order.");
-	printWrite(globs['logfilename'], globs['log-v'], "# ** Failure to do so will result in inaccurate calculations!!");
+	printWrite(globs['logfilename'], globs['log-v'], "** IMPORTANT!");
+	printWrite(globs['logfilename'], globs['log-v'], "** Input columns: Scaffold\tPosition\tAA\tAC\tAG\tAT\tCC\tCG\tCT\tGG\tGT\tTT");
+	printWrite(globs['logfilename'], globs['log-v'], "** Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order without headers.");
+	printWrite(globs['logfilename'], globs['log-v'], "** Failure to do so will result in inaccurate calculations!!");
 	printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40 + "\n#");
 
 	if globs['fastq']:
@@ -63,9 +63,10 @@ def endProg(globs):
 # A nice way to end the program.
 	endtime = timeit.default_timer();
 	totaltime = endtime - globs['starttime'];
-	printWrite(globs['logfilename'], globs['log-v'], "#\n# The date and time at the end is: " + getDateTime());
+	printWrite(globs['logfilename'], globs['log-v'], "#\n# Done!");
+	printWrite(globs['logfilename'], globs['log-v'], "# The date and time at the end is: " + getDateTime());
 	printWrite(globs['logfilename'], globs['log-v'], "# Total execution time: " + str(round(totaltime,3)) + " seconds.");
-	printWrite(globs['logfilename'], globs['log-v'], "# =========================================================================");
+	printWrite(globs['logfilename'], globs['log-v'], "# =================================================");
 	print("#");
 	sys.exit();
 
@@ -142,7 +143,7 @@ def getFileLen(i_name):
 #############################################################################
 
 def getFileReader(i_name):
-# Check if the genotype likelihood file is gzipped, and if so set gzip as the file reader. Otherwise, read as a normal text file.
+# Check if a file is gzipped, and if so set gzip as the file reader. Otherwise, read as a normal text file.
 	try:
 		gzip_check = gzip.open(i_name).read(1);
 		reader = gzip.open;
@@ -222,8 +223,7 @@ def fastaGet(i_name, inds):
 #############################################################################
 
 def fastaRead(i_name, globs):
-	import gzip
-
+	# This function reads a FASTA file into a dictionary.
 	try:
 		gzip_check = gzip.open(i_name).read(1);
 		reader = gzip.open;
@@ -248,6 +248,7 @@ def fastaRead(i_name, globs):
 #############################################################################
 
 def welcome():
+# Reads the ASCII art "Referee" text to be printed to the command line.
 	return open("lib/ref-welcome.txt", "r").read();
 
 #############################################################################

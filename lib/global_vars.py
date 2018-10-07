@@ -23,7 +23,8 @@ def init():
         'pids' : "",
         'reffile' : "",
         'ref' : "",
-        'outdir' : ""
+        'outdir' : "",
+        'fasta' : 1
     }
 
     globs['logfilename'] = "referee-log-" + globs['startdatetime'] + ".log";
