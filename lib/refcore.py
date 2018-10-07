@@ -25,7 +25,9 @@ def startProg(globs):
 # A nice way to start the program.
 	print("#");
 	printWrite(globs['logfilename'], globs['log-v'], "# =========================================================================");
-	printWrite(globs['logfilename'], globs['log-v'], "# Welcome to Referee -- Reference genome quality score calculator.");
+	print(welcome());
+	print("    Reference genome quality score calculator.\n")
+	printWrite(globs['logfilename'], 0, "# Welcome to Referee -- Reference genome quality score calculator.");
 	printWrite(globs['logfilename'], globs['log-v'], "# The date and time at the start is: " + getDateTime());
 	printWrite(globs['logfilename'], globs['log-v'], "# The program was called as: " + " ".join(sys.argv));
 	printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40 + "\n#");
@@ -245,7 +247,10 @@ def fastaRead(i_name, globs):
 
 #############################################################################
 
+def welcome():
+	return open("lib/ref-welcome.txt", "r").read();
 
+#############################################################################
 
 
 

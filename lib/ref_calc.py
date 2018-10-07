@@ -65,6 +65,7 @@ def refCalc(file_item):
     file_num, file_info, globs = file_item;
     genotypes = ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"];
 
+    last_scaff = "";
     with open(file_info['out'], "w") as outfile:
         for line in RC.getFileReader(file_info['in'])(file_info['in']):
             line = line.strip().split("\t");
@@ -76,7 +77,10 @@ def refCalc(file_item):
             # Parse the info from the current line -- scaffold, position, genotype likelihoods.
 
             if globs['fasta'] == 1:
-                ref = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1][pos-1];
+                if last_scaff != scaff:
+                    seq = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1];
+                    last_scaff = scaff;
+                ref = seq[pos-1];
             elif globs['fasta'] == 2:
                 ref = globs['ref'][scaff][pos-1];
             elif globs['fasta'] == 3:
