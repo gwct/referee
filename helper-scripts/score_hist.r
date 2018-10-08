@@ -8,12 +8,12 @@
 library(ggplot2)
 cat("----------\n")
 
-args = commandArgs(trailingOnly=TRUE)
+#args = commandArgs(trailingOnly=TRUE)
 # Command line entry of input files
 
-#this.dir <- dirname(parent.frame(2)$ofile)
-#setwd(this.dir)
-#args = c("../test.txt", T, "../data/pileup-snippet.txt")
+this.dir <- dirname(parent.frame(2)$ofile)
+setwd(this.dir)
+args = c("../test.txt", T, "../data/pileup-snippet.txt")
 # Manual entry of input files
 
 if(!length(args) %in% c(1,2,3) || "-h" %in% args){
@@ -103,23 +103,27 @@ if(barp){
   scaff_scores = split(in_data, in_data[,"scaff"])
   rm(in_data)
   for(df in scaff_scores){
-    bar_p = ggplot(df, aes(x=pos, y=score)) +
-      geom_bar(stat="identity") +
-      labs(x="Position", y="Referee score") +
-      theme_classic() +
-      theme(axis.text=element_text(size=10), 
-            axis.title=element_text(size=12), 
-            axis.title.y=element_text(margin=margin(t=0,r=20,b=0,l=0),color="black"), 
-            axis.title.x=element_text(margin=margin(t=20,r=0,b=0,l=0),color="black"),
-            axis.line=element_line(colour='#595959',size=0.75),
-            axis.ticks=element_line(colour="#595959",size = 1),
-            axis.ticks.length=unit(0.2,"cm"),
-            legend.position="none"
-      )
-    
     outfile = paste(outdir, "/", df[1,1], "-scores.png", sep="")
     print(outfile)
-    ggsave(file=outfile, bar_p, width=8, height=6, units="in")
+    png(outfile)
+    barplot(df$score, names.arg=df$pos, ylim=c(-2,92), xlab="Position", ylab="Score", border=NA, space=0)
+    #axis(1,at=bp,labels=df$pos)
+    dev.off()
+    
+    #bar_p = ggplot(df, aes(x=pos, y=score)) +
+    #  geom_bar(stat="identity") +
+    #  labs(x="Position", y="Referee score") +
+    #  theme_classic() +
+    #  theme(axis.text=element_text(size=10), 
+    #        axis.title=element_text(size=12), 
+    #        axis.title.y=element_text(margin=margin(t=0,r=20,b=0,l=0),color="black"), 
+    #        axis.title.x=element_text(margin=margin(t=20,r=0,b=0,l=0),color="black"),
+    #        axis.line=element_line(colour='#595959',size=0.75),
+    #        axis.ticks=element_line(colour="#595959",size = 1),
+    #        axis.ticks.length=unit(0.2,"cm"),
+    #        legend.position="none"
+    #  )
+    #ggsave(file=outfile, bar_p, width=8, height=6, units="in")
   }
   
 }
