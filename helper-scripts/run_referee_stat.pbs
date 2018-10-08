@@ -8,4 +8,4 @@
 
 module load r/3.4.4
 cd /N/u/grthomas/Carbonate/bin/referee/
-Rscript helper-scripts/score_hist.r ref-test-1-1.txt T /N/dc2/scratch/grthomas/qtip/single-depth.pileup
+Rscript helper-scripts/score_hist.r ~/ref-tests/ref-test-1-1.txt T /N/dc2/scratch/grthomas/qtip/single-depth.pileup
