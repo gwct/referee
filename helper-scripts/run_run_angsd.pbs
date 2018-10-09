@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -k o
+#PBS -l nodes=1:ppn=1,walltime=6:00:00,vmem=100GB
+#PBS -M grthomas@indiana.edu
+#PBS -m abe
+#PBS -N run-angsd-om
+#PBS -j oe
+
+cd /N/u/grthomas/Carbonate/bin/referee/
+python helper-scripts/run_angsd.py -s /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffolds-10kb.txt -r /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/scaffolds/ -b /N/dcwan/projects/hahnlab-phi/owl-monkey/swapRef/owl-monkey-120ref-sorted.bam -o /N/dc2/scratch/grthomas/qtip/owl-monkey/angsd-out/

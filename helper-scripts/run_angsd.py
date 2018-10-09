@@ -21,10 +21,10 @@ args = parser.parse_args();
 # Input options.
 
 # For owl monkey:
-# -s = /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffolds-10kb.txt
-# -r = /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/scaffolds/
-# -b = /N/dcwan/projects/hahnlab-phi/owl-monkey/swapRef/owl-monkey-120ref-sorted.bam
-# -o = /N/dc2/scratch/grthomas/qtip/owl-monkey/angsd-out/
+# -s /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffolds-10kb.txt
+# -r /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/scaffolds/
+# -b /N/dcwan/projects/hahnlab-phi/owl-monkey/swapRef/owl-monkey-120ref-sorted.bam
+# -o /N/dc2/scratch/grthomas/qtip/owl-monkey/angsd-out/
 
 if any(a == False for a in [args.refdir, args.scaff_file, args.outdir]):
     print("\n ** Error: All input (-r, -s) and output (-o) options must be specified!\n");
@@ -76,13 +76,14 @@ if __name__ == '__main__':
     print;
     print " -> Run ANGSD";
     print " -> Call: " + " ".join(sys.argv);
-    print " -> Output directory:", outdir;
+    print " -> Output directory:", args.outdir;
     print;
 
     scaffs = { line : "" for line in open(scaffilename, "r").readlines() };
     # Read the scaffold IDs.
 
     with open(logfilename, "w") as logfile:
+        logfile.write(" ".join(sys.argv) + "\n");
         num_scaffs = len(scaffs);
         counter = 1;
         if args.threads == 1:
