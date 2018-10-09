@@ -6,5 +6,6 @@
 #PBS -N om-split-bam
 #PBS -j oe
 
+module load samtools/1.9
 cd /N/u/grthomas/Carbonate/bin/referee/
 python helper-scripts/split_bam.py -p 23 -s /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffold-list.txt -b /N/dcwan/projects/hahnlab-phi/owl-monkey/swapRef/owl-monkey-120ref-sorted.bam -o /N/dc2/scratch/grthomas/qtip/owl-monkey/split-bam-out/

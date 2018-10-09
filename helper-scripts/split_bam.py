@@ -51,7 +51,8 @@ def samView(scaff_item):
     outfile = os.path.join(args.outdir, scaffold)
     samtools_cmd = "samtools view " + args.bam_file + " " + scaffold + " > " + outfile;
     try:
-        print samtools_cmd;
+        #print samtools_cmd;
+        os.system(samtools_cmd);
     except:
         return [False, samtools_cmd, "FAILED ANGSD CMD", scaffold];
 
