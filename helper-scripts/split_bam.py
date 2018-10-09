@@ -19,7 +19,7 @@ args = parser.parse_args();
 # For owl monkey:
 # -s /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffolds-list.txt
 # -b /N/dcwan/projects/hahnlab-phi/owl-monkey/swapRef/owl-monkey-120ref-sorted.bam
-# -o /N/dc2/scratch/grthomas/qtip/owl-monkey/bam-split-out/
+# -o /N/dc2/scratch/grthomas/qtip/owl-monkey/split-bam-out/
 
 if any(a == False for a in [args.scaff_file, args.bam_file, args.outdir]):
     print("\n ** Error: All input (-b, -s) and output (-o) options must be specified!\n");

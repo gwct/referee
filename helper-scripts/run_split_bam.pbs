@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -k o
+#PBS -l nodes=1:ppn=24,walltime=24:00:00,vmem=100GB
+#PBS -M grthomas@indiana.edu
+#PBS -m abe
+#PBS -N om-split-bam
+#PBS -j oe
+
+cd /N/u/grthomas/Carbonate/bin/referee/
+python helper-scripts/split_bam.py -p 23 -s /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffold-list.txt -b /N/dcwan/projects/hahnlab-phi/owl-monkey/swapRef/owl-monkey-120ref-sorted.bam -o /N/dc2/scratch/grthomas/qtip/owl-monkey/split-bam-out/
