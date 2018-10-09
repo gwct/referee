@@ -86,7 +86,7 @@ if __name__ == '__main__':
         logfile.write(" ".join(sys.argv) + "\n");
         num_scaffs = len(scaffs);
         counter = 1;
-        if args.threads == 1:
+        if args.num_proc == 1:
             for scaff in scaffs.iteritems():
                 result = runANGSD(scaff);
                 if result[0]:
