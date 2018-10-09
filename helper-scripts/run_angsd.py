@@ -51,6 +51,7 @@ if not os.path.isdir(args.outdir):
     print(" ++ Making output directory: " + args.outdir);
     os.makedirs(args.outdir);
 logfilename = os.path.join(args.outdir, "run-angsd.log");
+outfilename = os.path.join(args.outdir, "run-angsd-out.txt");
 # Pertinant file and directory names.
 ############################################################
 # FUNCTION DEFINITIONS
@@ -68,7 +69,7 @@ def runANGSD(scaff_item):
     except:
         return [False, angsd_cmd, "FAILED ANGSD CMD", scaffold];
 
-    return [True, angsd_cmd, "", scaffold];
+    return [True, angsd_cmd, "", scaffold, outfile];
 
 ############################################################
 # MAIN BLOCK
@@ -82,7 +83,7 @@ if __name__ == '__main__':
     scaffs = { line.strip() : "" for line in open(args.scaff_file, "r").readlines() };
     # Read the scaffold IDs.
 
-    with open(logfilename, "w") as logfile:
+    with open(logfilename, "w") as logfile, open(outfilename, "w") as mainoutfile:
         logfile.write(" ".join(sys.argv) + "\n");
         num_scaffs = len(scaffs);
         counter = 1;
@@ -91,6 +92,7 @@ if __name__ == '__main__':
                 result = runANGSD(scaff);
                 if result[0]:
                     print counter, "/", num_scaffs, " -> ", result[3], " done!";
+                    mainoutfile.write(result[4] + "\n");
                 else:
                     print counter, "/", num_scaffs, " -> ", result[3], " FAILED!";
                 logfile.write(result[3] + " " + result[1] + " " + result[2] + "\n");
@@ -102,6 +104,7 @@ if __name__ == '__main__':
                 result = runANGSD(scaff);
                 if result[0]:
                     print counter, "/", num_scaffs, " -> ", result[3], " done!";
+                    mainoutfile.write(result[4] + "\n");
                 else:
                     print counter, "/", num_scaffs, " -> ", result[3], " FAILED!";
                 logfile.write(result[3] + " " + result[1] + " " + result[2] + "\n");
