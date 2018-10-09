@@ -1,10 +1,9 @@
 #!/usr/bin/python
 ############################################################
-# For owl monkey, 12.17
-# Using the output files from pileup_count_scaffold_base.py
-# this script takes min and max read depth and counts the 
-# number of sites.
-# This is part of the error rate estimation.
+# For Referee, 10.18
+# This takes a set of bam files and a reference genome and
+# uses ANGSD to calculate genotype likelihoods on each bam
+# file.
 ############################################################
 
 import sys, os, argparse, math, multiprocessing as mp
@@ -26,8 +25,8 @@ args = parser.parse_args();
 # -b /N/dcwan/projects/hahnlab-phi/owl-monkey/swapRef/owl-monkey-120ref-sorted.bam
 # -o /N/dc2/scratch/grthomas/qtip/owl-monkey/angsd-out/
 
-if any(a == False for a in [args.refdir, args.scaff_file, args.outdir]):
-    print("\n ** Error: All input (-r, -s) and output (-o) options must be specified!\n");
+if any(a == False for a in [args.refdir, args.scaff_file, args.bamfile, args.outdir]):
+    print("\n ** Error: All input (-r, -s, -b) and output (-o) options must be specified!\n");
     parser.print_help();
     sys.exit();
 if not os.path.isdir(args.refdir):
@@ -100,7 +99,7 @@ if __name__ == '__main__':
         # A serial version.
         else:
             pool = mp.Pool(processes = args.num_proc);
-            for result in pool.imap_unordered(callHetAB, scaffs.iteritems()):
+            for result in pool.imap_unordered(runANGSD, scaffs.iteritems()):
                 result = runANGSD(scaff);
                 if result[0]:
                     print counter, "/", num_scaffs, " -> ", result[3], " done!";
