@@ -58,7 +58,7 @@ def runANGSD(scaff_item):
     scaffold, blank = scaff_item;
     scaff_ref = os.path.join(args.refdir, scaffold + ".fa");
     if not os.path.isfile(scaff_ref):
-        return [False, "", "COULD NOT FIND SCAFF REF FILE", scaff];
+        return [False, "", "COULD NOT FIND SCAFF REF FILE", scaffold];
 
     outfile = os.path.join(outdir, scaffold)
     angsd_cmd = "angsd -GL 2 -i " + args.bam_file + " -ref " + scaff_ref + " -minQ 0 -doGlf 4 -out " + outfile;
@@ -66,9 +66,9 @@ def runANGSD(scaff_item):
     try:
         print angsd_cmd;
     except:
-        return [False, angsd_cmd, "FAILED ANGSD CMD", scaff];
+        return [False, angsd_cmd, "FAILED ANGSD CMD", scaffold];
 
-    return [True, angsd_cmd, "", scaff];
+    return [True, angsd_cmd, "", scaffold];
 
 ############################################################
 # MAIN BLOCK
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     print " -> Output directory:", args.outdir;
     print;
 
-    scaffs = { line : "" for line in open(args.scaff_file, "r").readlines() };
+    scaffs = { line.strip() : "" for line in open(args.scaff_file, "r").readlines() };
     # Read the scaffold IDs.
 
     with open(logfilename, "w") as logfile:
