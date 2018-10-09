@@ -79,7 +79,7 @@ if __name__ == '__main__':
     print " -> Output directory:", args.outdir;
     print;
 
-    scaffs = { line : "" for line in open(scaffilename, "r").readlines() };
+    scaffs = { line : "" for line in open(args.scaff_file, "r").readlines() };
     # Read the scaffold IDs.
 
     with open(logfilename, "w") as logfile:
