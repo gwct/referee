@@ -12,8 +12,8 @@ import sys, os, argparse, math, multiprocessing as mp
 # GLOBAL VARIABLES
 parser = argparse.ArgumentParser(description="");
 parser.add_argument("-s", dest="scaff_file", help="A file containing the list of scaffolds on which to run ANGSD.", default=False);
-parser.add_argument("-r", dest="refdir", help="The path to the directory FASTA files for each scaffold. Scaffold IDs should match those in the scaffolds file (-s) exactly and be named [scaffold-id].fa", default=False);
-parser.add_argument("-b", dest="bam_file", help="A BAM file with the reference genome's reads mapped back to the reference genome.", default=False);
+parser.add_argument("-r", dest="ref_file", help="The path to the reference genome FASTA file. Scaffold IDs should match those in the scaffolds file (-s) exactly", default=False);
+parser.add_argument("-b", dest="bamdir", help="The path to a directory containing a BAM file for each scaffold with the reference genome's reads mapped back to the reference genome.", default=False);
 parser.add_argument("-o", dest="outdir", help="Desired output directory location. Will create if not present.", default=False);
 parser.add_argument("-p", dest="num_proc", help="The number of processes to use. Default = 1", type=int, default=1);
 args = parser.parse_args();
@@ -21,15 +21,15 @@ args = parser.parse_args();
 
 # For owl monkey:
 # -s /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffolds-10kb.txt
-# -r /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/scaffolds/
-# -b /N/dcwan/projects/hahnlab-phi/owl-monkey/swapRef/owl-monkey-120ref-sorted.bam
+# -r /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna
+# -b /N/dc2/scratch/grthomas/qtip/owl-monkey/split-bam-out/
 # -o /N/dc2/scratch/grthomas/qtip/owl-monkey/angsd-out/
 
-if any(a == False for a in [args.refdir, args.scaff_file, args.bamfile, args.outdir]):
+if any(a == False for a in [args.ref_file, args.scaff_file, args.bamdir, args.outdir]):
     print("\n ** Error: All input (-r, -s, -b) and output (-o) options must be specified!\n");
     parser.print_help();
     sys.exit();
-if not os.path.isdir(args.refdir):
+if not os.path.isfile(args.ref_file):
     print("\n ** Error: Cannot find reference genome file (-r).\n");
     parser.print_help();
     sys.exit();
@@ -37,8 +37,8 @@ if not os.path.isfile(args.scaff_file):
     print("\n ** Error: Cannot find scaffolds file (-s).\n");
     parser.print_help();
     sys.exit();
-if not os.path.isfile(args.bam_file):
-    print("\n ** Error: Cannot find BAM file (-b).\n");
+if not os.path.isdir(args.bamdir):
+    print("\n ** Error: Cannot find BAM directory (-b).\n");
     parser.print_help();
     sys.exit();
 if args.num_proc < 1:
@@ -56,12 +56,12 @@ outfilename = os.path.join(args.outdir, "run-angsd-out.txt");
 # FUNCTION DEFINITIONS
 def runANGSD(scaff_item):
     scaffold, blank = scaff_item;
-    scaff_ref = os.path.join(args.refdir, scaffold + ".fa");
-    if not os.path.isfile(scaff_ref):
+    scaff_bam = os.path.join(args.bamdir, scaffold + ".bam");
+    if not os.path.isfile(scaff_bam):
         return [False, "", "COULD NOT FIND SCAFF REF FILE", scaffold];
 
     outfile = os.path.join(args.outdir, scaffold)
-    angsd_cmd = "angsd -GL 2 -i " + args.bam_file + " -ref " + scaff_ref + " -minQ 0 -doGlf 4 -out " + outfile;
+    angsd_cmd = "angsd -GL 2 -i " + scaff_bam + " -ref " + args.ref_file + " -minQ 0 -doGlf 4 -out " + outfile;
 
     try:
         print angsd_cmd;
