@@ -60,7 +60,7 @@ def runANGSD(scaff_item):
     if not os.path.isfile(scaff_ref):
         return [False, "", "COULD NOT FIND SCAFF REF FILE", scaffold];
 
-    outfile = os.path.join(outdir, scaffold)
+    outfile = os.path.join(args.outdir, scaffold)
     angsd_cmd = "angsd -GL 2 -i " + args.bam_file + " -ref " + scaff_ref + " -minQ 0 -doGlf 4 -out " + outfile;
 
     try:
