@@ -101,7 +101,6 @@ if __name__ == '__main__':
         else:
             pool = mp.Pool(processes = args.num_proc);
             for result in pool.imap_unordered(runANGSD, scaffs.iteritems()):
-                result = runANGSD(scaff);
                 if result[0]:
                     print counter, "/", num_scaffs, " -> ", result[3], " done!";
                     mainoutfile.write(result[4] + "\n");
