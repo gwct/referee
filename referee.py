@@ -56,9 +56,9 @@ def referee(files, globs, step_start_time):
 				globs['pids'].append(result);
 		for result in pool.imap(CALC.refCalc, ((file_num, new_files[file_num], globs) for file_num in new_files)):
 			if len(files) == 1:
-				new_files[file_num]['scaffs'] = result[1];
+				new_files[result[0]]['scaffs'] = result[1];
 			else:
-				files[file_num]['scaffs'] = result[1];
+				files[result[0]]['scaffs'] = result[1];
 			if globs['stats']:
 				file_start_time = RC.report_stats(globs, "File " + str(result[0]), file_start_time);
 		# Creates the pool of processes and passes each file to one process to calculate scores on.
