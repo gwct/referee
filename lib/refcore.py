@@ -112,7 +112,7 @@ def report_stats(globs, msg="", step_start=0, stat_start=False, stat_end=False):
 	# The first time through just print the headers.
 		globs['progstarttime'] = cur_time;
 		printWrite(globs['logfilename'], globs['log-v'], "# --stats : Reporting Referee time and memory usage.");
-		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 120);
+		printWrite(globs['logfilename'], globs['log-v'], "\n# " + "-" * 120);
 		printWrite(globs['logfilename'], globs['log-v'], "# Step" + " " * 15 + "Time since prev (sec)" + " " * 6 + "Elapsed time (sec)" + " " * 4 + "Current mem usage (MB)" + " " * 4 + "Virtual mem usage (MB)");
 		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 120);
 	else:

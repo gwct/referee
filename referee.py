@@ -12,12 +12,9 @@ import sys, os, multiprocessing as mp, shutil, lib.refcore as RC, lib.ref_calc a
 
 #############################################################################
 
-def referee(files, globs):
+def referee(files, globs, step_start_time):
 	if globs['stats']:
 		import psutil
-		globs['stats'] = True;
-		globs['pids'] = [psutil.Process(os.getpid())];		
-		step_start_time = RC.report_stats(globs, stat_start=True);
 		step_start_time  = RC.report_stats(globs, "Index ref fasta", step_start=step_start_time);
 	# Initialize the stats output if --stats is set
 
@@ -48,6 +45,8 @@ def referee(files, globs):
 			if globs['stats']:
 				step_start_time  = RC.report_stats(globs, "Split files", step_start=step_start_time);
 			new_files = OP.multiSplit(files, globs);
+		else:
+			new_files = files;
 		# If multiple processors are available for 1 file, we split the file into chunks.
 
 		pool = mp.Pool(processes = globs['num-procs']);
@@ -84,11 +83,14 @@ def referee(files, globs):
 
 if __name__ == '__main__':
 # Main is necessary for multiprocessing to work on Windows.
+	print("#");
+	print("# =================================================");
+	print(RC.welcome());
+	print("    Reference genome quality score calculator.\n")
 	globs = GV.init();
-	files, globs = OP.optParse(globs);
+	files, globs, step_start_time = OP.optParse(globs);
 	# Getting the input parameters from optParse.
-	RC.startProg(globs);
-	referee(files, globs);
+	referee(files, globs, step_start_time);
 	RC.endProg(globs);
 
 #############################################################################

@@ -1,13 +1,13 @@
 #!/bin/bash
 #PBS -k o
-#PBS -l nodes=1:ppn=2,walltime=4:00:00,vmem=48GB
+#PBS -l nodes=1:ppn=24,walltime=24:00:00,vmem=48GB
 #PBS -M grthomas@indiana.edu
 #PBS -m abe
 #PBS -N referee-tests
 #PBS -j oe
 
-#module load biopython/1.70
+module load biopython/1.70
 # Biopython needed for -f 3
 cd /N/u/grthomas/Carbonate/bin/referee/
-time -p python referee.py -gl /N/dc2/scratch/grthomas/qtip/angsd-doglf4/angsdput.glf.gz -ref data/rpgc_assembly.fasta --stats --fastq --correct -o ref-test-1-1 -f 1
+time -p python referee.py -i data/om-angsd-files.txt -ref /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna --stats --fastq --correct -o owl-monkey-test -p 23
 

@@ -82,12 +82,21 @@ def optParse(globs):
 		globs['correct-opt'] = True;
 	# Checking the correct option.
 
-	if args.stats_opt:
-		globs['stats'] = True;
-	# Initializing the stats options if --stats is set.
 	if args.allcalc_opt:
 		globs['allcalc'] = True;
 		globs['fastq'] = False;
+
+	RC.startProg(globs);
+	# After all the essential options have been set, call the welcome function.
+
+	if args.stats_opt:
+		import psutil
+		globs['stats'] = True;
+		globs['pids'] = [psutil.Process(os.getpid())];		
+		step_start_time = RC.report_stats(globs, stat_start=True);
+	else:
+		step_start_time = "";
+	# Initializing the stats options if --stats is set.
 	# Parse performance options.
 
 	file_paths, file_num = {}, 1;
@@ -107,6 +116,10 @@ def optParse(globs):
 			os.makedirs(globs['outdir']);
 		# Specifiy and create the output directory, if necessary.
 
+		if globs['stats']:
+			step_start_time  = RC.report_stats(globs, "Reading input", step_start=step_start_time);
+		else:
+			print("Reading input file paths...");
 		for line in open(args.input_list):
 			cur_gl_file = line.strip();
 			if not cur_gl_file:
@@ -148,7 +161,7 @@ def optParse(globs):
 		file_paths[file_num] = { 'in' : args.gl_file, 'out' : outfiletab, 'tmpfile' : outfiletmp, 'outfq' : outfilefq };
 	# Get the file paths for the current files.
 
-	return file_paths, globs
+	return file_paths, globs, step_start_time;
 
 #############################################################################
 
