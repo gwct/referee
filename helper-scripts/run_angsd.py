@@ -64,7 +64,8 @@ def runANGSD(scaff_item):
     angsd_cmd = "angsd -GL 2 -i " + scaff_bam + " -ref " + args.ref_file + " -minQ 0 -doGlf 4 -out " + outfile;
 
     try:
-        print angsd_cmd;
+        #print angsd_cmd;
+        os.system(angsd_cmd);
     except:
         return [False, angsd_cmd, "FAILED ANGSD CMD", scaffold];
 
