@@ -64,14 +64,12 @@ def refCalc(file_item):
 # Reads through a genotype likelihood file and calculates a quality scores for each line.
     file_num, file_info, globs = file_item;
     genotypes = ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"];
-    file_scaffs = set();
 
     last_scaff = "";
     with open(file_info['out'], "w") as outfile:
         for line in RC.getFileReader(file_info['in'])(file_info['in']):
             line = line.strip().split("\t");
             scaff, pos, gl_list = line[0], int(line[1]), line[2:];
-            file_scaffs.add(scaff);
 
             cor_ref, cor_score = "NA", "NA";
 
@@ -104,6 +102,6 @@ def refCalc(file_item):
             OUT.outputTab(outdict, outfile, globs);
             # Writes the output to the current output file.
 
-    return file_num, file_scaffs;
+    return file_num;
 
 #############################################################################

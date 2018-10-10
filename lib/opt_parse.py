@@ -3,10 +3,10 @@ import sys, os, refcore as RC
 
 def optParse(globs):
 # This function handles the command line options and prepares the output directory and files.
-	try:
-		from Bio import SeqIO
-	except:
-		sys.exit("\n*** ERROR: Your installation of Python is missing the Biopython module. Please install the module with: pip install biopython\n")
+	#try:
+	#	from Bio import SeqIO
+	#except:
+	#	sys.exit("\n*** ERROR: Your installation of Python is missing the Biopython module. Please install the module with: pip install biopython\n")
 	# First check if the argparse module is installed. If not, the input options cannot be parsed.
 	try:
 		import argparse;
@@ -168,7 +168,7 @@ def optParse(globs):
 			outfilefq = args.out_dest + ".fq";
 		# Specify the output files.
 
-		file_paths[file_num] = { 'in' : args.gl_file, 'out' : outfiletab, 'tmpfile' : outfiletmp, 'outfq' : outfilefq, 'scaffs' : set() };
+		file_paths[file_num] = { 'in' : args.gl_file, 'out' : outfiletab, 'tmpfile' : outfiletmp, 'outfq' : outfilefq };
 	# Get the file paths for the current files.
 
 	return file_paths, globs, step_start_time;

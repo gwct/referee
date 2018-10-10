@@ -54,9 +54,11 @@ def outputTab(outdict, outfile, globs):
     # Write the line.
 #############################################################################
 
-def addUnmapped(file_info, globs):
+def addUnmapped(file_item):
 # Since we need to have a score for every position in the reference genome and some of those positions are unmapped,
 # this function goes through the positions in the output file and adds the unmapped positions.
+
+    file_num, file_info, globs = file_item;
 
     scaff_pos, last_scaff, first = 1, "", True;
     # scaff_pos keeps track of the last position we've filled in. Comparing it to the current position in the output file
@@ -72,8 +74,7 @@ def addUnmapped(file_info, globs):
         for line in open(file_info['out']):
             linelist = line.strip().split("\t");
             scaff, pos = linelist[0], int(linelist[1]);
-            if scaff not in file_info['scaffs']:
-                continue;
+
             if scaff != last_scaff:
                 if first:
                     first = False
@@ -116,6 +117,8 @@ def addUnmapped(file_info, globs):
                 fq_vars = outputFastq(fqoutdict, fq_vars, globs, final=True);
             fqoutfile.close();
         # Write the final FASTQ line if the last position was mapped and had a score and close the FASTQ output file.
+
+        return file_num;
 
 #############################################################################
 

@@ -9,5 +9,5 @@
 module load biopython/1.70
 # Biopython needed for -f 3
 cd /N/u/grthomas/Carbonate/bin/referee/
-time -p python referee.py -i data/om-angsd-files.txt -ref /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna --stats --fastq --correct -o owl-monkey-test -p 23
+time -p python referee.py -i data/om-angsd-files.txt -ref /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna --stats --fastq --correct -o /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee -p 23
 
