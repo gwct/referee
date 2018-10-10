@@ -7,4 +7,4 @@
 #PBS -j oe
 
 cd /N/u/grthomas/Carbonate/bin/referee/
-python helper-scripts/run_angsd.py -s /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffolds-10kb.txt -r /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/scaffolds/ -b /N/dcwan/projects/hahnlab-phi/owl-monkey/swapRef/owl-monkey-120ref-sorted.bam -o /N/dc2/scratch/grthomas/qtip/owl-monkey/angsd-out/
+python helper-scripts/run_angsd.py -s /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffold-list.txt -r /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna -b /N/dc2/scratch/grthomas/qtip/owl-monkey/split-bam-out/ -o /N/dc2/scratch/grthomas/qtip/owl-monkey/angsd-out/

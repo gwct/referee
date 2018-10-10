@@ -48,8 +48,8 @@ logfilename = os.path.join(args.outdir, "split-bam.log");
 # FUNCTION DEFINITIONS
 def samView(scaff_item):
     scaffold, blank = scaff_item;
-    outfile = os.path.join(args.outdir, scaffold)
-    samtools_cmd = "samtools view " + args.bam_file + " " + scaffold + " > " + outfile;
+    outfile = os.path.join(args.outdir, scaffold + ".bam")
+    samtools_cmd = "samtools view -b " + args.bam_file + " " + scaffold + " > " + outfile;
     try:
         #print samtools_cmd;
         os.system(samtools_cmd);

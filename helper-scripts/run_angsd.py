@@ -20,7 +20,7 @@ args = parser.parse_args();
 # Input options.
 
 # For owl monkey:
-# -s /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffolds-10kb.txt
+# -s /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffolds-list.txt
 # -r /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna
 # -b /N/dc2/scratch/grthomas/qtip/owl-monkey/split-bam-out/
 # -o /N/dc2/scratch/grthomas/qtip/owl-monkey/angsd-out/
