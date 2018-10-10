@@ -12,7 +12,7 @@ import sys, os, argparse, math, multiprocessing as mp
 # GLOBAL VARIABLES
 parser = argparse.ArgumentParser(description="");
 parser.add_argument("-s", dest="scaff_file", help="A file containing the list of scaffolds on which to run ANGSD.", default=False);
-parser.add_argument("-r", dest="ref_file", help="The path to the reference genome FASTA file. Scaffold IDs should match those in the scaffolds file (-s) exactly", default=False);
+parser.add_argument("-r", dest="refdir", help="The path to the directory containing reference genome FASTA files split by scaffold. Scaffold IDs should match those in the scaffolds file (-s) exactly", default=False);
 parser.add_argument("-b", dest="bamdir", help="The path to a directory containing a BAM file for each scaffold with the reference genome's reads mapped back to the reference genome.", default=False);
 parser.add_argument("-o", dest="outdir", help="Desired output directory location. Will create if not present.", default=False);
 parser.add_argument("-p", dest="num_proc", help="The number of processes to use. Default = 1", type=int, default=1);
@@ -25,12 +25,12 @@ args = parser.parse_args();
 # -b /N/dc2/scratch/grthomas/qtip/owl-monkey/split-bam-out/
 # -o /N/dc2/scratch/grthomas/qtip/owl-monkey/angsd-out/
 
-if any(a == False for a in [args.ref_file, args.scaff_file, args.bamdir, args.outdir]):
+if any(a == False for a in [args.refdir, args.scaff_file, args.bamdir, args.outdir]):
     print("\n ** Error: All input (-r, -s, -b) and output (-o) options must be specified!\n");
     parser.print_help();
     sys.exit();
-if not os.path.isfile(args.ref_file):
-    print("\n ** Error: Cannot find reference genome file (-r).\n");
+if not os.path.isdir(args.refdir):
+    print("\n ** Error: Cannot find reference genome directory (-r).\n");
     parser.print_help();
     sys.exit();
 if not os.path.isfile(args.scaff_file):
@@ -56,12 +56,15 @@ outfilename = os.path.join(args.outdir, "run-angsd-out.txt");
 # FUNCTION DEFINITIONS
 def runANGSD(scaff_item):
     scaffold, blank = scaff_item;
+    scaff_ref = os.path.join(args.refdir, scaffold + ".fa");
+    if not os.path.isfile(scaff_ref):
+        return [False, "", "COULD NOT FIND SCAFF REF FILE", scaffold];
     scaff_bam = os.path.join(args.bamdir, scaffold + ".bam");
     if not os.path.isfile(scaff_bam):
-        return [False, "", "COULD NOT FIND SCAFF REF FILE", scaffold];
+        return [False, "", "COULD NOT FIND SCAFF BAM FILE", scaffold];
 
     outfile = os.path.join(args.outdir, scaffold)
-    angsd_cmd = "angsd -GL 2 -i " + scaff_bam + " -ref " + args.ref_file + " -minQ 0 -doGlf 4 -out " + outfile;
+    angsd_cmd = "angsd -GL 2 -i " + scaff_bam + " -ref " + scaff_ref + " -minQ 0 -doGlf 4 -out " + outfile;
 
     try:
         print angsd_cmd;
