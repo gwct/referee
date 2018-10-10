@@ -130,7 +130,7 @@ def optParse(globs):
 				RC.errorOut(8, "Invalid file path found in input file: " + cur_gl_file, globs);
 			basename = os.path.splitext(os.path.basename(cur_gl_file));
 			if basename[1] == '.gz':
-				basename = os.path.splitext(basename)[0];
+				basename = os.path.splitext(basename[0])[0];
 			else:
 				basename = basename[0];
 
