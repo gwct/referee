@@ -72,6 +72,8 @@ def addUnmapped(file_info, globs):
         for line in open(file_info['out']):
             linelist = line.strip().split("\t");
             scaff, pos = linelist[0], int(linelist[1]);
+            if scaff not in file_info['scaffs']:
+                continue;
             if scaff != last_scaff:
                 if first:
                     first = False

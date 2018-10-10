@@ -128,14 +128,24 @@ def optParse(globs):
 
 			if not os.path.isfile(cur_gl_file):
 				RC.errorOut(8, "Invalid file path found in input file: " + cur_gl_file, globs);
-			if not args.out_dest:
-				cur_outfiletab = os.path.join(globs['outdir'], os.path.splitext(cur_gl_file)[0] + "-referee-out.txt");
-				cur_outfiletmp = os.path.join(globs['outdir'], os.path.splitext(cur_gl_file)[0] + str(file_num) + "-referee-tmp-" + globs['startdatetime'] + ".tmp");
-				cur_outfilefq = os.path.join(globs['outdir'], os.path.splitext(cur_gl_file)[0] + "-referee-out.fq");
+			basename = os.path.splitext(os.path.basename(cur_gl_file));
+			if basename[1] == '.gz':
+				basename = os.path.splitext(basename)[0];
 			else:
-				cur_outfiletab = os.path.join(globs['outdir'], args.out_dest + "-" + str(file_num) + ".txt");
-				cur_outfiletmp = os.path.join(globs['outdir'], args.out_dest + "-" + str(file_num) + ".tmp");
-				cur_outfilefq = os.path.join(globs['outdir'], args.out_dest + "-" + str(file_num) + ".fq");				
+				basename = basename[0];
+
+			cur_outfiletab = os.path.join(globs['outdir'], basename + "-out.txt");
+			cur_outfiletmp = os.path.join(globs['outdir'], basename + "-" + globs['startdatetime'] + "-" + RC.getRandStr() + ".tmp");
+			cur_outfilefq = os.path.join(globs['outdir'], basename + ".fq");
+
+			# if not args.out_dest:
+			# 	cur_outfiletab = os.path.join(globs['outdir'], os.path.splitext(cur_gl_file)[0] + "-referee-out.txt");
+			# 	cur_outfiletmp = os.path.join(globs['outdir'], os.path.splitext(cur_gl_file)[0] + str(file_num) + "-referee-tmp-" + globs['startdatetime'] + ".tmp");
+			# 	cur_outfilefq = os.path.join(globs['outdir'], os.path.splitext(cur_gl_file)[0] + "-referee-out.fq");
+			# else:
+			# 	cur_outfiletab = os.path.join(globs['outdir'], args.out_dest + "-" + str(file_num) + ".txt");
+			# 	cur_outfiletmp = os.path.join(globs['outdir'], args.out_dest + "-" + str(file_num) + ".tmp");
+			# 	cur_outfilefq = os.path.join(globs['outdir'], args.out_dest + "-" + str(file_num) + ".fq");				
 			# Output file names.
 
 			file_paths[file_num] = { 'in' : cur_gl_file, 'out' : cur_outfiletab, 'tmpfile' : cur_outfiletmp, 'outfq' : cur_outfilefq };
@@ -158,7 +168,7 @@ def optParse(globs):
 			outfilefq = args.out_dest + ".fq";
 		# Specify the output files.
 
-		file_paths[file_num] = { 'in' : args.gl_file, 'out' : outfiletab, 'tmpfile' : outfiletmp, 'outfq' : outfilefq };
+		file_paths[file_num] = { 'in' : args.gl_file, 'out' : outfiletab, 'tmpfile' : outfiletmp, 'outfq' : outfilefq, 'scaffs' : set() };
 	# Get the file paths for the current files.
 
 	return file_paths, globs, step_start_time;

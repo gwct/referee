@@ -37,8 +37,9 @@ def referee(files, globs, step_start_time):
 	if globs['num-procs'] == 1:
 		for file_num in files:
 			result = CALC.refCalc((file_num, files[file_num], globs));
+			files[file_num]['scaffs'] = result[1];
 			if globs['stats']:
-				file_start_time = RC.report_stats(globs, "File " + str(result), file_start_time);
+				file_start_time = RC.report_stats(globs, "File " + str(result[0]), file_start_time);
 	# The serial version.
 	else:
 		if len(files) == 1:
@@ -54,19 +55,26 @@ def referee(files, globs, step_start_time):
 			for result in pool.imap(RC.getSubPID, range(globs['num-procs'])):
 				globs['pids'].append(result);
 		for result in pool.imap(CALC.refCalc, ((file_num, new_files[file_num], globs) for file_num in new_files)):
+			if len(files) == 1:
+				new_files[file_num]['scaffs'] = result[1];
+			else:
+				files[file_num]['scaffs'] = result[1];
 			if globs['stats']:
-				file_start_time = RC.report_stats(globs, "File " + str(result), file_start_time);
+				file_start_time = RC.report_stats(globs, "File " + str(result[0]), file_start_time);
 		# Creates the pool of processes and passes each file to one process to calculate scores on.
 
 		if len(files) == 1:
 			if globs['stats']:
 				step_start_time  = RC.report_stats(globs, "Merge files", step_start=step_start_time);
 			OP.mergeFiles(files[1]['out'], new_files, globs);
+			for file_num in new_files:
+				files[1]['scaffs'] = files[1]['scaffs'].union(new_files[file_num]['scaffs']);
+			
 		# Merges the split tmp files back into a single output file.
 	# The parallel verison.
-
 	if not globs['mapped']:
 		for file_num in files:
+			print file_num, files[file_num]['scaffs'];
 			if globs['stats']:
 				step_start_time  = RC.report_stats(globs, "Add unmapped " + str(file_num), step_start=step_start_time);
 			OUT.addUnmapped(files[file_num], globs);
@@ -83,10 +91,6 @@ def referee(files, globs, step_start_time):
 
 if __name__ == '__main__':
 # Main is necessary for multiprocessing to work on Windows.
-	print("#");
-	print("# =================================================");
-	print(RC.welcome());
-	print("    Reference genome quality score calculator.\n")
 	globs = GV.init();
 	files, globs, step_start_time = OP.optParse(globs);
 	# Getting the input parameters from optParse.
