@@ -100,8 +100,9 @@ if(length(args)==3){
   print("Generating score-v-depth plot...")
   in_combo = merge(in_data, pileup_data, by=c("scaff", "pos"))
   depth_p = ggplot(in_combo, aes(x=score, y=depth)) +
-    geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
+    #geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
     geom_point(color='#333333', size=0.5) +
+    ylim(0, NA) +
     labs(x="Referee score", y="Depth") +
     theme_classic() +
     theme(axis.text=element_text(size=10), 
