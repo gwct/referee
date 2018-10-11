@@ -12,7 +12,7 @@ cd /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee/
 scriptdir="/N/u/grthomas/Carbonate/bin/referee/helper_scripts"
 pileupdir="/N/dcwan/projects/hahnlab-phi/owl-monkey/pileup-files/ref-120X-scaffolds"
 
-cat ../scaffold-list.txt | parallel --eta '"Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r {}-out.txt F /N/dcwan/projects/hahnlab-phi/owl-monkey/pileup-files/ref-120X-scaffolds/39093-{}.pileup plots"'
+cat ../scaffold-list.txt | parallel --eta '"Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee/{}-out.txt F /N/dcwan/projects/hahnlab-phi/owl-monkey/pileup-files/ref-120X-scaffolds/39093-{}.pileup /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee/plots"'
 
 # for i in *-out.txt; do
 #     echo $i

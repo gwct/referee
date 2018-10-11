@@ -16,7 +16,7 @@ args = commandArgs(trailingOnly=TRUE)
 #args = c("../test.txt", T, "../data/pileup-snippet.txt")
 # Manual entry of input files
 
-if(!length(args) %in% c(1,2,3) || "-h" %in% args){
+if(!length(args) %in% c(1,2,3,4) || "-h" %in% args){
   stop("\n\nUsage: Rscript [referee tabbed output file (required)] [barplot opt (T/F - Default: F)] [genome pileup file (optional)] [output directory] [-h]\n\n")
 }
 
