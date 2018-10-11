@@ -25,7 +25,7 @@ if(length(args) == 4){
 }else{
   outdir = paste(basename(tools::file_path_sans_ext(args[1])), "-plots", sep="")
 }
-dir.create(file.path(getwd(), outdir))
+#dir.create(file.path(getwd(), outdir))
 
 print(args)
 print("---")
@@ -81,6 +81,7 @@ score_p = ggplot(in_data, aes(x=score)) +
 outfile = paste(outdir, "/score-hist.png", sep="")
 ggsave(file=outfile, score_p, width=8, height=6, units="in")
 print("Generating score-v-depth plot...")
+
 if(length(args)==3){
   in_combo = merge(in_data, pileup_data, by=c("scaff", "pos"))
   depth_p = ggplot(in_combo, aes(x=score, y=depth)) +
