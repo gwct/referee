@@ -31,7 +31,6 @@ print(args)
 print("---")
 print("Reading referee table...")
 in_data = read.table(args[1], header=F, sep="\t")
-print(length(in_data[1,]))
 if(length(in_data[1,])==3){
   names(in_data) = c("scaff", "pos", "score")
 }else if(length(in_data[1,])==5){
@@ -48,7 +47,7 @@ if(length(args>=2)){
 print("Reading pileup...")
 if(length(args)==3){
   pileup_data = read.table(args[3], header=F, sep="\t")
-  names(pileup_data) = c("scaff", "pos", "base", "depth")
+  names(pileup_data) = c("scaff", "pos", "base", "depth", "reads", "qual")
 }
   
 print("Calculating mean...")
