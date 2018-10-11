@@ -17,10 +17,14 @@ args = commandArgs(trailingOnly=TRUE)
 # Manual entry of input files
 
 if(!length(args) %in% c(1,2,3) || "-h" %in% args){
-  stop("\n\nUsage: Rscript [referee tabbed output file (required)] [barplot opt (T/F - Default: F)] [genome pileup file (optional)] [-h]\n\n")
+  stop("\n\nUsage: Rscript [referee tabbed output file (required)] [barplot opt (T/F - Default: F)] [genome pileup file (optional)] [output directory] [-h]\n\n")
 }
 
-outdir = paste(basename(tools::file_path_sans_ext(args[1])), "-plots", sep="")
+if(length(args) == 4){
+  outdir = args[4]
+}else{
+  outdir = paste(basename(tools::file_path_sans_ext(args[1])), "-plots", sep="")
+}
 dir.create(file.path(getwd(), outdir))
 
 print(args)
@@ -97,33 +101,33 @@ if(length(args)==3){
   outfile = paste(outdir, "/score-v-depth.png", sep="")
   ggsave(file=outfile, depth_p, width=8, height=6, units="in")
 }
-print("Generating barplots...")
-if(barp){
-  rm(score_p, depth_p,pileup_data)
-  scaff_scores = split(in_data, in_data[,"scaff"])
-  rm(in_data)
-  for(df in scaff_scores){
-    outfile = paste(outdir, "/", df[1,1], "-scores.png", sep="")
-    print(outfile)
-    png(outfile)
-    barplot(df$score, names.arg=df$pos, ylim=c(-2,92), xlab="Position", ylab="Score", border=NA, space=0)
-    #axis(1,at=bp,labels=df$pos)
-    dev.off()
+# print("Generating barplots...")
+# if(barp){
+#   rm(score_p, depth_p,pileup_data)
+#   scaff_scores = split(in_data, in_data[,"scaff"])
+#   rm(in_data)
+#   for(df in scaff_scores){
+#     outfile = paste(outdir, "/", df[1,1], "-scores.png", sep="")
+#     print(outfile)
+#     png(outfile)
+#     barplot(df$score, names.arg=df$pos, ylim=c(-2,92), xlab="Position", ylab="Score", border=NA, space=0)
+#     #axis(1,at=bp,labels=df$pos)
+#     dev.off()
     
-    #bar_p = ggplot(df, aes(x=pos, y=score)) +
-    #  geom_bar(stat="identity") +
-    #  labs(x="Position", y="Referee score") +
-    #  theme_classic() +
-    #  theme(axis.text=element_text(size=10), 
-    #        axis.title=element_text(size=12), 
-    #        axis.title.y=element_text(margin=margin(t=0,r=20,b=0,l=0),color="black"), 
-    #        axis.title.x=element_text(margin=margin(t=20,r=0,b=0,l=0),color="black"),
-    #        axis.line=element_line(colour='#595959',size=0.75),
-    #        axis.ticks=element_line(colour="#595959",size = 1),
-    #        axis.ticks.length=unit(0.2,"cm"),
-    #        legend.position="none"
-    #  )
-    #ggsave(file=outfile, bar_p, width=8, height=6, units="in")
-  }
+#     #bar_p = ggplot(df, aes(x=pos, y=score)) +
+#     #  geom_bar(stat="identity") +
+#     #  labs(x="Position", y="Referee score") +
+#     #  theme_classic() +
+#     #  theme(axis.text=element_text(size=10), 
+#     #        axis.title=element_text(size=12), 
+#     #        axis.title.y=element_text(margin=margin(t=0,r=20,b=0,l=0),color="black"), 
+#     #        axis.title.x=element_text(margin=margin(t=20,r=0,b=0,l=0),color="black"),
+#     #        axis.line=element_line(colour='#595959',size=0.75),
+#     #        axis.ticks=element_line(colour="#595959",size = 1),
+#     #        axis.ticks.length=unit(0.2,"cm"),
+#     #        legend.position="none"
+#     #  )
+#     #ggsave(file=outfile, bar_p, width=8, height=6, units="in")
+#   }
   
-}
+# }

@@ -1,11 +1,24 @@
 #!/bin/bash
 #PBS -k o
-#PBS -l nodes=1:ppn=1,walltime=6:00:00,vmem=100GB
+#PBS -l nodes=1:ppn=1,walltime=24:00:00,vmem=100GB
 #PBS -M grthomas@indiana.edu
 #PBS -m abe
 #PBS -N referee-plots
 #PBS -j oe
 
+module load gnu-parallel/20170622
 module load r/3.4.4
-cd /N/u/grthomas/Carbonate/bin/referee/
-Rscript helper-scripts/score_hist.r ~/ref-tests/ref-test-1-1.txt T /N/dc2/scratch/grthomas/qtip/single-depth.pileup
+cd /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee/
+scriptdir="/N/u/grthomas/Carbonate/bin/referee/helper_scripts"
+pileupdir="/N/dcwan/projects/hahnlab-phi/owl-monkey/pileup-files/ref-120X-scaffolds"
+
+cat ../scaffold-list.txt | parallel --eta '"Rscript $scriptdir/score_hist.r {}-out.txt F $pileupdir/39093-{}.pileup plots"'
+
+# for i in *-out.txt; do
+#     echo $i
+#     #print $scriptdir/score_hist.r $i F $pileupdir/39093-$i.pileup
+#     Rscript $scriptdir/score_hist.r $i F $pileupdir/39093-$i.pileup plots
+#     &
+# done
+# wait
+
