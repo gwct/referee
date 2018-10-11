@@ -8,29 +8,45 @@
 library(ggplot2)
 cat("----------\n")
 
-args = commandArgs(trailingOnly=TRUE)
+#args = commandArgs(trailingOnly=TRUE)
 # Command line entry of input files
 
-#this.dir <- dirname(parent.frame(2)$ofile)
-#setwd(this.dir)
-#args = c("../test.txt", T, "../data/pileup-snippet.txt")
+this.dir <- dirname(parent.frame(2)$ofile)
+setwd(this.dir)
+args = c("../data/om-scaff/JYKP02038398.1-out.txt", "../data/om-scaff/plots/", "../data/om-scaff/39093-JYKP02038398.1.pileup")
 # Manual entry of input files
 
-if(!length(args) %in% c(1,2,3,4) || "-h" %in% args){
-  stop("\n\nUsage: Rscript [referee tabbed output file (required)] [barplot opt (T/F - Default: F)] [genome pileup file (optional)] [output directory] [-h]\n\n")
+if(!length(args) %in% c(2,3) || "-h" %in% args){
+  stop("\n\nUsage: Rscript [referee tabbed output file (required)] [output directory (required)] [genome pileup file (optional)]  [-h]\n\n")
 }
 
-if(length(args) == 4){
-  outdir = args[4]
-}else{
-  outdir = paste(basename(tools::file_path_sans_ext(args[1])), "-plots", sep="")
+infile = args[1]
+if(!file.exists(infile)){
+  stop("\n\nInput file not found.\n")
 }
+print(paste("Input file:", infile))
+
+outdir = args[2]
+if(!dir.exists(outdir)){
+  stop("\n\nOutput directory not found.\n")
+}
+print(paste("Output directory:", outdir))
+outfile_prefix = paste(outdir, basename(tools::file_path_sans_ext(args[1])), sep="")
+print(paste("Output file prexid:", outfile_prefix))
 #dir.create(file.path(getwd(), outdir))
 
-print(args)
+if(length(args)==3){
+  pileupfile = args[3]
+  if(!file.exists(pileupfile)){
+    stop("\n\nPileup file not found.\n")
+  }
+  print(paste("Pileup file:", pileupfile))
+}
+
+
 print("---")
 print("Reading referee table...")
-in_data = read.table(args[1], header=F, sep="\t")
+in_data = read.table(infile, header=F, sep="\t")
 if(length(in_data[1,])==3){
   names(in_data) = c("scaff", "pos", "score")
 }else if(length(in_data[1,])==5){
@@ -40,16 +56,12 @@ if(length(in_data[1,])==3){
 }else if(length(in_data[1,])==1){
   names(in_data) = c("scaff", "pos", "score", "lr", "l.match", "l.mismatch", "ref", "max.gt", "max.gl", "core.base", "core.score")
 }
-print("Setting barplot option...")
-if(length(args>=2)){
-  barp = args[2]
-}
-print("Reading pileup...")
-if(length(args)==3){
-  pileup_data = read.table(args[3], header=F, sep="\t")
-  names(pileup_data) = c("scaff", "pos", "base", "depth", "reads", "qual")
-}
-  
+
+#print("Setting barplot option...")
+#if(length(args>=2)){
+#  barp = args[2]
+#}
+
 print("Calculating mean...")
 mean_score = mean(in_data$score)
 print(paste("Mean: ", mean_score))
@@ -77,11 +89,15 @@ score_p = ggplot(in_data, aes(x=score)) +
         legend.position="none"
   )
 
-outfile = paste(outdir, "/score-hist.png", sep="")
+outfile = paste(outfile_prefix, "-score-hist.png", sep="")
 ggsave(file=outfile, score_p, width=8, height=6, units="in")
-print("Generating score-v-depth plot...")
 
 if(length(args)==3){
+  print("Reading pileup...")
+  pileup_data = read.table(pileupfile, header=F, sep="\t", quote="", comment="", colClasses=c("character", "integer", "character", "integer", "character", "character"))
+  names(pileup_data) = c("scaff", "pos", "base", "depth", "reads", "qual")
+  
+  print("Generating score-v-depth plot...")
   in_combo = merge(in_data, pileup_data, by=c("scaff", "pos"))
   depth_p = ggplot(in_combo, aes(x=score, y=depth)) +
     geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
@@ -98,9 +114,10 @@ if(length(args)==3){
           legend.position="none"
     )
   
-  outfile = paste(outdir, "/score-v-depth.png", sep="")
+  outfile = paste(outfile_prefix, "-score-v-depth.png", sep="")
   ggsave(file=outfile, depth_p, width=8, height=6, units="in")
 }
+
 # print("Generating barplots...")
 # if(barp){
 #   rm(score_p, depth_p,pileup_data)
