@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -k o
+#PBS -l nodes=1:ppn=9,walltime=24:00:00,vmem=48GB
+#PBS -M grthomas@indiana.edu
+#PBS -m abe
+#PBS -N referee-tests
+#PBS -j oe
+
+module load bwa/0.7.12
+module load samtools/1.5
+refpath="/N/dc2/scratch/grthomas/qtip/jsinuosa/
+bwa aln
