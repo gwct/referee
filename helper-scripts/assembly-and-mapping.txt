@@ -1,0 +1,35 @@
+fastq-dump --defline-seq '@$sn[_$rn]/$ri' --split-files <SRR ID>, <SRR ID> ...
+# Get reads from SRA
+
+Trinity --seqType fq --max_memory 100G --left <file>_1.fastq --right <file>_2.fastq --CPU 8
+# Assembly with Trinity -- results in output file Trinity.fasta
+
+bwa index <reference.fa>
+# Index with BWA -- reference.fa should be Trinity.fasta
+
+java -jar $PICARD CreateSequenceDictionary R=<reference.fasta> O=<reference.dict>
+# Sequence dictionary with Picard
+
+bwa mem <reference.fasta> <file>_1.fastq <file>_2.fastq > <output.sam>
+# Map with BWA
+
+java -jar $PICARD ReplaceSamHeader I=<input.sam> HEADER=<reference.dict> O=<output.sam>
+# Add header to SAM (if missing)
+
+samtools view -b <input.sam> > <output.bam>
+# Convert to BAM
+ 
+samtools sort <input.bam> -o <output-sorted.bam>
+# Sort BAM
+
+time -p angsd -GL 2 -i <sorted.bam> -ref <reference.fasta> -minQ 0 -doGlf 4 -out <output-prefix>
+# Calculate GLs with ANGSD
+
+
+
+
+grep ">" file.fasta | wc -l
+# Count number of scaffolds/transcripts in FASTA file
+
+grep -v ">" file.fasta | wc | awk '{print $3-$1}' 
+# Count number of bases in FASTA file

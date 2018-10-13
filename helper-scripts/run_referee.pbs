@@ -1,11 +1,11 @@
 #!/bin/bash
 #PBS -k o
-#PBS -l nodes=1:ppn=9,walltime=24:00:00,vmem=48GB
+#PBS -l nodes=1:ppn=5,walltime=24:00:00,vmem=48GB
 #PBS -M grthomas@indiana.edu
 #PBS -m abe
 #PBS -N referee-tests
 #PBS -j oe
 
 cd /N/u/grthomas/Carbonate/bin/referee/
-time -p python referee.py -i data/om-angsd-files.txt -ref /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna --stats --fastq --correct -o /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee-8proc -p 8
+time -p python referee.py -i data/om-angsd-files.txt -ref /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna --stats --fastq --correct -o /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee-4proc -p 4
 
