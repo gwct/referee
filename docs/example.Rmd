@@ -1,0 +1,330 @@
+---
+title: "Referee"
+author: "Gregg Thomas"
+output:
+  html_document: default
+  pdf_document:
+    fig_caption: yes
+  word_document: default
+---
+
+<style type="text/css"> .table { width: 40%; } </style>
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(ggplot2)
+library(directlabels)
+library(gridExtra)
+library(kableExtra)
+opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)  
+```
+
+```{r functions, echo=FALSE}
+##########
+# Functions
+gl <- function(reads, base_probs, map_probs, ref, meth){
+  genotypes = c("AA","AT","AC","AG","TT","TC","TG","CC","CG","GG")
+  gt_data = data.frame(genotypes)
+  gt_data$probs = 1
+
+  for(gt in gt_data$genotypes){
+    a1 = substr(gt,1,1)
+    a2 = substr(gt,2,2)
+    rprobs = c()
+    
+    for(i in 1:length(reads)){
+      r = reads[i]
+      p = base_probs[i] * map_probs[i]
+      aprobs = c()
+      for(a in c(a1,a2)){
+        if(r==a){
+          aprobs = c(aprobs, 1-p)
+        }else if (r!=a){
+          aprobs = c(aprobs, p/3)
+        }
+      }
+      rprobs = c(rprobs, ((0.5 * aprobs[1]) + (0.5 * aprobs[2])))
+    }
+    gt_data$probs[which(gt_data$genotypes==gt)] = prod(rprobs)
+  }
+  
+  gt_data$pl = -10 * log(gt_data$probs, 10)
+  gt_data$norm_pl = gt_data$pl - min(gt_data$pl)
+  gt_data$norm_pl[which(gt_data$norm_pl==0)] = NA
+  min_gt = gt_data$genotype[which(gt_data$pl==min(gt_data$pl))]
+  gq = gt_data$norm_pl[which(gt_data$norm_pl==min(gt_data$norm_pl, na.rm=T))]
+  
+  match_gt = subset(gt_data, grepl(ref, genotypes))
+  unmatch_gt = subset(gt_data, !grepl(ref, genotypes))
+  
+  p_correct = sum(match_gt$probs)
+  p_incorrect = sum(unmatch_gt$probs)
+  
+  #p_ratio = p_incorrect / p_correct
+  #p_ratio = abs(2 * (log(p_correct) - log(p_incorrect)))
+  
+  if(meth==1){
+    rq = abs(p_incorrect - p_correct)
+    rq = -10 * log(rq, 10)
+  }else if(meth=="1a"){
+    if(grepl(ref, min_gt)){
+      rq = abs(p_correct - p_incorrect)
+    }else{
+      rq = abs(1 - (p_correct - p_incorrect))
+    }
+    rq = -10 * log(rq, 10)
+  }else if(meth==2){
+    rq = (p_correct / p_incorrect)
+    rq = 10 * log(rq, 10)
+  }else if(meth==3){
+    rq = 2 * (log(p_incorrect) - log(p_correct))
+    rq = -10 * log(abs(rq), 10)
+  }else if(meth==4){
+    rq = -10 * log(p_correct, 10)
+  }else if(meth==5){
+    rq = -10 * log(max(match_gt$probs), 10)
+  }
+  
+  gl_result = c(as.character(min_gt), gq[1], rq)
+  return(gl_result)
+}
+#####
+
+cycleReads <- function(cur_read_set, meth){
+  min_gts = c()
+  quals = c()
+  alt_b_quals = c()
+  alt_m_quals = c()
+  ref_quals = c()
+  
+  #cat(cur_read_set$num, cur_read_set$reads, "\n")
+  
+  alt_b_qual = 40
+  while(alt_b_qual > 0){
+    baseq = c()
+    for(i in 1:length(cur_read_set$reads)){
+      baseq = c(baseq, 40)
+    }
+    baseq[length(baseq)] = alt_b_qual
+    basep = 10^(-baseq / 10)
+    
+    alt_m_qual = 40
+    while(alt_m_qual > 0){
+      #cat(alt_b_qual, alt_m_qual, "\n")
+      mapq = c()
+      for(i in 1:length(cur_read_set$reads)){
+        mapq = c(mapq, 40)
+      }
+      mapq[length(mapq)] = alt_m_qual
+      mapp = 10^(-mapq / 10)
+
+      r = gl(cur_read_set$reads, basep, mapp, cur_read_set$ref, meth)
+
+      min_gts = c(min_gts, r[1])
+      quals = c(quals, as.numeric(r[2]))
+      ref_quals = c(ref_quals, as.numeric(r[3]))
+      alt_b_quals = c(alt_b_quals, alt_b_qual)
+      alt_m_quals = c(alt_m_quals, alt_m_qual)
+      
+      alt_m_qual = alt_m_qual - 1 
+    }
+    alt_b_qual = alt_b_qual - 1
+  }
+  
+  cur_results = data.frame(read_set=cur_read_set$num, ref_base=cur_read_set$ref, ref_type=cur_read_set$ans, genotypes=min_gts, gt_quality=quals, alt_base_quality=alt_b_quals, alt_map_quality=alt_m_quals, ref_quality=ref_quals)
+  
+  return(cur_results)
+}
+#####
+
+plotScores <- function(results_df, num, ref, ans){
+  p_rq = ggplot(results_df, aes(alt_base_quality, alt_map_quality, z=ref_quality)) +
+    geom_raster(aes(fill=genotypes)) +
+    scale_fill_manual(name="Genotype",values=c("AA"="#999999","AT"="#d3d3d3")) +
+    
+    geom_contour(color="#000000", linetype=2) +
+    geom_dl(aes(label=..level..), method="bottom.pieces", stat="contour", color="#000000") +
+  
+    ggtitle(paste("Read set: ", num, "\nReference base:", ref, ans)) +
+    labs(x="Alternate allele\nsequencing quality score", y="Alternate allele\nmapping quality score") +
+    theme_classic() +
+    theme(axis.text=element_text(size=12), 
+          axis.title=element_text(size=12), 
+          axis.title.y=element_text(margin=margin(t=0,r=0,b=0,l=0),color="black"), 
+          axis.title.x=element_text(margin=margin(t=0,r=0,b=0,l=0),color="black"),
+          axis.line=element_line(colour='#595959',size=0.75),
+          axis.ticks=element_line(colour="#595959",size = 1),
+          axis.ticks.length=unit(0.2,"cm"),
+          legend.title=element_text(size=12),
+          legend.text=element_text(size=12),
+          plot.margin=unit(c(0,0.5,1,0), "cm"),
+          plot.title = element_text(size=14)
+          #panel.background = element_rect(fill="#666666")
+    )
+  return(p_rq)
+}
+#####
+topScores <- function(df_list, score){
+  if(score==40){
+    cap="Scores at max base and mapping quality"
+  }else if(score==1){
+    cap="Scores at min base and mapping quality"
+  }else{
+    cap=paste("Scores at base and mapping quality = ", score)
+  }
+  
+  scores = data.frame()
+  for(i in 1:length(df_list)){
+    scores = rbind(scores, subset(df_list[[i]], alt_base_quality==score & alt_map_quality==score))
+  }
+  kable(scores, "html", caption=cap) %>%
+    kable_styling(bootstrap_options=c("striped", "condensed", "responsive"), full_width=F)
+}
+
+```
+## Example read sets
+```{r read-sets, echo=FALSE}
+read_set = c("A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A")
+read_set_1a = list(num=1,reads=read_set,ref="A",ans="(correct)")
+read_set_1t = list(num=1,reads=read_set,ref="T",ans="(incorrect)")
+read_set_1c = list(num=1,reads=read_set,ref="C",ans="(incorrect)")
+read_set = c("A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","T")
+read_set_2a = list(num=2,reads=read_set,ref="A",ans="(correct)")
+read_set_2t = list(num=2,reads=read_set,ref="T",ans="(incorrect)")
+read_set_2c = list(num=2,reads=read_set,ref="C",ans="(incorrect)")
+read_set = c("A","A","A","A","A","A","A","A","A","A","T","T","T","T","T","T","T","T","T","T")
+read_set_3a = list(num=3,reads=read_set,ref="A",ans="(correct)")
+read_set_3t = list(num=3,reads=read_set,ref="T",ans="(correct)")
+read_set_3c = list(num=3,reads=read_set,ref="C",ans="(incorrect)")
+
+rs1_df = data.frame(read_set=c("Reads","Base qual","Map qual"),
+                       reads=c("A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A",
+                               "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40",
+                               "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40"))
+
+rs1_table = kable(rs1_df, "html", caption="Read set 1") %>%
+  kable_styling(bootstrap_options=c("striped", "condensed", "responsive"), full_width=F)
+gsub("<thead>.*</thead>", "", rs1_table)
+
+rs2_df = data.frame(read_set=c("Reads","Base qual","Map qual"),
+                       reads=c("A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  T",
+                               "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40",
+                               "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40"))
+
+rs2_table = kable(rs2_df, "html", caption="Read set 2") %>%
+  kable_styling(bootstrap_options=c("striped", "condensed", "responsive"), full_width=F)
+gsub("<thead>.*</thead>", "", rs2_table)
+
+rs3_df = data.frame(read_set=c("Reads","Base qual","Map qual"),
+                       reads=c("A  A  A  A  A  A  A  A  A  A  T  T  T  T  T  T  T  T  T  T",
+                               "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40",
+                               "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40"))
+
+rs3_table = kable(rs3_df, "html", caption="Read set 3") %>%
+  kable_styling(bootstrap_options=c("striped", "condensed", "responsive"), full_width=F)
+gsub("<thead>.*</thead>", "", rs3_table)
+```
+
+## I. Genotype likelihoods and quality scores (briefly)
+
+There are 10 possible genotypes at a biallelic site:
+
+$$ \mathbb{G} = \{\{A,A\}, \{A,T\}, \{A,C\}, \{A,G\}, \{T,T\}, \{T,C\}, \{T,G\}, \{C,C\}, \{C,G\}, \{G,G\}\} $$
+
+Given a set of reads $R$ at a site, we can calculate the likelihood of each genotype.
+
+**Equation 1**
+
+$$ P(R|\mathbb{G} = \{A_1,A_2\}) = \prod_{r}^{R} (\frac{1}{2}P(b_r|A_1) + \frac{1}{2}P(b_r|A_2) ) $$
+
+To calculate the probability of the mapped base at the current read $b_r$ given each allele in the genotype $A_i$, we can use the Phred scaled base quality score $Q_b$ and Phred scaled mapping quality score $Q_m$ for that base. First we convert the Phred scale scores into probabilities of error:
+
+**Equation 2**
+
+$$ e = 10^{-\frac{Q}{10}} $$
+
+Plugging in $Q_b$ and $Q_m$ gets us $e_b$ and $e_m$, respectively. These are the probabilities of error for both base calling and mapping.
+
+Then we can calculate the probability of the base given an allele $P(b_r|A_i)$ as follows:
+
+**Equation 3**
+
+\begin{equation}
+  P(b_r|A_i) =
+    \begin{cases}
+      \frac{(e_s * e_m)}{3} & \text{: $b \neq A_i$}\\
+      1 - (e_s * e_m) & \text{: $b = A_i$}\\
+    \end{cases}       
+\end{equation}
+
+The likelihood of each genotype is obtained in this fashion. These likelihoods are then converted back to the Phred scale:
+
+**Equation 4**
+
+$$ PL = -10 \log_{10}(P(R|\mathbb{G} = \{A_1,A_2\})) $$
+
+Since these are likelihoods that the genotype is incorrect, the lowest likelihood is the best scoring. This translates to $PL$ as well. Therefore, we obtain a genotype quality score $Q_\mathbb{G}$ by taking the difference between the lowest score and the second lowest score.
+
+**Equation 5**
+
+$$ Q_\mathbb{G} = min_2(PL) - min(PL) $$
+
+## II. A reference quality score
+
+Now we wish to compute a similar value for a reference base given a set of reads that map to that position $Q_{ref}$. The general behavior we want for this score is that it will be high when we are sure the reference base is correct (as in Read Sets 1 and 2 with reference base A; see Example read sets at top of page) and low when we are sure the reference base is incorrect (as in Read Sets 1 and 2 with reference base T or C; see Example read sets at top of page)
+
+First, we sum up the likelihoods of all genotypes that contain the reference allele ($L_{match}$) and separately sum up the likelihoods of all the genotypes that do not contain the reference allele ($L_{mismatch}$). For instance, if our reference base was an A, then:
+
+$$ L_{match} = P(R|\{A,A\}) + P(R|\{A,T\}) + P(R|\{A,C\}) + P(R|\{A,G\})$$
+
+and:
+
+$$ L_{mismatch} = P(R|\{T,T\}) + P(R|\{T,C\}) + P(R|\{T,G\}) + P(R|\{C,C\}) + P(R|\{C,G\}) + P(R|\{G,G\})$$
+
+We can then set up a likelihood ratio $LR$ by divding $L_{mismatch}$ by $L_{match}$:
+
+**Equation 6**
+
+$$ LR = \frac{L_{match}}{L_{mismatch}} $$
+
+And this can be log-scaled:
+
+**Equation 7**
+
+$$ Q_\mathbb{R} = \log{LR} $$
+
+**Figure 2: Examples of $Q_{ref}$**
+
+```{r method2, fig.width=14, fig.height=11.2, fig.align="center", echo=FALSE, message=FALSE}
+method = 2
+read_set_1a_results = cycleReads(read_set_1a, method)
+rs1a_p = plotScores(read_set_1a_results, read_set_1a$num, read_set_1a$ref, read_set_1a$ans)
+read_set_1t_results = cycleReads(read_set_1t, method)
+rs1t_p = plotScores(read_set_1t_results, read_set_1t$num, read_set_1t$ref, read_set_1t$ans)
+read_set_1c_results = cycleReads(read_set_1c, method)
+rs1c_p = plotScores(read_set_1c_results, read_set_1c$num, read_set_1c$ref, read_set_1c$ans)
+read_set_2a_results = cycleReads(read_set_2a, method)
+rs2a_p = plotScores(read_set_2a_results, read_set_2a$num, read_set_2a$ref, read_set_2a$ans)
+read_set_2t_results = cycleReads(read_set_2t, method)
+rs2t_p = plotScores(read_set_2t_results, read_set_2t$num, read_set_2t$ref, read_set_2t$ans)
+read_set_2c_results = cycleReads(read_set_2c, method)
+rs2c_p = plotScores(read_set_2c_results, read_set_2c$num, read_set_2c$ref, read_set_2c$ans)
+read_set_3a_results = cycleReads(read_set_3a, method)
+rs3a_p = plotScores(read_set_3a_results, read_set_3a$num, read_set_3a$ref, read_set_3a$ans)
+read_set_3t_results = cycleReads(read_set_3t, method)
+rs3t_p = plotScores(read_set_3t_results, read_set_3t$num, read_set_3t$ref, read_set_3t$ans)
+read_set_3c_results = cycleReads(read_set_3c, method)
+rs3c_p = plotScores(read_set_3c_results, read_set_3c$num, read_set_3c$ref, read_set_3c$ans)
+
+method2 = grid.arrange(rs1a_p,rs2a_p,rs3a_p,rs1t_p,rs2t_p,rs3t_p,rs1c_p,rs2c_p,rs3c_p, ncol=3,nrow=3)
+
+result_list = list(read_set_1a_results, read_set_2a_results, read_set_3a_results,
+                    read_set_1t_results, read_set_2t_results, read_set_3t_results,
+                    read_set_1c_results, read_set_2c_results, read_set_3c_results)
+topScores(result_list, 40)
+topScores(result_list, 1)
+```
+
+This has the desired behavior of being a high score when we are sure the reference base is correct and a low score when we are sure the reference base is not correct. In fact, it has the nice property of being centered around 0, with positive scores indicating support for the called reference base and negative scores indicating support for the reference base being an error. The closer to 0 the score is (positive or negative) the more confident we are in our assertion.
+
+
