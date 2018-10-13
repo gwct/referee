@@ -31,7 +31,7 @@ if(!dir.exists(outdir)){
   stop("\n\nOutput directory not found.\n")
 }
 print(paste("Output directory:", outdir))
-outfile_prefix = paste(outdir, basename(tools::file_path_sans_ext(args[1])), sep="")
+outfile_prefix = paste(outdir, "/", basename(tools::file_path_sans_ext(args[1])), sep="")
 print(paste("Output file prexid:", outfile_prefix))
 #dir.create(file.path(getwd(), outdir))
 

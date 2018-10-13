@@ -7,6 +7,9 @@ Trinity --seqType fq --max_memory 100G --left <file>_1.fastq --right <file>_2.fa
 bwa index <reference.fa>
 # Index with BWA -- reference.fa should be Trinity.fasta
 
+samtools faidx <reference.fa>
+# Index with samtools
+
 java -jar $PICARD CreateSequenceDictionary R=<reference.fasta> O=<reference.dict>
 # Sequence dictionary with Picard
 
@@ -19,6 +22,8 @@ java -jar $PICARD ReplaceSamHeader I=<input.sam> HEADER=<reference.dict> O=<outp
 samtools view -b <input.sam> > <output.bam>
 # Convert to BAM
 
+samtools mpileup -d 999999999 -f <reference.fa> -Q 0 -o <output.pileup> <input.bam>
+# Convert BAM to mpileup with mapping quality
 
 # Merge BAM files if necessary
  
@@ -28,11 +33,28 @@ samtools sort <input.bam> -o <output-sorted.bam>
 time -p angsd -GL 2 -i <sorted.bam> -ref <reference.fasta> -minQ 0 -doGlf 4 -out <output-prefix>
 # Calculate GLs with ANGSD
 
+time -p python referee.py -gl <angsd-genotype-likelihood-file.gz> -ref <reference.fa> --fastq --correct -o <output-prefix>
+# Calculate reference quality scores with Referee
 
-
+Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r <referee-output.txt> <plot-output-dir> <pileup-file>
+# Plot some stats
 
 grep ">" file.fasta | wc -l
 # Count number of scaffolds/transcripts in FASTA file
 
 grep -v ">" file.fasta | wc | awk '{print $3-$1}' 
 # Count number of bases in FASTA file
+
+grep "\-1" <referee-output.txt> | wc -l
+# Find sites where reference base is N in the referee output
+
+grep "\-2" <referee-output.txt> | wc -l
+# Find sites with no reads mapped to them in the referee output
+
+grep -P "\t-1\n" <referee-output.txt> | wc -l
+# Find sites where reference l_mismatch = 0 in the referee output when --correct is NOT specified
+
+grep -P "\t-1\t" <referee-output.txt> | wc -l
+# Find sites where reference l_mismatch = 0 in the referee output when --correct is specified
+
+

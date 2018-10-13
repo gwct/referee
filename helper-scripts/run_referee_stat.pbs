@@ -1,18 +1,21 @@
 #!/bin/bash
 #PBS -k o
-#PBS -l nodes=1:ppn=24,walltime=24:00:00,vmem=200GB
+#PBS -l nodes=1:ppn=1,walltime=4:00:00,vmem=48GB
 #PBS -M grthomas@indiana.edu
 #PBS -m abe
 #PBS -N referee-plots
 #PBS -j oe
 
-module load gnu-parallel/20170622
+#module load gnu-parallel/20170622
 module load r/3.4.4
 #cd /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee/
 #scriptdir="/N/u/grthomas/Carbonate/bin/referee/helper_scripts"
 #pileupdir="/N/dcwan/projects/hahnlab-phi/owl-monkey/pileup-files/ref-120X-scaffolds"
 
-cat /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffold-list.txt | parallel --eta 'Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee-24proc/{}-out.txt /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee-24proc/plots/ /N/dcwan/projects/hahnlab-phi/owl-monkey/pileup-files/ref-120X-scaffolds/39093-{}.pileup'
+#cat /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffold-list.txt | parallel --eta 'Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee-24proc/{}-out.txt /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee-24proc/plots/ /N/dcwan/projects/hahnlab-phi/owl-monkey/pileup-files/ref-120X-scaffolds/39093-{}.pileup'
+
+$jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
+Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-referee-out-1proc.txt $jsindir/jsin-plots $jsindir/jsin-plots/
 
 # for i in *-out.txt; do
 #     echo $i
