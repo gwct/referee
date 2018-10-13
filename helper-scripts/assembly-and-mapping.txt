@@ -18,6 +18,9 @@ java -jar $PICARD ReplaceSamHeader I=<input.sam> HEADER=<reference.dict> O=<outp
 
 samtools view -b <input.sam> > <output.bam>
 # Convert to BAM
+
+
+# Merge BAM files if necessary
  
 samtools sort <input.bam> -o <output-sorted.bam>
 # Sort BAM
