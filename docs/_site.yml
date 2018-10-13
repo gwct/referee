@@ -1,0 +1,13 @@
+name: "referee"
+output_dir: "docs"
+navbar:
+  title: "Referee"
+  left:
+  - text: "Home"
+    href: index.html
+  - text: "Example calculation"
+    href: example.html
+output:
+  html_document:
+theme: cosmo
+

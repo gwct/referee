@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Gregg Thomas" />
+
+
+<title>Referee</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Referee</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="example.html">Example calculation</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Referee</h1>
+<h4 class="author"><em>Gregg Thomas</em></h4>
+
+</div>
+
+
+<style type="text/css"> .table { width: 40%; } </style>
+<div id="example-read-sets" class="section level2">
+<h2>Example read sets</h2>
+<table class="table table-striped table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Read set 1
+</caption>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Reads
+</td>
+<td style="text-align:left;">
+A A A A A A A A A A A A A A A A A A A A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Base qual
+</td>
+<td style="text-align:left;">
+40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Map qual
+</td>
+<td style="text-align:left;">
+40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40
+</td>
+</tr>
+</tbody>
+</table>
+<table class="table table-striped table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Read set 2
+</caption>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Reads
+</td>
+<td style="text-align:left;">
+A A A A A A A A A A A A A A A A A A A T
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Base qual
+</td>
+<td style="text-align:left;">
+40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Map qual
+</td>
+<td style="text-align:left;">
+40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40
+</td>
+</tr>
+</tbody>
+</table>
+<table class="table table-striped table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Read set 3
+</caption>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Reads
+</td>
+<td style="text-align:left;">
+A A A A A A A A A A T T T T T T T T T T
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Base qual
+</td>
+<td style="text-align:left;">
+40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Map qual
+</td>
+<td style="text-align:left;">
+40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="i.-genotype-likelihoods-and-quality-scores-briefly" class="section level2">
+<h2>I. Genotype likelihoods and quality scores (briefly)</h2>
+<p>There are 10 possible genotypes at a biallelic site:</p>
+<p><span class="math display">\[ \mathbb{G} = \{\{A,A\}, \{A,T\}, \{A,C\}, \{A,G\}, \{T,T\}, \{T,C\}, \{T,G\}, \{C,C\}, \{C,G\}, \{G,G\}\} \]</span></p>
+<p>Given a set of reads <span class="math inline">\(R\)</span> at a site, we can calculate the likelihood of each genotype.</p>
+<p><strong>Equation 1</strong></p>
+<p><span class="math display">\[ P(R|\mathbb{G} = \{A_1,A_2\}) = \prod_{r}^{R} (\frac{1}{2}P(b_r|A_1) + \frac{1}{2}P(b_r|A_2) ) \]</span></p>
+<p>To calculate the probability of the mapped base at the current read <span class="math inline">\(b_r\)</span> given each allele in the genotype <span class="math inline">\(A_i\)</span>, we can use the Phred scaled base quality score <span class="math inline">\(Q_b\)</span> and Phred scaled mapping quality score <span class="math inline">\(Q_m\)</span> for that base. First we convert the Phred scale scores into probabilities of error:</p>
+<p><strong>Equation 2</strong></p>
+<p><span class="math display">\[ e = 10^{-\frac{Q}{10}} \]</span></p>
+<p>Plugging in <span class="math inline">\(Q_b\)</span> and <span class="math inline">\(Q_m\)</span> gets us <span class="math inline">\(e_b\)</span> and <span class="math inline">\(e_m\)</span>, respectively. These are the probabilities of error for both base calling and mapping.</p>
+<p>Then we can calculate the probability of the base given an allele <span class="math inline">\(P(b_r|A_i)\)</span> as follows:</p>
+<p><strong>Equation 3</strong></p>
+<span class="math display">\[\begin{equation}
+  P(b_r|A_i) =
+    \begin{cases}
+      \frac{(e_s * e_m)}{3} &amp; \text{: $b \neq A_i$}\\
+      1 - (e_s * e_m) &amp; \text{: $b = A_i$}\\
+    \end{cases}       
+\end{equation}\]</span>
+<p>The likelihood of each genotype is obtained in this fashion. These likelihoods are then converted back to the Phred scale:</p>
+<p><strong>Equation 4</strong></p>
+<p><span class="math display">\[ PL = -10 \log_{10}(P(R|\mathbb{G} = \{A_1,A_2\})) \]</span></p>
+<p>Since these are likelihoods that the genotype is incorrect, the lowest likelihood is the best scoring. This translates to <span class="math inline">\(PL\)</span> as well. Therefore, we obtain a genotype quality score <span class="math inline">\(Q_\mathbb{G}\)</span> by taking the difference between the lowest score and the second lowest score.</p>
+<p><strong>Equation 5</strong></p>
+<p><span class="math display">\[ Q_\mathbb{G} = min_2(PL) - min(PL) \]</span></p>
+</div>
+<div id="ii.-a-reference-quality-score" class="section level2">
+<h2>II. A reference quality score</h2>
+<p>Now we wish to compute a similar value for a reference base given a set of reads that map to that position <span class="math inline">\(Q_{ref}\)</span>. The general behavior we want for this score is that it will be high when we are sure the reference base is correct (as in Read Sets 1 and 2 with reference base A; see Example read sets at top of page) and low when we are sure the reference base is incorrect (as in Read Sets 1 and 2 with reference base T or C; see Example read sets at top of page)</p>
+<p>First, we sum up the likelihoods of all genotypes that contain the reference allele (<span class="math inline">\(L_{match}\)</span>) and separately sum up the likelihoods of all the genotypes that do not contain the reference allele (<span class="math inline">\(L_{mismatch}\)</span>). For instance, if our reference base was an A, then:</p>
+<p><span class="math display">\[ L_{match} = P(R|\{A,A\}) + P(R|\{A,T\}) + P(R|\{A,C\}) + P(R|\{A,G\})\]</span></p>
+<p>and:</p>
+<p><span class="math display">\[ L_{mismatch} = P(R|\{T,T\}) + P(R|\{T,C\}) + P(R|\{T,G\}) + P(R|\{C,C\}) + P(R|\{C,G\}) + P(R|\{G,G\})\]</span></p>
+<p>We can then set up a likelihood ratio <span class="math inline">\(LR\)</span> by divding <span class="math inline">\(L_{mismatch}\)</span> by <span class="math inline">\(L_{match}\)</span>:</p>
+<p><strong>Equation 6</strong></p>
+<p><span class="math display">\[ LR = \frac{L_{match}}{L_{mismatch}} \]</span></p>
+<p>And this can be log-scaled:</p>
+<p><strong>Equation 7</strong></p>
+<p><span class="math display">\[ Q_\mathbb{R} = \log{LR} \]</span></p>
+<p><strong>Figure 2: Examples of <span class="math inline">\(Q_{ref}\)</span></strong></p>
+<img src="example_files/figure-html/method2-1.png" width="1344" style="display: block; margin: auto;" />
+<table class="table table-striped table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Scores at max base and mapping quality
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+read_set
+</th>
+<th style="text-align:left;">
+ref_base
+</th>
+<th style="text-align:left;">
+ref_type
+</th>
+<th style="text-align:left;">
+genotypes
+</th>
+<th style="text-align:right;">
+gt_quality
+</th>
+<th style="text-align:right;">
+alt_base_quality
+</th>
+<th style="text-align:right;">
+alt_map_quality
+</th>
+<th style="text-align:right;">
+ref_quality
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+(correct)
+</td>
+<td style="text-align:left;">
+AA
+</td>
+<td style="text-align:right;">
+60.20600
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+1687.64275
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+(correct)
+</td>
+<td style="text-align:left;">
+AT
+</td>
+<td style="text-align:right;">
+24.56521
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+1547.45189
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+(correct)
+</td>
+<td style="text-align:left;">
+AT
+</td>
+<td style="text-align:right;">
+787.50613
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+787.49765
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+T
+</td>
+<td style="text-align:left;">
+(incorrect)
+</td>
+<td style="text-align:left;">
+AA
+</td>
+<td style="text-align:right;">
+60.20600
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+-60.20601
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+T
+</td>
+<td style="text-align:left;">
+(incorrect)
+</td>
+<td style="text-align:left;">
+AT
+</td>
+<td style="text-align:right;">
+24.56521
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+24.56520
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+T
+</td>
+<td style="text-align:left;">
+(correct)
+</td>
+<td style="text-align:left;">
+AT
+</td>
+<td style="text-align:right;">
+787.50613
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+787.49765
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+(incorrect)
+</td>
+<td style="text-align:left;">
+AA
+</td>
+<td style="text-align:right;">
+60.20600
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+-60.20601
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+(incorrect)
+</td>
+<td style="text-align:left;">
+AT
+</td>
+<td style="text-align:right;">
+24.56521
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+-81.77607
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+(incorrect)
+</td>
+<td style="text-align:left;">
+AT
+</td>
+<td style="text-align:right;">
+787.50613
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+-814.59883
+</td>
+</tr>
+</tbody>
+</table>
+<table class="table table-striped table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Scores at min base and mapping quality
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+read_set
+</th>
+<th style="text-align:left;">
+ref_base
+</th>
+<th style="text-align:left;">
+ref_type
+</th>
+<th style="text-align:left;">
+genotypes
+</th>
+<th style="text-align:right;">
+gt_quality
+</th>
+<th style="text-align:right;">
+alt_base_quality
+</th>
+<th style="text-align:right;">
+alt_map_quality
+</th>
+<th style="text-align:right;">
+ref_quality
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+1600
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+(correct)
+</td>
+<td style="text-align:left;">
+AA
+</td>
+<td style="text-align:right;">
+58.24727
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1605.31352
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+16001
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+(correct)
+</td>
+<td style="text-align:left;">
+AA
+</td>
+<td style="text-align:right;">
+55.80529
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1601.89704
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+16002
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+(correct)
+</td>
+<td style="text-align:left;">
+AT
+</td>
+<td style="text-align:right;">
+707.13562
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+789.45156
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+16003
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+T
+</td>
+<td style="text-align:left;">
+(incorrect)
+</td>
+<td style="text-align:left;">
+AA
+</td>
+<td style="text-align:right;">
+58.24727
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+-58.24728
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+16004
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+T
+</td>
+<td style="text-align:left;">
+(incorrect)
+</td>
+<td style="text-align:left;">
+AA
+</td>
+<td style="text-align:right;">
+55.80529
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+-55.80530
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+16005
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+T
+</td>
+<td style="text-align:left;">
+(correct)
+</td>
+<td style="text-align:left;">
+AT
+</td>
+<td style="text-align:right;">
+707.13562
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+707.12715
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+16006
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+(incorrect)
+</td>
+<td style="text-align:left;">
+AA
+</td>
+<td style="text-align:right;">
+58.24727
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+-58.24728
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+16007
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+(incorrect)
+</td>
+<td style="text-align:left;">
+AA
+</td>
+<td style="text-align:right;">
+55.80529
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+-57.19572
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+16008
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+(incorrect)
+</td>
+<td style="text-align:left;">
+AT
+</td>
+<td style="text-align:right;">
+707.13562
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+-737.23862
+</td>
+</tr>
+</tbody>
+</table>
+<p>This has the desired behavior of being a high score when we are sure the reference base is correct and a low score when we are sure the reference base is not correct. In fact, it has the nice property of being centered around 0, with positive scores indicating support for the called reference base and negative scores indicating support for the reference base being an error. The closer to 0 the score is (positive or negative) the more confident we are in our assertion.</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

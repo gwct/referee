@@ -1,11 +1,6 @@
 ---
 title: "Referee"
 author: "Gregg Thomas"
-output:
-  html_document: default
-  pdf_document:
-    fig_caption: yes
-  word_document: default
 ---
 
 <style type="text/css"> .table { width: 40%; } </style>
