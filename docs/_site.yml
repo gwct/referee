@@ -13,9 +13,9 @@ output:
   html_document:
     theme: flatly
     include:
-      in_header: lib/favicon.html
+      in_header: lib/info.html
       after_body: lib/footer.html
-    css: lib/footer.css
+    css: lib/styles.css
     lib_dir: site_libs
     self_contained: no
 
