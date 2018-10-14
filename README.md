@@ -61,7 +61,7 @@ If you have pre-calculated genotype likelihoods as input, exclude the `--pileup`
 
 ### Calculating genotype likelihoods from a pileup file (`--pileup`)
 
-Referee cant take as input a pileup file and calculate genotype likelihoods for each site prior to reference quality scores. To generate a pileup file, use samtools:
+Referee can take as input a pileup file and calculate genotype likelihoods for each site prior to reference quality scores. To generate a pileup file, use samtools:
 
 `samtools mpileup -d 999999999 -f <reference.fasta> -Q 0 -s -o <output.pileup> <input.bam>`
 
