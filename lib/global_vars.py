@@ -18,6 +18,7 @@ def init():
         'mapped' : False,
         'stats' : False,
         'allcalc' : False,
+        'pileup' : False,
         'progstarttime' : 0,
         'stepstarttime' : 0,
         'pids' : "",

@@ -25,6 +25,7 @@ def optParse(globs):
 	parser.add_argument("--fastq", dest="fastq_flag", help="Set this option to output in FASTQ format instead of the default tab delimited format.", action="store_true", default=False);
 	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score below a cut-off set by -c.", action="store_true", default=False);
 	parser.add_argument("--mapped", dest="mapped_flag", help="Set this to calculate scores only for positions that have reads mapped to them.", action="store_true", default=False);
+	parser.add_argument("--pileup", dest="pileup_flag", help="If your input is a pileup file, Referee can calculate the genotype likelihoods for you. Set this flag to indicate input is in this format.", action="store_true", default=False);
 	# User options	
 	#parser.add_argument("-s", dest="startpos", help="Set the starting position for the input file(s). Default: 1", default=False);
 	#parser.add_argument("-e", dest="endpos", help="Set the end position for the input file(s). Default: last position in assembly/scaffold", default=False);
@@ -85,6 +86,9 @@ def optParse(globs):
 	if args.allcalc_opt:
 		globs['allcalc'] = True;
 		globs['fastq'] = False;
+
+	if args.pileup_flag:
+		globs['pileup'] = True;
 
 	RC.startProg(globs);
 	# After all the essential options have been set, call the welcome function.

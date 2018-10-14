@@ -37,10 +37,16 @@ def startProg(globs):
 	printWrite(globs['logfilename'], globs['log-v'], "** Failure to do so will result in inaccurate calculations!!");
 	printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40 + "\n#");
 
-	if globs['fastq']:
-		printWrite(globs['logfilename'], globs['log-v'], "# --fastq : Output format is FASTQ.");
+	if globs['pileup']:
+		printWrite(globs['logfilename'], globs['log-v'], "# --pileup : Input type set to pileup. Referee will calculate genotype likelihoods.");
 	else:
-		printWrite(globs['logfilename'], globs['log-v'], "# Output format is tab delimited.");
+		printWrite(globs['logfilename'], globs['log-v'], "# Input is pre-calculated genotype likelihoods.");
+	# Reporting the pileup option.
+
+	if globs['fastq']:
+		printWrite(globs['logfilename'], globs['log-v'], "# --fastq : Writing output in FASTQ format in addition to tab delimited.");
+	else:
+		printWrite(globs['logfilename'], globs['log-v'], "# Writing output in tab delimited format only.");
 	# Reporting the fastq option.
 
 	if globs['mapped']:

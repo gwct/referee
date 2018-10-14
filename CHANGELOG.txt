@@ -1,0 +1,8 @@
+# These are the major changes and updates. For build specific changes (which are too numerous to document manually), check the commits on github.
+
+# Version 1.2: 
+01) Implemented in-house genotype likelihood calculations with --pileup input.
+02) Added the website.
+
+# Version Beta 1.0: October 6, 2018
+01)	First commit and implementation of reference quality algorithm.

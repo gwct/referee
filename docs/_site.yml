@@ -1,13 +1,22 @@
-name: "referee"
-output_dir: "docs"
+name: referee
+output_dir: .
 navbar:
-  title: "Referee"
+  title: Referee
   left:
-  - text: "Home"
+  - text: About
     href: index.html
-  - text: "Example calculation"
+  - text: Example calculation
     href: example.html
+  - text: Download & README
+    href: https://github.com/gwct/referee
 output:
   html_document:
-theme: cosmo
+    theme: flatly
+    include:
+      in_header: lib/favicon.html
+      after_body: lib/footer.html
+    css: lib/footer.css
+    lib_dir: site_libs
+    self_contained: no
+
 

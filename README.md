@@ -8,14 +8,19 @@
 
 ### Referee is a program to calculate a quality score for every position in a genome assembly. This allows for easy filtering of low quality sites for any downstream analysis.
 
-For a given site in a diploid genome, there are 10 possible genotypes (AA, AC, AG, AT, CC, CG, CT, GG, GT, TT). Referee takes as input the genotype likelihoods calculated for all 10 genotypes given the called reference base at each position. To obtain these likelihoods, one must first map the reads used to make the assembly back onto the finished assembly. Then these reads can be used to calculate genotype likelihoods using any method/program. We recommend [ANGSD](https://github.com/ANGSD/angsd) as it easily outputs all 10 genotype likelihoods in a format ready-to-use by referee. Then, Referee compares the log of the ratio of the sum of genotype likelihoods for genotypes that contain the reference base vs. the sum of those that do not contain the reference base. Positive scores indicate support for the called reference base while negative scores indicate support for some other base. Scores close to 0 indicate less confidence while higher scores indicate more confidence in the reference base. Scores range from 0 to 91, with some special cases (see below). With the `--correct` option specified Referee will also output the highest scoring base for sites with negative scores.
+### See the project [website](https://gwct.github.io/referee/) for more info!
 
 ## Citation
 
 #### Forthcoming
 
 ## Version History
-#### This is version Beta 1.0, released October 6, 2018
+#### This is version Beta 1.1, released October 14, 2018
+
+Change log:
+* Implemented in-house genotype likelihood calculations with `--pileup` input.
+
+###### Version Beta 1.0 (October 6, 2018): First release and implementation of reference quality algorithm
 
 ## Installation
 
@@ -28,34 +33,43 @@ These are the general steps for scoring your genome:
 
 1. Using any applicable software, map the reads from which you constructed your genome back to the finished assembly. (A BAM file is usable by ANGSD for calculating genotype likelihoods in the next step)
 
-2. Calculate log genotype likelihoods for all 10 genotypes at every position in the genome (we recommend [ANGSD](https://github.com/ANGSD/angsd) for this).
+2. Compile a pileup file for Referee to calculate genotype likelihoods OR pre-calculate log genotype likelihoods for all 10 genotypes at every position in the genome (we recommend [ANGSD](https://github.com/ANGSD/angsd) for this).
 
 3. Score your genome with one of the following Referee commands:
 
-`python referee.py -gl [genotype likelihood file] -ref [reference genome FASTA file]`
+`python referee.py -gl [genotype likelihood file] -ref [reference genome FASTA file] --pileup`
 
 Alternatively, if you have multiple genotype likelihood files you wish to score with the same reference genome, you could put the paths to each file in a text file with one file path per line for Referee to score them all:
 
-`python referee.py -i [text file with paths to genotype likelihood files] -ref [reference genome FASTA file]`
+`python referee.py -i [text file with paths to genotype likelihood files] -ref [reference genome FASTA file] --pileup`
 
-The parallelization will be more efficient with files that are roughly equal in size.
+If you have pre-calculated genotype likelihoods as input, exclude the `--pileup` flag.
 
 ### Options
 
 | Option | Description | 
 | ------ | ----------- |
-| -gl | A file containing log genotype likelihoods for every site in your genome with reads mapped to it. Can be gzip compressed or not. Note: Only one of `-gl` or `-i` can be specified.|
-| -i | A file containing paths to multiple log genotype likelihood files. One file path per line. Note: Only one of `-gl` or `-i` can be specified.|
+| -gl | A single pileup file or a single file containing log genotype likelihoods for every site in your genome with reads mapped to it. Can be gzip compressed or not. Note: Only one of `-gl` or `-i` can be specified.|
+| -i | A file containing paths to multiple pileup files or multiple log genotype likelihood files. One file path per line. Note: Only one of `-gl` or `-i` can be specified.|
 | -ref | A FASTA formatted file containing the genome you wish to score. Can be gzip compressed or not. FASTA headers must match the sequence IDs in column one of the genotype likelihood file. |
 | -o | Referee will create at least 2 output files: a tab delimited score file and a log file. Use this option to specify a prefix for these file names. Otherwise, they will default to `referee-out-[date]-[time]-[random string]` |
+| --pileup | If this option is set, Referee will read the input file(s) in pileup format and use this info to calculate genotype likelihoods prior to the reference quality score (see below) |
 | --fastq | The scores can also be output in FASTQ format. This option cannot be set with `--mapped`. Scores will be converted to [ASCII](https://en.wikipedia.org/wiki/ASCII) characters: score + 35 = ASCII char |
 | --correct | With this option, sites where reads do not support the called reference base will have a higher scoring base suggested. |
 | --mapped | Only report scores for sites with reads mapped to them. This option cannot be set with `--fastq`. |
 | -p |The number of processes Referee can use. |
 
-### The genotype likelihoods file (`-gl`)
+### Calculating genotype likelihoods from a pileup file (`--pileup`)
 
-This should be a tab delimited file with columns in exactly this order:
+Referee cant take as input a pileup file and calculate genotype likelihoods for each site prior to reference quality scores. To generate a pileup file, use samtools:
+
+`samtools mpileup -d 999999999 -f <reference.fasta> -Q 0 -s -o <output.pileup> <input.bam>`
+
+The option `-d 999999999` sets the minimum depth to report a site to a high enough number that all sites will be reported. `-Q 0` sets the maximum base quality required to report a site to 0, again ensuring that all sites will e reported. `-s` tells mpileup to output mapping quality in an additional column. If this is set, Referee will incorporate mapping quality into the genotype likelihood calculation.
+
+### The genotype likelihoods format
+
+If `--pileup` is not set, a file with precalculated **log** genotype likelihoods may be provided. We recommend [ANGSD](https://github.com/ANGSD/angsd) for this as it provides output in a format ready for use by Referee. This file should be a tab delimited file with columns in exactly this order:
 
 | Sequence ID | Position | AA | AC | AG | AT | CC | CG | CT | GG | GT | TT |
 |-------------|----------|----|----|----|----|----|----|----|----|----|----|
