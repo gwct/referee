@@ -120,7 +120,7 @@ def refCalc(file_item):
             if globs['pileup']:
             # If the input type is pileup, we calculate the genotype likelihoods here.
                 if line[3] == "0":
-                    ref, rq, lr, l_match, l_mismatch = line[3], -2, "NA", "NA", "NA";
+                    ref, rq, lr, l_match, l_mismatch, gls = line[3], -2, "NA", "NA", "NA", "NA";
                     calc_rq_flag = False;
                 # If no reads have mapped to the site, assign score -2 and skip everything else.
                 else:
