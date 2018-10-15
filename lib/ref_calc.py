@@ -69,6 +69,9 @@ def glCalc(line, genotypes):
         scaff, pos, ref, depth, reads, bqs, mqs = line;
         mps = [10.0 ** (-float(ord(char) - 33) / 10.0) for char in mqs];
     # If there are mapping qualities, convert them to probabilities here.
+    else:
+        print line;
+        sys.exit();
     pos = int(pos);
     bps = [10.0 ** (-float(ord(char) - 33) / 10.0) for char in bqs];
     # Convert the base qualities to probabilities.
