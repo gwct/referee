@@ -1,12 +1,14 @@
 #!/bin/bash
 #PBS -k o
-#PBS -l nodes=1:ppn=1,walltime=4:00:00,vmem=48GB
+#PBS -l nodes=1:ppn=5,walltime=4:00:00,vmem=48GB
 #PBS -M grthomas@indiana.edu
 #PBS -m abe
 #PBS -N referee-tests
 #PBS -j oe
 
 cd /N/u/grthomas/Carbonate/bin/referee/
-jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
-time -p python referee.py -gl $jsindir/jsinuosa-angsd.glf.gz  -ref $jsindir/assembly/Trinity.fasta --stats --fastq --correct -o $jsindir/jsin-referee-out-1proc
+# jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
+# time -p python referee.py -gl $jsindir/jsinuosa-angsd.glf.gz  -ref $jsindir/assembly/Trinity.fasta --stats --fastq --correct -o $jsindir/jsin-referee-out-1proc
 
+celedir="/N/dc2/scratch/grthomas/qtip/celegans"
+time -p python referee.py -gl $celedir/pileup/single.pileup -ref $celedir/assembly/rpgc_assembly.fasta --pileup --stats --fastq --correct -o $celedir/celegans-refout-4proc-glcalcs -p 4

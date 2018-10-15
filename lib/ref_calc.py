@@ -23,7 +23,7 @@ def calcScore(ref, gls):
         # Sum the genotypes that match the called reference base and those that don't (mismatch).
 
         if l_mismatch == 0:
-            score, lr = 92, 0;
+            score, lr = 91, 0;
         # If the sum of the genotypes that don't match the called reference base is 0, assign maximum score.
         # This should scale with read depth somehow, though...
         elif l_match == 0:
@@ -33,8 +33,8 @@ def calcScore(ref, gls):
             lr = l_match / l_mismatch;
             score = math.log(lr, 10);
             # Calculate the match : mismatch ratio and log transform.
-            if score > 91:
-                score = 91;
+            if score > 90:
+                score = 90;
             if score < 0:
                 score = 0;
             # Scale the scores so the max score is 91 and the all negative scores are 0.
@@ -60,10 +60,54 @@ def correctRef(max_score, ref, gls):
         return max_base, max_score;
 #############################################################################
 
+def glCalc(line, genotypes):
+    if len(line) == 6:
+        scaff, pos, ref, depth, reads, bqs = line;
+        mps = [1 for char in bqs];
+    # If there are no mapping qualities, just assign dummy values of 1 for mapping probs for every read.
+    elif len(line) == 7:
+        scaff, pos, ref, depth, reads, bqs, mqs = line;
+        mps = [10.0 ** (-float(ord(char) - 33) / 10.0) for char in mqs];
+    # If there are mapping qualities, convert them to probabilities here.
+    pos = int(pos);
+    bps = [10.0 ** (-float(ord(char) - 33) / 10.0) for char in bqs];
+    # Convert the base qualities to probabilities.
+
+    while True:
+        indel = re.search(r'[-+]\d+', reads)
+        if indel == None:
+            break;
+        start, end = indel.span()
+        reads = reads.replace(reads[start:end + int(reads[start+1:end])], "");
+    # First, we use some regular expressions to remove the indel strings (ie +2AG, -3CAT)
+    reads = re.sub("\^.", "", reads);
+    reads = reads.replace("$","");
+    reads = list(re.sub("[,|.]", ref, reads));
+    # Next we remove the symbols that indicate beginning (^) and end (&) of reads.
+    # If it is the beginning of the read, we must also removing the following quality score symbol -- \w!\"#$%&'()*+,./:;<=>?@-
+    # In regex, . matches ANY CHARACTER but \n
+    # Then convert the . and , symbols to the actual base stored in ref
+
+    gls = {};
+    for gt in genotypes:
+        gls[gt] = 1;
+        for i in range(len(reads)):
+            base, bp, mp = reads[i], bps[i], mps[i];
+            cur_p = 0;
+            for a in gt:
+                if base == a:
+                    cur_p += 0.5 * (1 - (bp*mp));
+                else:
+                    cur_p += 0.5 * ((bp*mp)/3.0);
+            gls[gt] = gls[gt] * cur_p;
+    # Calculate the genotype likelihood for every genotype given the current reads and probabilities.
+
+    return scaff, pos, ref, gls;
+#############################################################################
+
 def refCalc(file_item):
 # Reads through a genotype likelihood file and calculates a quality scores for each line.
     file_num, file_info, globs = file_item;
-    genotypes = ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"];
     calc_rq_flag = True;
 
     last_scaff = "";
@@ -79,51 +123,13 @@ def refCalc(file_item):
                     calc_rq_flag = False;
                 # If no reads have mapped to the site, assign score -2 and skip everything else.
                 else:
-                    if len(line) == 6:
-                        scaff, pos, ref, depth, reads, bqs = line;
-                        mps = [1 for char in bqs];
-                    # If there are no mapping qualities, just assign dummy values of 1 for mapping probs for every read.
-                    elif len(line) == 7:
-                        scaff, pos, ref, depth, reads, bqs, mqs = line;
-                        mps = [10.0 ** (-float(ord(char) - 33) / 10.0) for char in mqs];
-                    # If there are mapping qualities, convert them to probabilities here.
-                    pos = int(pos);
-                    bps = [10.0 ** (-float(ord(char) - 33) / 10.0) for char in bqs];
-                    # Convert the base qualities to probabilities.
-
-                    while True:
-                        indel = re.search(r'[-+]\d+', reads)
-                        if indel == None:
-                            break;
-                        start, end = indel.span()
-                        reads = reads.replace(reads[start:end + int(reads[start+1:end])], "");
-                    # First, we use some regular expressions to remove the indel strings (ie +2AG, -3CAT)
-                    reads = re.sub("\^.", "", reads);
-                    reads = reads.replace("$","");
-                    reads = list(re.sub("[,|.]", ref, reads));
-                    # Next we remove the symbols that indicate beginning (^) and end (&) of reads.
-                    # If it is the beginning of the read, we must also removing the following quality score symbol -- \w!\"#$%&'()*+,./:;<=>?@-
-                    # In regex, . matches ANY CHARACTER but \n
-                    # Then convert the . and , symbols to the actual base stored in ref
-
-                    gls = {};
-                    for gt in genotypes:
-                        gls[gt] = 1;
-                        for i in range(len(reads)):
-                            base, bp, mp = reads[i], bps[i], mps[i];
-                            cur_p = 0;
-                            for a in gt:
-                                if base == a:
-                                    cur_p += 0.5 * (1 - (bp*mp));
-                                else:
-                                    cur_p += 0.5 * ((bp*mp)/3.0);
-                            gls[gt] = gls[gt] * cur_p;
-                    # Calculate the genotype likelihood for every genotype given the current reads and probabilities.
+                    scaff, pos, ref, gls = glCalc(line, globs['genotypes']);
+                # Otherwise call the genotype likelihood function.
 
             else:
             # If the input type is pre-calculated genotype likelihoods, just parse the line and pass it to calcScore.
                 scaff, pos, gl_list = line[0], int(line[1]), line[2:];
-                gls = { genotypes[x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
+                gls = { globs['genotypes'][x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
                 # Parse the info from the current line -- scaffold, position, genotype likelihoods.
 
                 if globs['fasta'] == 1:

@@ -143,7 +143,7 @@ def getSubPID(n):
 def getFileLen(i_name):
 # Gets the numebr of lines in a file.
 	num_lines = 0;
-	for line in getFileReader(i_name)(i_name).readlines(): num_lines += 1;
+	for line in getFileReader(i_name)(i_name): num_lines += 1;
 	return float(num_lines);
 
 #############################################################################

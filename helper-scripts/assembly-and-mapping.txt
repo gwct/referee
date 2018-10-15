@@ -22,7 +22,7 @@ java -jar $PICARD ReplaceSamHeader I=<input.sam> HEADER=<reference.dict> O=<outp
 samtools view -b <input.sam> > <output.bam>
 # Convert to BAM
 
-samtools mpileup -d 999999999 -f <reference.fa> -Q 0 -o <output.pileup> <input.bam>
+samtools mpileup -d 999999999 -f <reference.fa> -Q 0 -s -o <output.pileup> <input.bam>
 # Convert BAM to mpileup with mapping quality
 
 # Merge BAM files if necessary

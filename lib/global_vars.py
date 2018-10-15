@@ -25,7 +25,8 @@ def init():
         'reffile' : "",
         'ref' : "",
         'outdir' : "",
-        'fasta' : 1
+        'fasta' : 1,
+        'genotypes' : ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"]
     }
 
     globs['logfilename'] = "referee-log-" + globs['startdatetime'] + ".log";

@@ -155,7 +155,7 @@ There are several scenarios where the scoring calculation is impossible. We have
 
 | Scenario | Score |
 |----------|-------|
-| The sum of the genotype likelihoods that do not contain the reference base is 0 | 92 |
+| The sum of the genotype likelihoods that do not contain the reference base is 0 | 91 |
 | The reference base is called as N | -1 |
 | No reads mapped to this site | -2 |
 
