@@ -207,12 +207,12 @@ $(document).ready(function () {
 
 <p></br></p>
 <center>
-<img src="img/ref-logo-3.png" />
+<img src="img/ref-icon-4.png" />
 </center>
 <p></br></p>
 <div id="referee-is-a-program-to-calculate-a-quality-score-for-every-position-in-a-genome-assembly.-this-allows-for-easy-filtering-of-low-quality-sites-for-any-downstream-analysis." class="section level3">
 <h3>Referee is a program to calculate a quality score for every position in a genome assembly. This allows for easy filtering of low quality sites for any downstream analysis.</h3>
-<p>Modern genome sequencing technologies provide a succint measure of quality at each position in every read, however all of this information is lost in the assembly process. Referee summarizes the quality information from the reads that map to a site in an assembled genome to calculate a quality score for each position in the genome assembly. We accomplish this by first calculating genotype likelihoods for every site. For a given site in a diploid genome, there are 10 possible genotypes (AA, AC, AG, AT, CC, CG, CT, GG, GT, TT). Referee takes as input the genotype likelihoods calculated for all 10 genotypes given the called reference base at each position. To obtain these likelihoods, one must first map the reads used to make the assembly back onto the finished assembly. Then these reads can be used to calculate genotype likelihoods using any method/program. <a href="example.html">Referee can calculate</a> the likelihoods from a pileup file as input or use pre-calculated log likelihoods, such as those output by <a href="https://github.com/ANGSD/angsd">ANGSD</a>. Then, Referee compares the log of the ratio of the sum of genotype likelihoods for genotypes that contain the reference base vs. the sum of those that do not contain the reference base. Positive scores indicate support for the called reference base while negative scores indicate support for some other base. Scores close to 0 indicate less confidence while higher scores indicate more confidence in the reference base. Scores range from 0 to 91, with some special cases (see <a href="https://gwct.github.com/gwct/referee">README</a>). With the <code>--correct</code> option specified Referee will also output the highest scoring base for sites with negative scores.</p>
+<p>Modern genome sequencing technologies provide a succint measure of quality at each position in every read, however all of this information is lost in the assembly process. Referee summarizes the quality information from the reads that map to a site in an assembled genome to calculate a quality score for each position in the genome assembly. We accomplish this by first calculating genotype likelihoods for every site. For a given site in a diploid genome, there are 10 possible genotypes (AA, AC, AG, AT, CC, CG, CT, GG, GT, TT). Referee takes as input the genotype likelihoods calculated for all 10 genotypes given the called reference base at each position. To obtain these likelihoods, one must first map the reads used to make the assembly back onto the finished assembly. Then these reads can be used to calculate genotype likelihoods using any method/program. <a href="example.html">Referee can calculate</a> the likelihoods from a pileup file as input or use pre-calculated log likelihoods, such as those output by <a href="https://github.com/ANGSD/angsd">ANGSD</a>. Then, Referee compares the log of the ratio of the sum of genotype likelihoods for genotypes that contain the reference base vs. the sum of those that do not contain the reference base. Positive scores indicate support for the called reference base while negative scores indicate support for some other base. Scores close to 0 indicate less confidence while higher scores indicate more confidence in the reference base. Scores range from 0 to 91, with some special cases (see <a href="https://github.com/gwct/referee">README</a>). With the <code>--correct</code> option specified Referee will also output the highest scoring base for sites with negative scores.</p>
 </div>
 <div id="usage" class="section level2">
 <h2>Usage</h2>
@@ -229,7 +229,7 @@ $(document).ready(function () {
 </br>
 <center>
 <div id="for-more-information-on-the-usage-and-inputs-see-the-readme" class="section level3">
-<h3><strong>For more information on the usage and inputs, see the <a href="https://gwct.github.com/gwct/referee">README</a></strong></h3>
+<h3><strong>For more information on the usage and inputs, see the <a href="https://github.com/gwct/referee">README</a></strong></h3>
 </center>
 </div>
 </div>
