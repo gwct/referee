@@ -15,7 +15,7 @@ module load r/3.4.4
 #cat /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffold-list.txt | parallel --eta 'Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee-24proc/{}-out.txt /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee-24proc/plots/ /N/dcwan/projects/hahnlab-phi/owl-monkey/pileup-files/ref-120X-scaffolds/39093-{}.pileup'
 
 jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
-Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-referee-out-1proc.txt $jsindir/jsin-plots $jsindir/jsinuosa.pileup
+Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-referee-out-1proc-glcalcs-mq.txt $jsindir/jsin-plots $jsindir/jsinuosa.pileup
 
 # for i in *-out.txt; do
 #     echo $i
