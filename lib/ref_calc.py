@@ -102,7 +102,7 @@ def glCalc(line, genotypes):
             gls[gt] = gls[gt] * cur_p;
     # Calculate the genotype likelihood for every genotype given the current reads and probabilities.
 
-    return scaff, pos, ref, gls;
+    return ref, gls;
 #############################################################################
 
 def refCalc(file_item):
@@ -114,6 +114,7 @@ def refCalc(file_item):
     with open(file_info['out'], "w") as outfile:
         for line in RC.getFileReader(file_info['in'])(file_info['in']):
             line = line.strip().split("\t");
+            scaff, pos = line[0], int(line[1]);
             cor_ref, cor_score = "NA", "NA";
 
             if globs['pileup']:
@@ -123,7 +124,7 @@ def refCalc(file_item):
                     calc_rq_flag = False;
                 # If no reads have mapped to the site, assign score -2 and skip everything else.
                 else:
-                    scaff, pos, ref, gls = glCalc(line, globs['genotypes']);
+                    ref, gls = glCalc(line, globs['genotypes']);
                 # Otherwise call the genotype likelihood function.
 
             else:
