@@ -42,7 +42,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 #this.dir <- dirname(parent.frame(2)$ofile)
 #setwd(this.dir)
-#args = c("../test1.txt", "../test2.txt", "../test-plot", "test-prefix")
+#args = c("../test1.txt", "../test2.txt", "..", "test-prefix")
 # Manual entry of input files
 
 if(length(args) != 4 || "-h" %in% args){
@@ -84,8 +84,9 @@ scoreStats(data2)
 print("Generating score-v-score plot...")
 in_combo = merge(data1, data2, by=c("scaff", "pos"))
 comp_p = ggplot(in_combo, aes(x=score1, y=score2)) +
-    geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
-    geom_point(color='#333333', size=1) +
+    #geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
+    #geom_point(color='#333333', size=1) +
+    geom_bin2d(bins=94) + 
     labs(x=paste(args[1], "score"), y=paste(args[2], "score")) +
     theme_classic() +
     theme(axis.text=element_text(size=10), 
@@ -94,11 +95,12 @@ comp_p = ggplot(in_combo, aes(x=score1, y=score2)) +
             axis.title.x=element_text(margin=margin(t=20,r=0,b=0,l=0),color="black"),
             axis.line=element_line(colour='#595959',size=0.75),
             axis.ticks=element_line(colour="#595959",size = 1),
-            axis.ticks.length=unit(0.2,"cm"),
-            legend.position="none"
+            axis.ticks.length=unit(0.2,"cm")
+            #legend.position="none"
     )
 
 outfile = paste(outfile_prefix, "-score-v-score.png", sep="")
 ggsave(file=outfile, comp_p, width=8, height=6, units="in")
+#print(comp_p)
 
 
