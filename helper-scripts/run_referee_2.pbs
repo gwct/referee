@@ -8,11 +8,11 @@
 
 cd /N/u/grthomas/Carbonate/bin/referee/
 jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
-#time -p python referee.py -gl $jsindir/jsinuosa-angsd.glf.gz  -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-referee-out-1proc
+time -p python referee.py -gl $jsindir/jsinuosa-angsd.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-referee-out-4proc -p 4
 # ANGSD input
 
-time -p python referee.py -gl $jsindir/jsinuosa-mq.pileup  -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-referee-out-4proc-glcalcs-mq -p 4
+#time -p python referee.py -gl $jsindir/jsinuosa-mq.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-referee-out-4proc-glcalcs-mq -p 4
 # pileup input with mq
 
-#time -p python referee.py -gl $jsindir/jsinuosa.pileup  -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-referee-out-1proc-glcalcs -p 4
+#time -p python referee.py -gl $jsindir/jsinuosa.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-referee-out-1proc-glcalcs -p 4
 # pileup input no mq
