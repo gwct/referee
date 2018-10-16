@@ -1,3 +1,2 @@
 data/angsd-output-snippet.txt
-data/angsd-output-snippet-2.txt
 data/angsd-output-snippet-3.txt

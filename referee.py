@@ -70,10 +70,10 @@ def referee(files, globs, step_start_time):
 	if not globs['mapped']:
 		if globs['num-procs'] == 1 or len(files) == 1:
 			for file_num in files:
-				result = OUT.addUnmapped((1, files[file_num], globs));
+				result = OUT.addUnmapped((file_num, files[file_num], globs));
 				if globs['stats']:
 					step_start_time = RC.report_stats(globs, "File " + str(result) + " unmapped done", step_start=file_start_time);
-				RC.printWrite(globs['logfilename'], globs['log-v'], "+ Renaming tmp file to output file: " + files[result]['tmpfile'] + " -> " + files[result]['out']);
+					RC.printWrite(globs['logfilename'], globs['log-v'], "+ Renaming tmp file to output file: " + files[result]['tmpfile'] + " -> " + files[result]['out']);
 				shutil.move(files[result]['tmpfile'], files[result]['out']);
 		# Serial version to add unmapped sites.
 		else:

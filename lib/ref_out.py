@@ -63,7 +63,6 @@ def addUnmapped(file_item):
 # this function goes through the positions in the output file and adds the unmapped positions.
 
     file_num, file_info, globs = file_item;
-
     scaff_pos, last_scaff, first = 1, "", True;
     # scaff_pos keeps track of the last position we've filled in. Comparing it to the current position in the output file
     # or the length of the current scaffold allows us to fill in the missing sites.
