@@ -7,5 +7,5 @@
 #PBS -j oe
 
 cd /N/u/grthomas/Carbonate/bin/referee/
-time -p python referee.py -i data/om-angsd-files.txt -ref /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna --stats --fastq --correct -o /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee-1proc
+time -p python referee.py -i data/om-angsd-files.txt -ref /N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna --fastq --correct -o /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee-1proc
 
