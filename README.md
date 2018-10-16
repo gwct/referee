@@ -62,22 +62,24 @@ If you have pre-calculated genotype likelihoods as input, exclude the `--pileup`
 
 ### Calculating genotype likelihoods from a pileup file (`--pileup`)
 
-Referee can take as input a pileup file and calculate genotype likelihoods for each site prior to reference quality scores. To generate a pileup file, use samtools:
+Referee can take as input a pileup file and calculate genotype likelihoods for each site prior to reference quality scores. This will have a detrimental effect on runtime. To generate a pileup file, use samtools:
 
 `samtools mpileup -d 999999999 -f <reference.fasta> -Q 0 -s -o <output.pileup> <input.bam>`
 
-The option `-d 999999999` sets the minimum depth to report a site to a high enough number that all sites will be reported. `-Q 0` sets the maximum base quality required to report a site to 0, again ensuring that all sites will e reported. `-s` tells mpileup to output mapping quality in an additional column. If this is set, Referee will incorporate mapping quality into the genotype likelihood calculation.
+The option `-d 999999999` sets the minimum depth to report a site to a high enough number that all sites will be reported. `-Q 0` sets the maximum base quality required to report a site to 0, again ensuring that all sites will be reported. `-s` tells mpileup to output mapping quality in an additional column. If this is set, Referee will incorporate mapping quality into the genotype likelihood calculation.
 
-### The genotype likelihoods format
+### The pre-calculated genotype likelihoods file format
 
 If `--pileup` is not set, a file with precalculated **log** genotype likelihoods may be provided. We recommend [ANGSD](https://github.com/ANGSD/angsd) for this as it provides output in a format ready for use by Referee. This file should be a tab delimited file with columns in exactly this order:
 
 | Sequence ID | Position | AA | AC | AG | AT | CC | CG | CT | GG | GT | TT |
 |-------------|----------|----|----|----|----|----|----|----|----|----|----|
 
-This file should not have headers.
+**This file should not have headers.**
 
 #### Important! The sequence IDs in the genotype likelihood file must match those in the reference FASTA file.
+
+The headers in the FASTA file can have additional information, but the sequence IDs must be first, followed immediately by a space (if this is too non-standard, contact me and I can change it).
 
 Example with log likelihoods:
 
