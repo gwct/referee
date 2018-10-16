@@ -6,5 +6,6 @@
 #PBS -N jsin-comp-scores
 #PBS -j oe
 
+module load r/3.4.4
 jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
 Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-referee-out-1proc.txt $jsindir/jsin-referee-out-1proc-glcalcs.txt $jsindir/jsin-plots jsin-angsd-vs-glcalcs
