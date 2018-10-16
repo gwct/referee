@@ -16,7 +16,9 @@ source("lib/utils.r")
 
 
 
-## I. Genotype likelihoods and quality scores (briefly)
+## I. Genotype likelihoods
+
+Referee can accept genotype likelihoods calculated with any method as long as they are properly formatted. For Referee's internal genotype likelihood calculations we use the simple method [described in the initial GATK publication (McKenna et al 2010)](https://dx.doi.org/10.1101/gr.107524.110). What follows is a description of that method, with the additional consideration of mapping quality.
 
 There are 10 possible genotypes at a biallelic site:
 
@@ -56,7 +58,11 @@ Now we wish to compute a quality value $Q_{ref}$ for a reference base given a se
 
 First, we sum up the likelihoods of all genotypes that contain the reference allele ($L_{match}$) and separately sum up the likelihoods of all the genotypes that do not contain the reference allele ($L_{mismatch}$). 
 
+**Equation 4**
+
 $$ L_{match} = \sum_g^\mathbb{G} P(R\;|\;g) \; \text{if} \; B_R \in g $$
+
+**Equation 5**
 
 $$ L_{mismatch} = \sum_g^\mathbb{G} P(R\;|\;g) \; \text{if} \; B_R \notin g $$
 
@@ -68,9 +74,9 @@ and:
 
 $$ L_{mismatch} = P(R|\{T,T\}) + P(R|\{T,C\}) + P(R|\{T,G\}) + P(R|\{C,C\}) + P(R|\{C,G\}) + P(R|\{G,G\})$$
 
-with the probabilities being calculated with #quation 1.
+with the probabilities being calculated with Equation 1.
 
-We can then set up a likelihood ratio $LR$ by divding $L_{mismatch}$ by $L_{match}$:
+We can then set up a likelihood ratio $LR$ by divding $L_{match}$ by $L_{mismatch}$:
 
 **Equation 6**
 

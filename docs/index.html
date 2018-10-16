@@ -92,6 +92,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -222,9 +225,9 @@ $(document).ready(function () {
 <li><p>Compile a pileup file for Referee to calculate genotype likelihoods OR pre-calculate log genotype likelihoods for all 10 genotypes at every position in the genome (we recommend <a href="https://github.com/ANGSD/angsd">ANGSD</a> for this).</p></li>
 <li><p>Score your genome with one of the following Referee commands:</p></li>
 </ol>
-<p><code>python referee.py -gl [genotype likelihood file] -ref [reference genome FASTA file] --pileup</code></p>
+<pre><code>python referee.py -gl [genotype likelihood file] -ref [reference genome FASTA file] --pileup</code></pre>
 <p>Alternatively, if you have multiple genotype likelihood files you wish to score with the same reference genome, you could put the paths to each file in a text file with one file path per line for Referee to score them all:</p>
-<p><code>python referee.py -i [text file with paths to genotype likelihood files] -ref [reference genome FASTA file] --pileup</code></p>
+<pre><code>python referee.py -i [text file with paths to genotype likelihood files] -ref [reference genome FASTA file] --pileup</code></pre>
 <p>If you have pre-calculated genotype likelihoods as input, exclude the <code>--pileup</code> flag.</p>
 </br>
 <center>

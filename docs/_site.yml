@@ -1,5 +1,5 @@
 name: referee
-output_dir: .
+output_dir: "."
 navbar:
   title: Referee
   left:
