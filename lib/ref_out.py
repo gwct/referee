@@ -4,6 +4,10 @@ import refcore as RC
 def outputFastq(outdict, fq_vars, globs, final=False):
 # For output to FASTQ format.
     if not final:
+        #if globs['correct-opt'] and outdict['rq'] in [0,-1,-3]:
+        #    fq_vars["fq_seq"] = outdict["cor_ref"];
+        #    score = str(unichr(int(round(outdict["cor_score"])+35)));
+        #else:
         fq_vars["fq_seq"] += outdict['ref'];
         score = str(unichr(int(round(outdict['rq'])+35)));
         fq_vars["fq_scores"] += score;
@@ -100,7 +104,10 @@ def addUnmapped(file_item):
             # up to that position.
 
             if globs['fastq']:
-                fqoutdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : seq[pos-1], 'rq' : int(line.strip().split("\t")[2]) };
+                if globs['correct-opt'] and len(linelist) == 5:
+                    fqoutdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : linelist[3].lower(), 'rq' : int(linelist[4]) };
+                else:
+                    fqoutdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : seq[pos-1], 'rq' : int(linelist[2]) };
                 fq_vars = outputFastq(fqoutdict, fq_vars, globs);
             # Output the current position to FASTQ.
 

@@ -69,10 +69,8 @@ def glCalc(line, genotypes):
         scaff, pos, ref, depth, reads, bqs, mqs = line;
         mps = [10.0 ** (-float(ord(char) - 33) / 10.0) for char in mqs];
     # If there are mapping qualities, convert them to probabilities here.
-    else:
-        print line;
-        sys.exit();
     pos = int(pos);
+    ref = ref.upper();
     bps = [10.0 ** (-float(ord(char) - 33) / 10.0) for char in bqs];
     # Convert the base qualities to probabilities.
 
@@ -123,7 +121,7 @@ def refCalc(file_item):
             if globs['pileup']:
             # If the input type is pileup, we calculate the genotype likelihoods here.
                 if line[3] == "0":
-                    ref, rq, lr, l_match, l_mismatch, gls = line[3], -2, "NA", "NA", "NA", "NA";
+                    ref, rq, lr, l_match, l_mismatch, gls = line[3].upper(), -2, "NA", "NA", "NA", "NA";
                     calc_rq_flag = False;
                 # If no reads have mapped to the site, assign score -2 and skip everything else.
                 else:

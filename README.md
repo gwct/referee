@@ -55,7 +55,7 @@ If you have pre-calculated genotype likelihoods as input, exclude the `--pileup`
 | -o | Referee will create at least 2 output files: a tab delimited score file and a log file. Use this option to specify a prefix for these file names. Otherwise, they will default to `referee-out-[date]-[time]-[random string]` |
 | --pileup | If this option is set, Referee will read the input file(s) in pileup format and use this info to calculate genotype likelihoods prior to the reference quality score (see below) |
 | --fastq | The scores can also be output in FASTQ format. This option cannot be set with `--mapped`. Scores will be converted to [ASCII](https://en.wikipedia.org/wiki/ASCII) characters: score + 35 = ASCII char |
-| --correct | With this option, sites where reads do not support the called reference base will have a higher scoring base suggested. |
+| --correct | With this option, sites where reads do not support the called reference base will have a higher scoring base suggested. In the tab delimited output, the corrected base and score is reported in additional columns. In FASTQ output, the corrected positions are indicated by lower case bases. |
 | --mapped | Only report scores for sites with reads mapped to them. This option cannot be set with `--fastq`. |
 | -p |The number of processes Referee can use. |
 
@@ -148,6 +148,8 @@ In this case, scores have been converted to [ASCII](https://en.wikipedia.org/wik
 FASTQ score char = ascii(Score+35)
 
 In other words, the [ASCII](https://en.wikipedia.org/wiki/ASCII) character `S` corresponds to the decimal 83. That means the score at this position was 83 - 35 = 48.
+
+If the `--correct` option is specified, corrected bases will be lower case. All others should be upper case.
 
 #### Special case scores
 
