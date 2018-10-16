@@ -57,6 +57,7 @@ If you have pre-calculated genotype likelihoods as input, exclude the `--pileup`
 | --fastq | The scores can also be output in FASTQ format. This option cannot be set with `--mapped`. Scores will be converted to [ASCII](https://en.wikipedia.org/wiki/ASCII) characters: score + 35 = ASCII char |
 | --correct | With this option, sites where reads do not support the called reference base will have a higher scoring base suggested. In the tab delimited output, the corrected base and score is reported in additional columns. In FASTQ output, the corrected positions are indicated by lower case bases. |
 | --mapped | Only report scores for sites with reads mapped to them. This option cannot be set with `--fastq`. |
+| --quiet | Set this optoin to prevent Referee from printing out runtime statistics for each step. |
 | -p |The number of processes Referee can use. |
 
 ### Calculating genotype likelihoods from a pileup file (`--pileup`)
@@ -162,3 +163,8 @@ There are several scenarios where the scoring calculation is impossible. We have
 | No reads mapped to this site | -2 |
 
 For the case of the reference base being called as N, Referee can calculate the highest scoring base and report it with the `--correct` option.
+
+#### Other notes
+
+By default, Referee prints out the runtime for each step. If the [psutil](https://pypi.org/project/psutil/) module is installed, it will also print out memory usage. However, if you have many input files or use many processes then this can be distracting. Use `--quiet` to disable.
+

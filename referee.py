@@ -14,7 +14,8 @@ import sys, os, multiprocessing as mp, shutil, lib.refcore as RC, lib.ref_calc a
 
 def referee(files, globs, step_start_time):
 	if globs['stats']:
-		import psutil
+		if globs['psutil']:
+			import psutil
 		step_start_time = RC.report_stats(globs, "Index ref fasta", step_start=step_start_time);
 	# Initialize the stats output if --stats is set
 
@@ -49,7 +50,7 @@ def referee(files, globs, step_start_time):
 		# If multiple processors are available for 1 file, we split the file into chunks.
 
 		pool = mp.Pool(processes = globs['num-procs']);
-		if globs['stats']:
+		if globs['stats'] and globs['psutil']:
 			for result in pool.imap(RC.getSubPID, range(globs['num-procs'])):
 				globs['pids'].append(result);
 		for result in pool.imap(CALC.refCalc, ((file_num, new_files[file_num], globs) for file_num in new_files)):

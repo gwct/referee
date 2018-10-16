@@ -16,7 +16,7 @@ def init():
         #'correct-cutoff' : 1,
         'log-v' : 1,
         'mapped' : False,
-        'stats' : False,
+        'stats' : True,
         'allcalc' : False,
         'pileup' : False,
         'progstarttime' : 0,
@@ -26,7 +26,8 @@ def init():
         'ref' : "",
         'outdir' : "",
         'fasta' : 1,
-        'genotypes' : ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"]
+        'genotypes' : ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"],
+        'psutil' : ""
     }
 
     globs['logfilename'] = "referee-log-" + globs['startdatetime'] + ".log";

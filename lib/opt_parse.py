@@ -13,6 +13,12 @@ def optParse(globs):
 	except:
 		sys.exit("\n*** ERROR: Your installation of Python is missing the argparse module. Please try a different version of Python (2.7 or later) or install the module.\n")
 	# First check if the argparse module is installed. If not, the input options cannot be parsed.
+	try:
+		import psutil
+		globs['psutil'] = True;
+	except:
+		globs['psutil'] = False;
+	# Check if psutil is installed for memory usage stats.
 
 	parser = argparse.ArgumentParser(description="Referee: Reference genome quality scoring.");
 
@@ -22,17 +28,18 @@ def optParse(globs):
 	# Inputs
 	parser.add_argument("-o", dest="out_dest", help="A PREFIX name for the output files/directories. Default: referee-out-[date]-[time]", default=False);
 	# Output
-	parser.add_argument("--fastq", dest="fastq_flag", help="Set this option to output in FASTQ format instead of the default tab delimited format.", action="store_true", default=False);
-	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score below a cut-off set by -c.", action="store_true", default=False);
-	parser.add_argument("--mapped", dest="mapped_flag", help="Set this to calculate scores only for positions that have reads mapped to them.", action="store_true", default=False);
+	parser.add_argument("-p", dest="processes", help="The number of processes Referee should use. Default: 1.", default=False);
+	# User params
 	parser.add_argument("--pileup", dest="pileup_flag", help="If your input is a pileup file, Referee can calculate the genotype likelihoods for you. Set this flag to indicate input is in this format.", action="store_true", default=False);
+	parser.add_argument("--fastq", dest="fastq_flag", help="Set this option to output in FASTQ format in addition to the default tab delimited format.", action="store_true", default=False);
+	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score 0.", action="store_true", default=False);
+	parser.add_argument("--mapped", dest="mapped_flag", help="Set this to calculate scores only for positions that have reads mapped to them.", action="store_true", default=False);
+	parser.add_argument("--quiet", dest="quiet_flag", help="Set this flag to prevent Referee from reporting detailed information about each step.", action="store_true", default=False);
 	# User options	
 	#parser.add_argument("-s", dest="startpos", help="Set the starting position for the input file(s). Default: 1", default=False);
 	#parser.add_argument("-e", dest="endpos", help="Set the end position for the input file(s). Default: last position in assembly/scaffold", default=False);
 	#parser.add_argument("-c", dest="score_cutoff", help="The cut-off score for --correct. Sites that score below this cut-off will have an alternate reference base suggested. If --correct isn't set, this option is ignored. Default: 1", default=False);
-	parser.add_argument("-p", dest="processes", help="The number of processes Referee should use. Not that 1 process is always reserved for the main script, so to see any benefit you must enter 3 or above. Default: 1.", default=False);
-	# User params
-	parser.add_argument("--stats", dest="stats_opt", help=argparse.SUPPRESS, action="store_true", default=False);
+	#parser.add_argument("--stats", dest="stats_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--allcalcs", dest="allcalc_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("-f", dest="fasta_opt", help=argparse.SUPPRESS, type=int, default=1);
 	# Performance tests
@@ -93,13 +100,15 @@ def optParse(globs):
 	RC.startProg(globs);
 	# After all the essential options have been set, call the welcome function.
 
-	if args.stats_opt:
-		import psutil
-		globs['stats'] = True;
-		globs['pids'] = [psutil.Process(os.getpid())];		
-		step_start_time = RC.report_stats(globs, stat_start=True);
-	else:
+	if args.quiet_flag:
+		globs['stats'] = False;
 		step_start_time = "";
+	else:
+		if globs['psutil']:
+			import psutil
+			globs['pids'] = [psutil.Process(os.getpid())];	
+		globs['stats'] = True;
+		step_start_time = RC.report_stats(globs, stat_start=True);
 	# Initializing the stats options if --stats is set.
 	# Parse performance options.
 

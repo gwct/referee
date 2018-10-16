@@ -29,18 +29,18 @@ def startProg(globs):
 	print("    Reference genome quality score calculator.\n")
 	printWrite(globs['logfilename'], 0, "# Welcome to Referee -- Reference genome quality score calculator.");
 	printWrite(globs['logfilename'], globs['log-v'], "# The date and time at the start is: " + getDateTime());
-	printWrite(globs['logfilename'], globs['log-v'], "# The program was called as: " + " ".join(sys.argv));
-	printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40 + "\n#");
-	printWrite(globs['logfilename'], globs['log-v'], "** IMPORTANT!");
-	printWrite(globs['logfilename'], globs['log-v'], "** Input columns: Scaffold\tPosition\tAA\tAC\tAG\tAT\tCC\tCG\tCT\tGG\tGT\tTT");
-	printWrite(globs['logfilename'], globs['log-v'], "** Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order without headers.");
-	printWrite(globs['logfilename'], globs['log-v'], "** Failure to do so will result in inaccurate calculations!!");
-	printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40 + "\n#");
+	printWrite(globs['logfilename'], globs['log-v'], "# The program was called as: " + " ".join(sys.argv) + "\n");
 
 	if globs['pileup']:
 		printWrite(globs['logfilename'], globs['log-v'], "# --pileup : Input type set to pileup. Referee will calculate genotype likelihoods.");
 	else:
 		printWrite(globs['logfilename'], globs['log-v'], "# Input is pre-calculated genotype likelihoods.");
+		printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40 + "\n#");
+		printWrite(globs['logfilename'], globs['log-v'], "** IMPORTANT!");
+		printWrite(globs['logfilename'], globs['log-v'], "** Input columns: Scaffold\tPosition\tAA\tAC\tAG\tAT\tCC\tCG\tCT\tGG\tGT\tTT");
+		printWrite(globs['logfilename'], globs['log-v'], "** Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order without headers.");
+		printWrite(globs['logfilename'], globs['log-v'], "** Failure to do so will result in inaccurate calculations!!");
+		printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40 + "\n#");
 	# Reporting the pileup option.
 
 	if globs['fastq']:
@@ -52,7 +52,7 @@ def startProg(globs):
 	if globs['mapped']:
 		printWrite(globs['logfilename'], globs['log-v'], "# --mapped : Only calculating scores for positions with reads mapped to them.");
 	else:
-		printWrite(globs['logfilename'], globs['log-v'], "# Calculating scores for every reference position specified.");
+		printWrite(globs['logfilename'], globs['log-v'], "# Calculating scores for every position in the reference genome.");
 	# Reporting the mapped option.
 
 	if globs['correct-opt']:
@@ -112,23 +112,34 @@ def printWrite(o_name, v, o_line1, o_line2="", pad=0):
 
 def report_stats(globs, msg="", step_start=0, stat_start=False, stat_end=False):
 # Uses psutil to gather memory and time info between steps and print them to the screen.
-	import timeit, psutil
+	import timeit
+	if globs['psutil']:
+		import psutil;
+		dashes = 125;
+	else:
+		dashes = 75;
 	cur_time = timeit.default_timer();
 	if stat_start:
 	# The first time through just print the headers.
 		globs['progstarttime'] = cur_time;
-		printWrite(globs['logfilename'], globs['log-v'], "# --stats : Reporting Referee time and memory usage.");
-		printWrite(globs['logfilename'], globs['log-v'], "\n# " + "-" * 125);
-		printWrite(globs['logfilename'], globs['log-v'], "# Step" + " " * 20 + "Time since prev (sec)" + " " * 6 + "Elapsed time (sec)" + " " * 4 + "Current mem usage (MB)" + " " * 4 + "Virtual mem usage (MB)");
-		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 125);
+		#printWrite(globs['logfilename'], globs['log-v'], "# --stats : Reporting Referee time and memory usage.");
+		printWrite(globs['logfilename'], globs['log-v'], "\n# " + "-" * dashes);
+		if globs['psutil']:
+			printWrite(globs['logfilename'], globs['log-v'], "# Step" + " " * 20 + "Time since prev (sec)" + " " * 6 + "Elapsed time (sec)" + " " * 4 + "Current mem usage (MB)" + " " * 4 + "Virtual mem usage (MB)");
+		else:
+			printWrite(globs['logfilename'], globs['log-v'], "# Step" + " " * 20 + "Time since prev (sec)" + " " * 6 + "Elapsed time (sec)");
+		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * dashes);
 	else:
 		prog_elapsed = cur_time - globs['progstarttime'];
 		step_elapsed = cur_time - step_start;
-		mem = sum([p.memory_info()[0] for p in globs['pids']]) / float(2 ** 20);
-		vmem = sum([p.memory_info()[1] for p in globs['pids']]) / float(2 ** 20);
-		printWrite(globs['logfilename'], globs['log-v'], "# " + msg + " " * (24-len(msg)) + str(step_elapsed) + " " * (27-len(str(step_elapsed))) + str(prog_elapsed) + " " * (22-len(str(prog_elapsed))) + str(mem) + " " * (26-len(str(mem))) + str(vmem));
+		if globs['psutil']:
+			mem = sum([p.memory_info()[0] for p in globs['pids']]) / float(2 ** 20);
+			vmem = sum([p.memory_info()[1] for p in globs['pids']]) / float(2 ** 20);
+			printWrite(globs['logfilename'], globs['log-v'], "# " + msg + " " * (24-len(msg)) + str(step_elapsed) + " " * (27-len(str(step_elapsed))) + str(prog_elapsed) + " " * (22-len(str(prog_elapsed))) + str(mem) + " " * (26-len(str(mem))) + str(vmem));
+		else:
+			printWrite(globs['logfilename'], globs['log-v'], "# " + msg + " " * (24-len(msg)) + str(step_elapsed) + " " * (27-len(str(step_elapsed))) + str(prog_elapsed) + " " * (22-len(str(prog_elapsed))));
 		if stat_end:
-			printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 125);
+			printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * dashes);
 	return cur_time;
 
 #############################################################################
