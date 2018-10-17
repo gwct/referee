@@ -87,7 +87,7 @@ comp_p = ggplot(in_combo, aes(x=score1, y=score2)) +
     #geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
     #geom_point(color='#333333', size=1) +
     geom_bin2d(bins=94) +
-    scale_fill_gradientn(colors=cm.colors(4)) +
+    #scale_fill_gradientn(colors=cm.colors(4)) +
     labs(x=paste(args[1], "score"), y=paste(args[2], "score")) +
     theme_classic() +
     theme(axis.text=element_text(size=10), 
