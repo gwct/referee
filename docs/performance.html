@@ -69,7 +69,7 @@ h6 {
 }
 </style>
 
-<link rel="stylesheet" href="lib/styles.css" type="text/css" />
+<link rel="stylesheet" href="lib\styles.css" type="text/css" />
 
 </head>
 
@@ -221,7 +221,7 @@ $(document).ready(function () {
 <pre><code>referee.py -gl jsinuosa-angsd.glf.gz -ref Trinity.fasta --fastq --correct -o jsinuosa-referee</code></pre>
 <p>Additionally, two pileup files were created from the BAM file to test Referee’s genotype likelihood calculations. One with mapping quality and one without (the -s flag controls mapping quality output):</p>
 <pre><code>samtools mpileup -d 999999999 -f &lt;reference.fa&gt; -Q 0 -s -o jsinuosa-mq.pileup SRR5380902-sorted.bam</code></pre>
-<p>The pileup was used by Referee to calculate genotype likelihoods and qualit scores:</p>
+<p>The pileup was used by Referee to calculate genotype likelihoods and quality scores:</p>
 <pre><code>referee.py -gl jsinuosa-mq.pileup -ref Trinity.fasta --pileup --fastq --correct -o jsinuosa-referee-glcalcs-mq</code></pre>
 <p>Here are some statistics from this process:</p>
 <center>

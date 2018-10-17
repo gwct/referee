@@ -36,7 +36,7 @@ Additionally, two pileup files were created from the BAM file to test Referee's 
 samtools mpileup -d 999999999 -f <reference.fa> -Q 0 -s -o jsinuosa-mq.pileup SRR5380902-sorted.bam
 ```
 
-The pileup was used by Referee to calculate genotype likelihoods and qualit scores:
+The pileup was used by Referee to calculate genotype likelihoods and quality scores:
 
 ```
 referee.py -gl jsinuosa-mq.pileup -ref Trinity.fasta --pileup --fastq --correct -o jsinuosa-referee-glcalcs-mq
