@@ -8,4 +8,4 @@
 
 module load r/3.4.4
 jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
-Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-referee-out-1proc-glcalcs.txt $jsindir/jsin-referee-out-1proc-glcalcs-nobaq.txt $jsindir/jsin-plots jsin-glcalcs-vs-glcalcs-nobaq
+Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-referee-out-1proc.txt $jsindir/jsin-referee-out-1proc-glcalcs.txt $jsindir/docs/img/performance-plots/ jsin-angsd-vs-glcalcs
