@@ -1,0 +1,51 @@
+procs,species,input type,stat,value
+1,j. sinuosa,jsin-angsd,max mem,31.3671875
+1,j. sinuosa,jsin-angsd,time,1121.165903
+1,j. sinuosa,jsin-pileup,max mem,31.90625
+1,j. sinuosa,jsin-pileup,time,8953.033994
+1,j. sinuosa,jsin-pileup mq,max mem,32.09375
+1,j. sinuosa,jsin-pileup mq,time,9828.899984
+1,owl monkey,om-angsd,max mem,102.125
+1,owl monkey,om-angsd,time,62391.39884
+4,j. sinuosa,jsin-angsd,max mem,239.046875
+4,j. sinuosa,jsin-angsd,time,734.455158
+4,j. sinuosa,jsin-pileup,max mem,240.5351563
+4,j. sinuosa,jsin-pileup,time,3371.666664
+4,j. sinuosa,jsin-pileup mq,max mem,243.4140625
+4,j. sinuosa,jsin-pileup mq,time,3272.166679
+4,owl monkey,om-angsd,max mem,539.484375
+4,owl monkey,om-angsd,time,17857.04213
+8,j. sinuosa,jsin-angsd,max mem,439.8398438
+8,j. sinuosa,jsin-angsd,time,657.825423
+8,j. sinuosa,jsin-pileup,max mem,444.1054688
+8,j. sinuosa,jsin-pileup,time,2270.955673
+8,j. sinuosa,jsin-pileup mq,max mem,445.171875
+8,j. sinuosa,jsin-pileup mq,time,2248.003797
+8,owl monkey,om-angsd,max mem,972
+8,owl monkey,om-angsd,time,9053.643466
+12,j. sinuosa,jsin-angsd,max mem,644.0898438
+12,j. sinuosa,jsin-angsd,time,597.131074
+12,j. sinuosa,jsin-pileup,max mem,644.9492188
+12,j. sinuosa,jsin-pileup,time,1595.792831
+12,j. sinuosa,jsin-pileup mq,max mem,646.1484375
+12,j. sinuosa,jsin-pileup mq,time,1582.10597
+16,j. sinuosa,jsin-angsd,max mem,841.921875
+16,j. sinuosa,jsin-angsd,time,594.099427
+16,j. sinuosa,jsin-pileup,max mem,846.8945313
+16,j. sinuosa,jsin-pileup,time,1467.254941
+16,j. sinuosa,jsin-pileup mq,max mem,847.421875
+16,j. sinuosa,jsin-pileup mq,time,1454.9007
+20,j. sinuosa,jsin-angsd,max mem,1043.191406
+20,j. sinuosa,jsin-angsd,time,565.0705781
+20,j. sinuosa,jsin-pileup,max mem,1048.132813
+20,j. sinuosa,jsin-pileup,time,1211.444033
+20,j. sinuosa,jsin-pileup mq,max mem,1052.105469
+20,j. sinuosa,jsin-pileup mq,time,1189.496807
+24,j. sinuosa,jsin-angsd,max mem,1244.488281
+24,j. sinuosa,jsin-angsd,time,576.7845299
+24,j. sinuosa,jsin-pileup,max mem,1250.089844
+24,j. sinuosa,jsin-pileup,time,1168.782569
+24,j. sinuosa,jsin-pileup mq,max mem,1250.773438
+24,j. sinuosa,jsin-pileup mq,time,1173.246491
+24,owl monkey,om-angsd,max mem,2446.160156
+24,owl monkey,om-angsd,time,4913.910043
