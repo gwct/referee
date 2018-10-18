@@ -61,12 +61,17 @@ Here are some statistics from this process:
 
 ### Referee run time on *J. sinuosa* data
 
+**Figure 1: Referee runtime on J. sinuosa data with 3 different genotype likelihood methods**
+
 <center> ![](img/performance-plots/jsin-time.png){width=75%} </center>
 </br>
 
 ### Referee memory usage on *J. sinuosa* data
 
+**Figure 2: Referee max memory use on J. sinuosa data with 3 different genotype likelihood methods**
+
 <center> ![](img/performance-plots/jsin-mem.png){width=75%} </center>
+</br>
 
 ### Comparing scores from different genotype likelihood methods on *J. sinuosa* data
 
@@ -83,34 +88,61 @@ Here are some statistics from this process:
 
 #### ANGSD
 
+**Figure 3: Referee score distribution on J. sinuosa with ANGSD genotype likelihoods**
+
 <center> ![](img/jsin-plots/jsin-referee-out-1proc-score-hist.png){width=75%} </center>
 </br>
+
+**Figure 4: Referee scores vs read depth on J. sinuosa with ANGSD genotype likelihoods**
 
 <center> ![](img/jsin-plots/jsin-referee-out-1proc-score-v-depth.png){width=75%} </center>
 </br>
 
 #### Pileup (no MQ)
 
+**Figure 5: Referee score distribution on J. sinuosa with pileup genotype likelihoods (no mapping quality)**
+
 <center> ![](img/jsin-plots/jsin-referee-out-1proc-glcalcs-score-hist.png){width=75%} </center>
 </br>
+
+**Figure 6: Referee scores vs. read depth on J. sinuosa with pileup genotype likelihoods (no mapping quality)**
 
 <center> ![](img/jsin-plots/jsin-referee-out-1proc-glcalcs-score-v-depth.png){width=75%} </center>
 </br>
 
 #### Pileup (with MQ)
 
+**Figure 7: Referee score distribution on J. sinuosa with pileup genotype likelihoods (WITH mapping quality)**
+
 <center> ![](img/jsin-plots/jsin-referee-out-1proc-glcalcs-mq-score-hist.png){width=75%} </center>
 </br>
+
+**Figure 8: Referee scores vs. read depth on J. sinuosa with pileup genotype likelihoods (WITH mapping quality)**
 
 <center> ![](img/jsin-plots/jsin-referee-out-1proc-glcalcs-mq-score-v-depth.png){width=75%} </center>
 </br>
 
 ### ANGSD scores vs. Referee pileup scores (no MQ)
+
+**Figure 9: Referee scores from ANGSD genotype likelihoods vs. pileup genotype likelihoods (no mapping quality)**
+
 <center> ![](img/jsin-plots/jsin-angsd-vs-glcalcs-score-v-score.png){width=75%} </center>
 </br>
 
 ### Referee pileup scores (no MQ) vs. Referee pileup scores (with MQ)
+
+**Figure 10: Referee scores from pileup genotype likelihoods (no mapping quality) vs. pileup genotype likelihoods (WITH mapping quality)**
+
 <center> ![](img/jsin-plots/jsin-glcalcs-vs-glcalcs-mq-score-v-score.png){width=75%} </center>
+</br>
+
+### ANGSD scores vs. Referee pileup scores (no MQ, no BAQ)
+
+Samtools mpileup's reported base quality scores actually undergo an adjustment. According to some [documentation](http://samtools.sourceforge.net/mpileup.shtml), this provides, "an efficient and effective way to rule out false SNPs caused by nearby INDELs." and, "is the Phred-scaled probability of the base being misaligned." This seems to take mapping quality into account, but it is unclear how. If I disabled this recalculation, Referee's scores from a pileup are more consistent with scores from ANGSD.
+
+**Figure 11: Referee scores from ANGSD genotype likelihoods vs. pileup genotype likelihoods (no mapping quality, no BAQ)**
+
+<center> ![](img/jsin-plots/jsin-angsd-vs-glcalcs-nobaq-score-v-score.png){width=75%} </center>
 </br>
 
 ## Owl monkey genome
@@ -139,10 +171,14 @@ Here are some statistics from this genome:
 
 ### Referee run time on Owl monkey and *J. sinuosa* data
 
+**Figure 12: Referee runtime on J. sinuosa and owl monkey data with 3 different genotype likelihood methods**
+
 <center> ![](img/performance-plots/time.png){width=75%} </center>
 </br>
 
 ### Referee memory usage on Owl monkey and *J. sinuosa* data
+
+**Figure 13: Referee max memory use on J. sinuosa and owl monkey data with 3 different genotype likelihood methods**
 
 <center> ![](img/performance-plots/mem.png){width=75%} </center>
 
