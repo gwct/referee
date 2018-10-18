@@ -158,15 +158,15 @@ Here are some statistics from this genome:
 | # Scaffolds                          | 22,922        |
 | Bases                                | 2,861,668,348 |
 | Size of sorted BAM file              | 561.67 GB     |
-| Average read depth                   | 151.698       |
+| Average read depth                   | 152.988       |
 | Time to run ANGSD                    | 54.38 min     |
 | Mapped sites with ANGSD calcs        | 2,664,619,299 |
 | Time to run Referee (1 proc)         | 17.33 hrs     |
 | Size of Referee output (tab)         | 7.6 GB        |
 | Size of Referee output (fastq)       | 608 MB        |
-| $L_{mismatch}$ = 0 ($R_Q$ = 91)      |               |
-| Reference is N ($R_Q$ = -1)          |               |
-| No reads mapped ($R_Q$ = -2)         |               |
+| $L_{mismatch}$ = 0 ($R_Q$ = 91)      | 2,385,493,538 |
+| Reference is N ($R_Q$ = -1)          | 173,395       |
+| No reads mapped ($R_Q$ = -2)         | 197,049,049   |
 </center>
 
 ### Referee run time on Owl monkey and *J. sinuosa* data

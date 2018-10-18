@@ -25,6 +25,7 @@ samtools view -b <input.sam> > <output.bam>
 samtools mpileup -d 999999999 -f <reference.fa> -Q 0 -s -o <output.pileup> <input.bam>
 # Convert BAM to mpileup with mapping quality
 
+samtools merge <output.bam> <input1.bam> <input2.bam> ...
 # Merge BAM files if necessary
  
 samtools sort <input.bam> -o <output-sorted.bam>
