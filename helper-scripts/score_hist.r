@@ -102,7 +102,7 @@ if(length(args)==3){
   depth_p = ggplot(in_combo, aes(x=score, y=depth)) +
     #geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
     #geom_point(color='#333333', size=0.5) +
-    geom_bin2d() +
+    geom_bin2d(bins=100) +
     ylim(0, NA) +
     labs(x="Referee score", y="Depth") +
     theme_classic() +
