@@ -101,7 +101,8 @@ if(length(args)==3){
   in_combo = merge(in_data, pileup_data, by=c("scaff", "pos"))
   depth_p = ggplot(in_combo, aes(x=score, y=depth)) +
     #geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
-    geom_point(color='#333333', size=0.5) +
+    #geom_point(color='#333333', size=0.5) +
+    geom_bin2d() +
     ylim(0, NA) +
     labs(x="Referee score", y="Depth") +
     theme_classic() +
@@ -111,8 +112,8 @@ if(length(args)==3){
           axis.title.x=element_text(margin=margin(t=20,r=0,b=0,l=0),color="black"),
           axis.line=element_line(colour='#595959',size=0.75),
           axis.ticks=element_line(colour="#595959",size = 1),
-          axis.ticks.length=unit(0.2,"cm"),
-          legend.position="none"
+          axis.ticks.length=unit(0.2,"cm")
+          #legend.position="none"
     )
   
   outfile = paste(outfile_prefix, "-score-v-depth.png", sep="")
