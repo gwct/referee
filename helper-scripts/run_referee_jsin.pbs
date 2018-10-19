@@ -8,10 +8,10 @@
 
 cd /N/u/grthomas/Carbonate/bin/referee/
 jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
-time -p python referee.py -gl $jsindir/angsd/jsinuosa-angsd.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-referee-out-angsd-s1 -p 24 -s 1
+#time -p python referee.py -gl $jsindir/angsd/jsinuosa-angsd.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-referee-out-angsd-s1 -p 24 -s 1
 time -p python referee.py -gl $jsindir/angsd/jsinuosa-angsd.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-referee-out-angsd-s2 -p 24 -s 2
 # ANGSD input
 
-time -p python referee.py -gl $jsindir/mapped/jsin-nobaq-nox.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-referee-out-pileup-s1 -p 24 -s 1
-time -p python referee.py -gl $jsindir/mapped/jsin-nobaq-nox.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-referee-out-pileup-s2    -p 24 -s 2
+#time -p python referee.py -gl $jsindir/mapped/jsin-nobaq-nox.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-referee-out-pileup-s1 -p 24 -s 1
+time -p python referee.py -gl $jsindir/mapped/jsin-nobaq-nox.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-referee-out-pileup-s2 -p 24 -s 2
 # pileup input with mq, no baq

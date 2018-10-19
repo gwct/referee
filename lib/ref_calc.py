@@ -34,6 +34,7 @@ def calcScore(ref, gls, method):
                 lr = l_match / l_mismatch;
                 score = math.log(lr, 10);
             elif method == 2:
+                lr = "NA";
                 score = -1 * math.log(l_mismatch, 10);
             # Calculate the match : mismatch ratio and log transform.
             if score > 90:
