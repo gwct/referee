@@ -26,6 +26,7 @@ def init():
         'ref' : "",
         'outdir' : "",
         'fasta' : 1,
+        'method' : 1,
         'genotypes' : ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"],
         'psutil' : ""
     }

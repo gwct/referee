@@ -37,12 +37,12 @@ scoreStats <- function(data){
 
 ############################################################
 
-args = commandArgs(trailingOnly=TRUE)
+#args = commandArgs(trailingOnly=TRUE)
 # Command line entry of input files
 
-#this.dir <- dirname(parent.frame(2)$ofile)
-#setwd(this.dir)
-#args = c("../test1.txt", "../test2.txt", "..", "test-prefix")
+this.dir <- dirname(parent.frame(2)$ofile)
+setwd(this.dir)
+args = c("../data/jsin-angsd-snippet.txt", "../data/jsin-pileup-snippet.txt", "..", "test-prefix")
 # Manual entry of input files
 
 if(length(args) != 4 || "-h" %in% args){

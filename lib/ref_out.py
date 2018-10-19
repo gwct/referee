@@ -153,7 +153,7 @@ def fillUnmapped(start, stop, scaff, seq, outfile, globs, fq_vars, final=False, 
 
         start += 1;
 
-    if final and fq_vars['filled'] and globs['fastq'] and fq_vars['fq_seq'] != "":
+    if globs['fastq'] and final and fq_vars['filled'] and fq_vars['fq_seq'] != "":
         fq_vars = outputFastq(outdict, fq_vars, globs, final=True);
     # If this is the final call and the last position was unmapped, we call the final FASTQ output here.
 

@@ -30,7 +30,7 @@ def optParse(globs):
 	# Output
 	parser.add_argument("-p", dest="processes", help="The number of processes Referee should use. Default: 1.", default=False);
 	# User params
-	parser.add_argument("--pileup", dest="pileup_flag", help="If your input is a pileup file, Referee can calculate the genotype likelihoods for you. Set this flag to indicate input is in this format.", action="store_true", default=False);
+	parser.add_argument("--pileup", dest="pileup_flag", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--fastq", dest="fastq_flag", help="Set this option to output in FASTQ format in addition to the default tab delimited format.", action="store_true", default=False);
 	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score 0.", action="store_true", default=False);
 	parser.add_argument("--mapped", dest="mapped_flag", help="Set this to calculate scores only for positions that have reads mapped to them.", action="store_true", default=False);
@@ -42,6 +42,7 @@ def optParse(globs):
 	#parser.add_argument("--stats", dest="stats_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--allcalcs", dest="allcalc_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("-f", dest="fasta_opt", help=argparse.SUPPRESS, type=int, default=1);
+	parser.add_argument("-s", dest="score_opt", help=argparse.SUPPRESS, type=int, default=1);
 	# Performance tests
 
 	args = parser.parse_args();
@@ -53,6 +54,11 @@ def optParse(globs):
 		globs['fasta'] = args.fasta_opt;
 	else:
 		RC.errorOut(0, "Invalid fasta opt.", globs);
+
+	if args.fasta_opt in [1,2]:
+		globs['method'] = args.score_opt;
+	else:
+		RC.errorOut(0, "Invalid score method opt.", globs);
 
 	if not args.input_list and not args.gl_file:
 		RC.errorOut(1, "No input method specified. Make sure one input method (either just -i or -gl) is specified.", globs);
