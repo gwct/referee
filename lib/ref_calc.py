@@ -16,12 +16,10 @@ def calcScore(ref, gls, method):
     else:
         l_match, l_mismatch = 0, 0;
         for gt in gls:
-            print gt, gls[gt];
             if ref in gt:
                 l_match += gls[gt];
             else:
                 l_mismatch += gls[gt];
-        print l_match, l_mismatch;
         # Sum the genotypes that match the called reference base and those that don't (mismatch).
 
         if l_mismatch == 0:
@@ -35,7 +33,6 @@ def calcScore(ref, gls, method):
             if method == 1:
                 lr = l_match / l_mismatch;
                 score = math.log(lr, 10);
-                print lr, score;
             elif method == 2:
                 score = -1 * math.log(l_mismatch, 10);
             # Calculate the match : mismatch ratio and log transform.
@@ -79,9 +76,6 @@ def glCalc(line, genotypes):
     ref = ref.upper();
     bps = [10.0 ** (-float(ord(char) - 33) / 10.0) for char in bqs];
     # Convert the base qualities to probabilities.
-    print bqs;
-    print bps;
-    print mps;
     while True:
         indel = re.search(r'[-+]\d+', reads)
         if indel == None:
@@ -102,7 +96,7 @@ def glCalc(line, genotypes):
         gls[gt] = 1;
         for i in range(len(reads)):
             base, bp, mp = reads[i], bps[i], mps[i];
-            print base, bp, bqs[i], mp;
+
             if bp == 1:
                 continue;
             cur_p = 0;
@@ -111,11 +105,7 @@ def glCalc(line, genotypes):
                     cur_p += 0.5 * (1 - (bp*mp));
                 else:
                     cur_p += 0.5 * ((bp*mp)/3.0);
-            print cur_p;
-            print "-----";
             gls[gt] = gls[gt] * cur_p;
-        #sys.exit();
-        print gt, gls[gt];
     # Calculate the genotype likelihood for every genotype given the current reads and probabilities.
 
     return ref, gls;

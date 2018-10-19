@@ -15,10 +15,10 @@ module load r/3.4.4
 #cat /N/dc2/scratch/grthomas/qtip/owl-monkey/scaffold-list.txt | parallel --eta 'Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee-24proc/{}-out.txt /N/dc2/scratch/grthomas/qtip/owl-monkey/owl-monkey-referee-24proc/plots/ /N/dcwan/projects/hahnlab-phi/owl-monkey/pileup-files/ref-120X-scaffolds/39093-{}.pileup'
 
 jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
-Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-referee-out-1proc.txt $jsindir/jsin-plots-2 $jsindir/jsinuosa.pileup
-Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-referee-out-1proc-glcalcs.txt $jsindir/jsin-plots-2 $jsindir/jsinuosa.pileup
-Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-referee-out-1proc-glcalcs-nobaq.txt $jsindir/jsin-plots-2 $jsindir/jsinuosa.pileup
-Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-referee-out-1proc-glcalcs-mq.txt $jsindir/jsin-plots-2 $jsindir/jsinuosa.pileup
+Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-referee-out-angsd-s1.txt $jsindir/jsin-plots-3 $jsindir/mapped/jsin-nobaq-nox.pileup
+Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-referee-out-angsd-s2.txt $jsindir/jsin-plots-3 $jsindir/mapped/jsin-nobaq-nox.pileup
+Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-referee-out-pileup-s1.txt $jsindir/jsin-plots-3 $jsindir/mapped/jsin-nobaq-nox.pileup
+Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-referee-out-pileup-s2.txt $jsindir/jsin-plots-3 $jsindir/mapped/jsin-nobaq-nox.pileup
 
 
 # for i in *-out.txt; do
