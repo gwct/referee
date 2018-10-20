@@ -91,6 +91,10 @@ def glCalc(line, genotypes):
     # If it is the beginning of the read, we must also removing the following quality score symbol -- \w!\"#$%&'()*+,./:;<=>?@-
     # In regex, . matches ANY CHARACTER but \n
     # Then convert the . and , symbols to the actual base stored in ref
+    # print line;
+    # print len(reads), reads;
+    # print len(bps), bps;
+    # print len(mps), mps;
 
     gls = {};
     for gt in genotypes:
@@ -151,6 +155,10 @@ def refCalc(file_item):
                     ref = globs['ref'][scaff][pos-1].upper();
                 # Gets the called reference base at the current position.
 
+            # for gt in gls:
+            #     print gt, gls[gt];
+            # print sum(gls.values());
+
             if calc_rq_flag:
                 rq, lr, l_match, l_mismatch = calcScore(ref, gls, globs['method']);
                 # Call the scoring function.
@@ -163,7 +171,7 @@ def refCalc(file_item):
                         'l_match' : l_match, 'l_mismatch' : l_mismatch, 'gls' : gls, 
                         'cor_ref' : cor_ref, 'cor_score' : cor_score };
             # Store the info from the current site to be written once returned.
-
+            # print rq, lr, l_match, l_mismatch;
             OUT.outputTab(outdict, outfile, globs);
             # Writes the output to the current output file.
 

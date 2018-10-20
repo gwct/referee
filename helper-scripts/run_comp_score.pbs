@@ -8,6 +8,7 @@
 
 module load r/3.4.4
 jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
-#Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-referee-out-angsd-s1.txt $jsindir/jsin-referee-out-angsd-s2.txt $jsindir/jsin-plots-3 jsin-angsds1-vs-angsds2
+Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-referee-out-angsd-s1.txt $jsindir/jsin-referee-out-angsd-s2.txt $jsindir/jsin-plots-3 jsin-angsds1-vs-angsds2
+Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-referee-out-pileup-s1.txt $jsindir/jsin-referee-out-pileup-s2.txt $jsindir/jsin-plots-3 jsin-pileups1-vs-pileups2
 
-Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-referee-out-angsd-s1.txt $jsindir/jsin-referee-out-pileup-s1.txt $jsindir/jsin-plots-3 jsin-angsds1-vs-pileups1
+#Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-referee-out-angsd-s1.txt $jsindir/jsin-referee-out-pileup-s1.txt $jsindir/jsin-plots-3 jsin-angsds1-vs-pileups1
