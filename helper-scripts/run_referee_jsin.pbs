@@ -10,7 +10,7 @@ module load r/3.4.4
 cd /N/u/grthomas/Carbonate/bin/referee/
 jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
 #time -p python referee.py -gl $jsindir/angsd/jsinuosa-angsd.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-referee-out-angsd-s1 -p 24 -s 1
-#time -p python referee.py -gl $jsindir/jsinuosa-angsd-new.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-referee-out-angsd-new-s1 -p 24
+time -p python referee.py -gl $jsindir/jsinuosa-angsd-new.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-referee-out-angsd-new-s1 -p 24
 Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-referee-out-angsd-new-s1.txt $jsindir/jsin-referee-out-pileup-s1.txt $jsindir/jsin-plots-4 jsin-angsds1-vs-pileups1
 # ANGSD input
 
