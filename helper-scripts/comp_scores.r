@@ -37,12 +37,12 @@ scoreStats <- function(data){
 
 ############################################################
 
-#args = commandArgs(trailingOnly=TRUE)
+args = commandArgs(trailingOnly=TRUE)
 # Command line entry of input files
 
-this.dir <- dirname(parent.frame(2)$ofile)
-setwd(this.dir)
-args = c("../data/angsd-s1.txt", "../data/pileup-s1.txt", "..", "test-prefix")
+#this.dir <- dirname(parent.frame(2)$ofile)
+#setwd(this.dir)
+#args = c("../data/angsd-s1.txt", "../data/pileup-s1.txt", "..", "test-prefix")
 # Manual entry of input files
 
 if(length(args) != 4 || "-h" %in% args){
@@ -102,6 +102,6 @@ comp_p = ggplot(in_combo, aes(x=score1, y=score2)) +
 
 outfile = paste(outfile_prefix, "-score-v-score.png", sep="")
 ggsave(file=outfile, comp_p, width=8, height=6, units="in")
-print(comp_p)
+#print(comp_p)
 
 
