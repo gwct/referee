@@ -22,7 +22,7 @@ def calcScore(ref, gls, method):
                 l_mismatch += gls[gt];
         # Sum the genotypes that match the called reference base and those that don't (mismatch).
 
-        print l_match, l_mismatch;
+        #print l_match, l_mismatch;
 
         if l_mismatch == 0:
             score, lr = 91, 0;
@@ -67,11 +67,11 @@ def correctRef(max_score, ref, gls, method):
 #############################################################################
 
 def glCalc(line, genotypes, log_probs, mapq):
-    if len(line) == 6:
+    if not mapq:
         scaff, pos, ref, depth, reads, bqs = line;
         mqs = [unichr(1+33) for char in bqs];
     # If there are no mapping qualities, just assign dummy values of 1 for mapping probs for every read.
-    elif len(line) == 7:
+    elif mapq:
         scaff, pos, ref, depth, reads, bqs, mqs = line;
     # If there are mapping qualities, convert them to probabilities here.
     pos = int(pos);
@@ -90,18 +90,20 @@ def glCalc(line, genotypes, log_probs, mapq):
     # If it is the beginning of the read, we must also removing the following quality score symbol -- \w!\"#$%&'()*+,./:;<=>?@-
     # In regex, . matches ANY CHARACTER but \n
     # Then convert the . and , symbols to the actual base stored in ref
-    print line;
-    print len(reads), reads;
-    print len(bqs), bqs;
-    print len(mqs), mqs;
+    #print line;
+    #print len(reads), reads;
+    #print len(bqs), bqs;
+    #print len(mqs), mqs;
 
     log_gls = {};
     for gt in genotypes:
         log_gls[gt] = 0;
         for i in range(len(reads)):
             base = reads[i];
-            qual_key = bqs[i]# + mqs[i];
-            print qual_key, log_probs[qual_key];
+            qual_key = bqs[i];
+            if mapq:
+                qual_key += mqs[i];
+            #print qual_key, log_probs[qual_key];
             if gt[0] == gt[1] and base == gt[0]:
                 log_gls[gt] += log_probs[qual_key][0];
             elif gt[0] != gt[1] and (base == gt[0] or base == gt[1]):
@@ -167,10 +169,10 @@ def refCalc(file_item):
                         'l_match' : l_match, 'l_mismatch' : l_mismatch, 'gls' : gls, 
                         'cor_ref' : cor_ref, 'cor_score' : cor_score };
             # Store the info from the current site to be written once returned.
-            for gt in log_gls:
-               print gt, log_gls[gt];
-            #print sum(gls.values());
-            print rq, lr, l_match, l_mismatch;
+            # for gt in log_gls:
+            #    print gt, log_gls[gt];
+            # #print sum(gls.values());
+            # print rq, lr, l_match, l_mismatch;
             OUT.outputTab(outdict, outfile, globs);
             # Writes the output to the current output file.
 

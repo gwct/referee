@@ -29,7 +29,10 @@ def startProg(globs):
 	print("    Reference genome quality score calculator.\n")
 	printWrite(globs['logfilename'], 0, "# Welcome to Referee -- Reference genome quality score calculator.");
 	printWrite(globs['logfilename'], globs['log-v'], "# The date and time at the start is: " + getDateTime());
-	printWrite(globs['logfilename'], globs['log-v'], "# The program was called as: " + " ".join(sys.argv) + "\n");
+	printWrite(globs['logfilename'], globs['log-v'], "# The program was called as: " + " ".join(sys.argv) + "\n#");
+
+	printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 40);
+	printWrite(globs['logfilename'], globs['log-v'], "# Options info:");
 
 	if globs['pileup']:
 		printWrite(globs['logfilename'], globs['log-v'], "# --pileup : Input type set to pileup. Referee will calculate genotype likelihoods.");
@@ -41,12 +44,6 @@ def startProg(globs):
 		printWrite(globs['logfilename'], globs['log-v'], "# --pileup not set : Input is pre-calculated genotype likelihoods.");
 		if globs['mapq']:
 			printWrite(globs['logfilename'], globs['log-v'], "# Ignoring --mapq option.");
-		printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40 + "\n#");
-		printWrite(globs['logfilename'], globs['log-v'], "** IMPORTANT!");
-		printWrite(globs['logfilename'], globs['log-v'], "** Input columns: Scaffold\tPosition\tAA\tAC\tAG\tAT\tCC\tCG\tCT\tGG\tGT\tTT");
-		printWrite(globs['logfilename'], globs['log-v'], "** Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order without headers.");
-		printWrite(globs['logfilename'], globs['log-v'], "** Failure to do so will result in inaccurate calculations!!");
-		printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40 + "\n#");
 	# Reporting the pileup option.
 
 	if globs['fastq']:
@@ -68,6 +65,16 @@ def startProg(globs):
 	if globs['allcalc']:
 		printWrite(globs['logfilename'], globs['log-v'], "# --allcalcs : Using tab delimited output and reporting extra columns.");
 	# Reporting the allcalc option.
+
+	printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 40);
+
+	if not globs['pileup']:
+		printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40);
+		printWrite(globs['logfilename'], globs['log-v'], "** IMPORTANT!");
+		printWrite(globs['logfilename'], globs['log-v'], "** Input columns: Scaffold\tPosition\tAA\tAC\tAG\tAT\tCC\tCG\tCT\tGG\tGT\tTT");
+		printWrite(globs['logfilename'], globs['log-v'], "** Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order without headers.");
+		printWrite(globs['logfilename'], globs['log-v'], "** Failure to do so will result in inaccurate calculations!!");
+		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 40 + "\n#");
 
 #############################################################################
 
@@ -129,7 +136,7 @@ def report_stats(globs, msg="", step_start=0, stat_start=False, stat_end=False):
 	# The first time through just print the headers.
 		globs['progstarttime'] = cur_time;
 		#printWrite(globs['logfilename'], globs['log-v'], "# --stats : Reporting Referee time and memory usage.");
-		printWrite(globs['logfilename'], globs['log-v'], "\n# " + "-" * dashes);
+		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * dashes);
 		if globs['psutil']:
 			printWrite(globs['logfilename'], globs['log-v'], "# Step" + " " * 20 + "Time since prev (sec)" + " " * 6 + "Elapsed time (sec)" + " " * 4 + "Current mem usage (MB)" + " " * 4 + "Virtual mem usage (MB)");
 		else:

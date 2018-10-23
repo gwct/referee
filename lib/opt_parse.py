@@ -103,7 +103,8 @@ def optParse(globs):
 
 	if args.pileup_flag:
 		globs['pileup'] = True;
-		globs['mapq'] = True;
+		if args.mapq_flag:
+			globs['mapq'] = True;
 
 	RC.startProg(globs);
 	# After all the essential options have been set, call the welcome function.
