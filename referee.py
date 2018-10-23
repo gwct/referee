@@ -8,7 +8,7 @@
 #############################################################################
 
 import sys, os, multiprocessing as mp, shutil, lib.refcore as RC, lib.ref_calc as CALC, \
-	lib.opt_parse as OP, lib.ref_out as OUT, lib.global_vars as GV
+	lib.opt_parse as OP, lib.ref_out as OUT, lib.ref_gl as GL, lib.global_vars as GV
 
 #############################################################################
 
@@ -18,7 +18,6 @@ def referee(files, globs, step_start_time):
 			import psutil
 		step_start_time = RC.report_stats(globs, "Index ref fasta", step_start=step_start_time);
 	# Initialize the stats output if --stats is set
-
 	if globs['fasta'] == 1:
 		globs['ref'] = RC.fastaReadInd(globs['reffile']);
 	# My fasta index functions
@@ -29,6 +28,11 @@ def referee(files, globs, step_start_time):
 		from Bio import SeqIO
 		globs['ref'] = SeqIO.to_dict(SeqIO.parse(globs['reffile'], "fasta"))
 	# Index the reference FASTA file.
+
+	if globs['pileup']:
+		if globs['stats']:
+			step_start_time = RC.report_stats(globs, "GL Init", step_start=step_start_time);
+		globs['probs'] = GL.glInit(globs['mapq']);
 
 	if globs['stats']:
 		file_start_time = RC.report_stats(globs, "Calcs", step_start=step_start_time);

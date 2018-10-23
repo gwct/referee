@@ -22,6 +22,8 @@ def calcScore(ref, gls, method):
                 l_mismatch += gls[gt];
         # Sum the genotypes that match the called reference base and those that don't (mismatch).
 
+        print l_match, l_mismatch;
+
         if l_mismatch == 0:
             score, lr = 91, 0;
         # If the sum of the genotypes that don't match the called reference base is 0, assign maximum score.
@@ -64,19 +66,16 @@ def correctRef(max_score, ref, gls, method):
         return max_base, max_score;
 #############################################################################
 
-def glCalc(line, genotypes):
+def glCalc(line, genotypes, log_probs, mapq):
     if len(line) == 6:
         scaff, pos, ref, depth, reads, bqs = line;
-        mps = [1 for char in bqs];
+        mqs = [unichr(1+33) for char in bqs];
     # If there are no mapping qualities, just assign dummy values of 1 for mapping probs for every read.
     elif len(line) == 7:
         scaff, pos, ref, depth, reads, bqs, mqs = line;
-        mps = [10.0 ** (-float(ord(char) - 33) / 10.0) for char in mqs];
     # If there are mapping qualities, convert them to probabilities here.
     pos = int(pos);
     ref = ref.upper();
-    bps = [10.0 ** (-float(ord(char) - 33) / 10.0) for char in bqs];
-    # Convert the base qualities to probabilities.
     while True:
         indel = re.search(r'[-+]\d+', reads)
         if indel == None:
@@ -85,35 +84,33 @@ def glCalc(line, genotypes):
         reads = reads.replace(reads[start:end + int(reads[start+1:end])], "");
     # First, we use some regular expressions to remove the indel strings (ie +2AG, -3CAT)
     reads = re.sub("\^.", "", reads);
-    reads = reads.replace("$","");
+    reads = reads.replace("$","").upper();
     reads = list(re.sub("[,|.]", ref, reads));
     # Next we remove the symbols that indicate beginning (^) and end (&) of reads.
     # If it is the beginning of the read, we must also removing the following quality score symbol -- \w!\"#$%&'()*+,./:;<=>?@-
     # In regex, . matches ANY CHARACTER but \n
     # Then convert the . and , symbols to the actual base stored in ref
-    # print line;
-    # print len(reads), reads;
-    # print len(bps), bps;
-    # print len(mps), mps;
+    print line;
+    print len(reads), reads;
+    print len(bqs), bqs;
+    print len(mqs), mqs;
 
-    gls = {};
+    log_gls = {};
     for gt in genotypes:
-        gls[gt] = 1;
+        log_gls[gt] = 0;
         for i in range(len(reads)):
-            base, bp, mp = reads[i], bps[i], mps[i];
-
-            if bp == 1:
-                continue;
-            cur_p = 0;
-            for a in gt:
-                if base == a:
-                    cur_p += 0.5 * (1 - (bp*mp));
-                else:
-                    cur_p += 0.5 * ((bp*mp)/3.0);
-            gls[gt] = gls[gt] * cur_p;
+            base = reads[i];
+            qual_key = bqs[i]# + mqs[i];
+            print qual_key, log_probs[qual_key];
+            if gt[0] == gt[1] and base == gt[0]:
+                log_gls[gt] += log_probs[qual_key][0];
+            elif gt[0] != gt[1] and (base == gt[0] or base == gt[1]):
+                log_gls[gt] += log_probs[qual_key][1];
+            else:
+                log_gls[gt] += log_probs[qual_key][2];
     # Calculate the genotype likelihood for every genotype given the current reads and probabilities.
 
-    return ref, gls;
+    return ref, log_gls;
 #############################################################################
 
 def refCalc(file_item):
@@ -131,17 +128,18 @@ def refCalc(file_item):
             if globs['pileup']:
             # If the input type is pileup, we calculate the genotype likelihoods here.
                 if line[3] == "0":
-                    ref, rq, lr, l_match, l_mismatch, gls = line[3].upper(), -2, "NA", "NA", "NA", "NA";
+                    ref, rq, lr, l_match, l_mismatch, log_gls = line[3].upper(), -2, "NA", "NA", "NA", "NA";
                     calc_rq_flag = False;
                 # If no reads have mapped to the site, assign score -2 and skip everything else.
                 else:
-                    ref, gls = glCalc(line, globs['genotypes']);
+                    ref, log_gls = glCalc(line, globs['genotypes'], globs['probs'], globs['mapq']);
                 # Otherwise call the genotype likelihood function.
 
             else:
             # If the input type is pre-calculated genotype likelihoods, just parse the line and pass it to calcScore.
                 scaff, pos, gl_list = line[0], int(line[1]), line[2:];
-                gls = { globs['genotypes'][x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
+                #gls = { globs['genotypes'][x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
+                log_gls = { globs['genotypes'][x] : float(gl_list[x]) for x in range(len(gl_list)) };
                 # Parse the info from the current line -- scaffold, position, genotype likelihoods.
 
                 if globs['fasta'] == 1:
@@ -156,6 +154,8 @@ def refCalc(file_item):
                 # Gets the called reference base at the current position.
 
             if calc_rq_flag:
+                gls = { gt : math.exp(log_gls[gt]) for gt in log_gls };
+
                 rq, lr, l_match, l_mismatch = calcScore(ref, gls, globs['method']);
                 # Call the scoring function.
 
@@ -167,10 +167,10 @@ def refCalc(file_item):
                         'l_match' : l_match, 'l_mismatch' : l_mismatch, 'gls' : gls, 
                         'cor_ref' : cor_ref, 'cor_score' : cor_score };
             # Store the info from the current site to be written once returned.
-            # for gt in gls:
-            #    print gt, gls[gt];
-            # print sum(gls.values());
-            # print rq, lr, l_match, l_mismatch;
+            for gt in log_gls:
+               print gt, log_gls[gt];
+            #print sum(gls.values());
+            print rq, lr, l_match, l_mismatch;
             OUT.outputTab(outdict, outfile, globs);
             # Writes the output to the current output file.
 

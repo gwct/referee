@@ -19,6 +19,7 @@ def init():
         'stats' : True,
         'allcalc' : False,
         'pileup' : False,
+        'mapq' : False,
         'progstarttime' : 0,
         'stepstarttime' : 0,
         'pids' : "",
@@ -28,7 +29,8 @@ def init():
         'fasta' : 1,
         'method' : 1,
         'genotypes' : ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"],
-        'psutil' : ""
+        'psutil' : "",
+        'probs' : ""
     }
 
     globs['logfilename'] = "referee-log-" + globs['startdatetime'] + ".log";

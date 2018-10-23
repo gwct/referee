@@ -33,8 +33,14 @@ def startProg(globs):
 
 	if globs['pileup']:
 		printWrite(globs['logfilename'], globs['log-v'], "# --pileup : Input type set to pileup. Referee will calculate genotype likelihoods.");
+		if globs['mapq']:
+			printWrite(globs['logfilename'], globs['log-v'], "# --mapq : Incorporating mapping qualities (7th column of pileup file) into quality score calculations if they are present.");
+		else:
+			printWrite(globs['logfilename'], globs['log-v'], "# --mapq not set : Ignoring mapping qualities in pileup file if they are present.");
 	else:
-		printWrite(globs['logfilename'], globs['log-v'], "# Input is pre-calculated genotype likelihoods.");
+		printWrite(globs['logfilename'], globs['log-v'], "# --pileup not set : Input is pre-calculated genotype likelihoods.");
+		if globs['mapq']:
+			printWrite(globs['logfilename'], globs['log-v'], "# Ignoring --mapq option.");
 		printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40 + "\n#");
 		printWrite(globs['logfilename'], globs['log-v'], "** IMPORTANT!");
 		printWrite(globs['logfilename'], globs['log-v'], "** Input columns: Scaffold\tPosition\tAA\tAC\tAG\tAT\tCC\tCG\tCT\tGG\tGT\tTT");
@@ -46,13 +52,13 @@ def startProg(globs):
 	if globs['fastq']:
 		printWrite(globs['logfilename'], globs['log-v'], "# --fastq : Writing output in FASTQ format in addition to tab delimited.");
 	else:
-		printWrite(globs['logfilename'], globs['log-v'], "# Writing output in tab delimited format only.");
+		printWrite(globs['logfilename'], globs['log-v'], "# --fastq not set : Writing output in tab delimited format only.");
 	# Reporting the fastq option.
 
 	if globs['mapped']:
 		printWrite(globs['logfilename'], globs['log-v'], "# --mapped : Only calculating scores for positions with reads mapped to them.");
 	else:
-		printWrite(globs['logfilename'], globs['log-v'], "# Calculating scores for every position in the reference genome.");
+		printWrite(globs['logfilename'], globs['log-v'], "# --mapped not set : Calculating scores for every position in the reference genome.");
 	# Reporting the mapped option.
 
 	if globs['correct-opt']:
@@ -173,7 +179,17 @@ def getFileReader(i_name):
 def getRandStr(strlen=6):
 # This function generates a random string to add onto the end of tmp files to avoid possible overwrites.
 	return ''.join(random.choice(string.ascii_letters) for m in xrange(strlen));
-	
+
+#############################################################################
+
+def mapQCheck(infile):
+	with open(infile) as f:
+		first_line = f.readline().split("\t");
+	if len(first_line) != 7:
+		return False;
+	else:
+		return True;
+
 #############################################################################
 
 def fastaReadInd(i_name):

@@ -34,6 +34,7 @@ def optParse(globs):
 	parser.add_argument("--fastq", dest="fastq_flag", help="Set this option to output in FASTQ format in addition to the default tab delimited format.", action="store_true", default=False);
 	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score 0.", action="store_true", default=False);
 	parser.add_argument("--mapped", dest="mapped_flag", help="Set this to calculate scores only for positions that have reads mapped to them.", action="store_true", default=False);
+	parser.add_argument("--mapq", dest="mapq_flag", help="Set with --pileup to indicate whether to consider mapping quality scores in the final score calculation. These should be in the seventh column of the pileup file.", action="store_true", default=False);
 	parser.add_argument("--quiet", dest="quiet_flag", help="Set this flag to prevent Referee from reporting detailed information about each step.", action="store_true", default=False);
 	# User options	
 	#parser.add_argument("-s", dest="startpos", help="Set the starting position for the input file(s). Default: 1", default=False);
@@ -102,6 +103,7 @@ def optParse(globs):
 
 	if args.pileup_flag:
 		globs['pileup'] = True;
+		globs['mapq'] = True;
 
 	RC.startProg(globs);
 	# After all the essential options have been set, call the welcome function.
@@ -189,6 +191,11 @@ def optParse(globs):
 
 		file_paths[file_num] = { 'in' : args.gl_file, 'out' : outfiletab, 'tmpfile' : outfiletmp, 'outfq' : outfilefq };
 	# Get the file paths for the current files.
+
+	if globs['pileup'] and globs['mapq']:
+		for file_num in file_paths:
+			if not RC.mapQCheck(file_paths[file_num]['in']):
+				RC.errorOut(10, "--mapq is set, but couldn't find mapping qualities on the first line of a file: " + file_paths[file_num]['in'], globs);
 
 	return file_paths, globs, step_start_time;
 
