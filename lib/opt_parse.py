@@ -48,6 +48,7 @@ def optParse(globs):
 
 	args = parser.parse_args();
 	# The input options and help messages
+
 	if args.out_dest:
 		globs['logfilename'] = args.out_dest + "-log.log";
 
@@ -55,11 +56,11 @@ def optParse(globs):
 		globs['fasta'] = args.fasta_opt;
 	else:
 		RC.errorOut(0, "Invalid fasta opt.", globs);
-
 	if args.fasta_opt in [1,2]:
 		globs['method'] = args.score_opt;
 	else:
 		RC.errorOut(0, "Invalid score method opt.", globs);
+	# Hidden test options
 
 	if not args.input_list and not args.gl_file:
 		RC.errorOut(1, "No input method specified. Make sure one input method (either just -i or -gl) is specified.", globs);
@@ -100,11 +101,13 @@ def optParse(globs):
 	if args.allcalc_opt:
 		globs['allcalc'] = True;
 		globs['fastq'] = False;
+	# Allcalc option (hidden)
 
 	if args.pileup_flag:
 		globs['pileup'] = True;
 		if args.mapq_flag:
 			globs['mapq'] = True;
+	# Pileup option
 
 	RC.startProg(globs);
 	# After all the essential options have been set, call the welcome function.
@@ -118,8 +121,7 @@ def optParse(globs):
 			globs['pids'] = [psutil.Process(os.getpid())];	
 		globs['stats'] = True;
 		step_start_time = RC.report_stats(globs, stat_start=True);
-	# Initializing the stats options if --stats is set.
-	# Parse performance options.
+	# Initializing the stats options if --quiet is not set.
 
 	file_paths, file_num = {}, 1;
 	# Variables to store the file info.

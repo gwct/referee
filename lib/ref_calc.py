@@ -1,6 +1,41 @@
 import math, re, refcore as RC, ref_out as OUT, sys
 #############################################################################
 
+def glInit(mapq):
+# If the input is a pileup from which to calculate genotype likelihoods, this function
+# precalculates the probabilities for each quality score (or combination of quality scores
+# if mapping quality is provided).
+    log_probs = {};
+    for i in range(1,94):
+        bq = unichr(i+33);
+        bpe = 10.0 ** (-i/10.0);
+
+        if mapq:
+            for j in range(1,94):
+                mq = unichr(j+33);
+                mpe = 10.00 ** (-j/10.0);
+                log_probs[bq+mq] = [0,0,0];
+                match_p = (0.5 * (1-bpe)) * (0.5 * (1-mpe));
+                mismatch_p = (0.5 * (bpe/3.0)) * (0.5 * (mpe/3.0));
+
+                log_probs[bq+mq][0] = math.log(match_p + match_p);
+                log_probs[bq+mq][1] = math.log(match_p + mismatch_p);
+                log_probs[bq+mq][2] = math.log(mismatch_p + mismatch_p);
+
+        else:
+            log_probs[bq] = [0,0,0];
+
+            match_p = (0.5 * (1-bpe));
+            mismatch_p = (0.5 * (bpe/3.0));
+
+            log_probs[bq][0] = math.log(match_p + match_p);
+            log_probs[bq][1] = math.log(match_p + mismatch_p);
+            log_probs[bq][2] = math.log(mismatch_p + mismatch_p);
+
+    return log_probs;
+
+#############################################################################
+
 def calcScore(ref, gls, method):
 # Given a reference base and a set of genotype likelihoods, this function calculates a reference quality
 # score by taking the ratio of the sum of genotypes containing the reference base to the sum of the 
@@ -22,8 +57,6 @@ def calcScore(ref, gls, method):
                 l_mismatch += gls[gt];
         # Sum the genotypes that match the called reference base and those that don't (mismatch).
 
-        #print l_match, l_mismatch;
-
         if l_mismatch == 0:
             score, lr = 91, 0;
         # If the sum of the genotypes that don't match the called reference base is 0, assign maximum score.
@@ -35,10 +68,11 @@ def calcScore(ref, gls, method):
             if method == 1:
                 lr = l_match / l_mismatch;
                 score = math.log(lr, 10);
+            # Calculate the match : mismatch ratio and log transform.
             elif method == 2:
                 lr = "NA";
                 score = -1 * math.log(l_mismatch, 10);
-            # Calculate the match : mismatch ratio and log transform.
+            # Use the negative log of the sum of the mismatch likelihoods as the score.
             if score > 90:
                 score = 90;
             if score < 0:
@@ -90,10 +124,6 @@ def glCalc(line, genotypes, log_probs, mapq):
     # If it is the beginning of the read, we must also removing the following quality score symbol -- \w!\"#$%&'()*+,./:;<=>?@-
     # In regex, . matches ANY CHARACTER but \n
     # Then convert the . and , symbols to the actual base stored in ref
-    #print line;
-    #print len(reads), reads;
-    #print len(bqs), bqs;
-    #print len(mqs), mqs;
 
     log_gls = {};
     for gt in genotypes:
@@ -106,7 +136,6 @@ def glCalc(line, genotypes, log_probs, mapq):
             if '!' in qual_key:
                 continue;
             # Skip the bad bases marked by pileup
-            #print qual_key, log_probs[qual_key];
             if gt[0] == gt[1] and base == gt[0]:
                 log_gls[gt] += log_probs[qual_key][0];
             elif gt[0] != gt[1] and (base == gt[0] or base == gt[1]):
@@ -172,10 +201,12 @@ def refCalc(file_item):
                         'l_match' : l_match, 'l_mismatch' : l_mismatch, 'gls' : gls, 
                         'cor_ref' : cor_ref, 'cor_score' : cor_score };
             # Store the info from the current site to be written once returned.
-            # for gt in log_gls:
+
+            #for gt in log_gls:
             #    print gt, log_gls[gt];
-            # #print sum(gls.values());
             # print rq, lr, l_match, l_mismatch;
+            # Debug info
+            
             OUT.outputTab(outdict, outfile, globs);
             # Writes the output to the current output file.
 
