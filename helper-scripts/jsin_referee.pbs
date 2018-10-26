@@ -20,7 +20,7 @@ time -p python referee.py -gl $jsindir/jsin-angsd.glf.gz -ref $jsindir/assembly/
 time -p python referee.py -gl $jsindir/jsin-angsd.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-ref-angsd-s2 -p 24 -s 2
 # Referee with ANGSD input
 
-time -p python referee.py -gl $jsindir/jsin.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-ref-pileup-s1 -p 24 -s 1
+1
 time -p python referee.py -gl $jsindir/jsin.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-ref-pileup-s2 -p 24 -s 2
 # Referee with pileup input no mq, no baq
 

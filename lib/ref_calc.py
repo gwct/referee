@@ -103,6 +103,9 @@ def glCalc(line, genotypes, log_probs, mapq):
             qual_key = bqs[i];
             if mapq:
                 qual_key += mqs[i];
+            if '!' in qual_key:
+                continue;
+            # Skip the bad bases marked by pileup
             #print qual_key, log_probs[qual_key];
             if gt[0] == gt[1] and base == gt[0]:
                 log_gls[gt] += log_probs[qual_key][0];
