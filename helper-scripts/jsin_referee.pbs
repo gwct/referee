@@ -16,16 +16,16 @@ jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
 # samtools mpileup -d 999999999 -f $jsindir/assembly/Trinity.fasta -Q 0 -B -o $jsindir/jsin.pileup $jsindir/mapped/SRR5380902-sorted.bam
 # pileup command for no mapping quality (-s) and no baq recalculation (-B)
 
-time -p python referee.py -gl $jsindir/jsin-angsd.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-ref-angsd-s1 -p 24 -s 1
-time -p python referee.py -gl $jsindir/jsin-angsd.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-ref-angsd-s2 -p 24 -s 2
+#time -p python referee.py -gl $jsindir/jsin-angsd.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-ref-angsd-s1 -p 24 -s 1
+#time -p python referee.py -gl $jsindir/jsin-angsd.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-ref-angsd-s2 -p 24 -s 2
 # Referee with ANGSD input
 
-1
-time -p python referee.py -gl $jsindir/jsin.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-ref-pileup-s2 -p 24 -s 2
+time -p python referee.py -gl $jsindir/jsin.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-ref-pileup-s1 -p 24 -s 1
+#time -p python referee.py -gl $jsindir/jsin.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-ref-pileup-s2 -p 24 -s 2
 # Referee with pileup input no mq, no baq
 
 module load r/3.4.4
-time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s1.txt $jsindir/jsin-ref-angsd-s2.txt $jsindir/jsin-plots jsin-angsds1-vs-angsds2
+#time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s1.txt $jsindir/jsin-ref-angsd-s2.txt $jsindir/jsin-plots jsin-angsds1-vs-angsds2
 # Compare angsd s1 vs angsd s2
 
 time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-pileup-s1.txt $jsindir/jsin-ref-pileup-s2.txt $jsindir/jsin-plots jsin-pileups1-vs-pileups2
@@ -34,5 +34,5 @@ time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r
 time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s1.txt $jsindir/jsin-ref-pileup-s1.txt $jsindir/jsin-plots jsin-angsds1-vs-pileups1
 # Compare angsd s1 vs pileup s1
 
-time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s2.txt $jsindir/jsin-ref-pileup-s2.txt $jsindir/jsin-plots jsin-angsds2-vs-pileups2
+#time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s2.txt $jsindir/jsin-ref-pileup-s2.txt $jsindir/jsin-plots jsin-angsds2-vs-pileups2
 # Compare angsd s2 vs pileup s2
