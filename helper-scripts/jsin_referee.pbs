@@ -25,14 +25,17 @@ jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
 # Referee with pileup input no mq, no baq
 
 module load r/3.4.4
-time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s1.txt $jsindir/jsin-ref-angsd-s2.txt $jsindir/jsin-plots jsin-angsds1-vs-angsds2
+#time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s1.txt $jsindir/jsin-ref-angsd-s2.txt $jsindir/jsin-plots jsin-angsds1-vs-angsds2
 # Compare angsd s1 vs angsd s2
 
-time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-pileup-s1.txt $jsindir/jsin-ref-pileup-s2.txt $jsindir/jsin-plots jsin-pileups1-vs-pileups2
+#time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-pileup-s1.txt $jsindir/jsin-ref-pileup-s2.txt $jsindir/jsin-plots jsin-pileups1-vs-pileups2
 # Compare pileup s1 vs pileup s2
 
-time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s1.txt $jsindir/jsin-ref-pileup-s1.txt $jsindir/jsin-plots jsin-angsds1-vs-pileups1
+#time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s1.txt $jsindir/jsin-ref-pileup-s1.txt $jsindir/jsin-plots jsin-angsds1-vs-pileups1
 # Compare angsd s1 vs pileup s1
 
-time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s2.txt $jsindir/jsin-ref-pileup-s2.txt $jsindir/jsin-plots jsin-angsds2-vs-pileups2
+#time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s2.txt $jsindir/jsin-ref-pileup-s2.txt $jsindir/jsin-plots jsin-angsds2-vs-pileups2
 # Compare angsd s2 vs pileup s2
+
+time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-ref-angsd-s1.txt $jsindir/jsin-plots $jsindir/jsin.pileup
+# Make score and read depth plots

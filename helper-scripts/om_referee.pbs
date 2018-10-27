@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -k o
+#PBS -l nodes=1:ppn=24,walltime=36:00:00,vmem=100GB
+#PBS -M grthomas@indiana.edu
+#PBS -m abe
+#PBS -N om-angsd
+#PBS -j oe
+
+runCMD() {
+    refdir="/N/u/grthomas/Carbonate/bin/referee"
+    omdir="/N/dc2/scratch/grthomas/qtip/owl-monkey"
+    omref="/N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna"
+    cd $omdir
+
+    angsd -GL 2 -i $omdir/split-bam-out/$1.bam -ref $omref -minQ 0 -doGlf 4 -remove_bads 0 -out om-angsd/$1
+    # Run ANGSD on all scaffolds
+
+    #module load samtools/1.9
+    #samtools mpileup -d 999999999 -f $omref -Q 0 -B -x -o om-pileupe/$1.pileup $1
+    # pileup command for no mapping quality (-s) and no baq recalculation (-B)
+
+}
+
+export -f runCMD
+module load gnu-parallel/20170622
+refdir="/N/u/grthomas/Carbonate/bin/referee"
+omdir="/N/dc2/scratch/grthomas/qtip/owl-monkey"
+omref="/N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna"
+cd $omdir
+cat scaffold-list.txt | parallel --eta 'runCMD'
+#cd $refdir
