@@ -31,50 +31,110 @@ def startProg(globs):
 	printWrite(globs['logfilename'], globs['log-v'], "# The date and time at the start is: " + getDateTime());
 	printWrite(globs['logfilename'], globs['log-v'], "# The program was called as: " + " ".join(sys.argv) + "\n#");
 
+	pad = 20;
 	printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 40);
-	printWrite(globs['logfilename'], globs['log-v'], "# Options info:");
+	printWrite(globs['logfilename'], globs['log-v'], "# Input/output info");
+	printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Input file:", pad) + globs['infile']);
+	printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Input type:", pad) + globs['intype']);
+	if globs['intype'] == "List of files":
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Output directory:", pad) + globs['outdir']);
+	else:
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Output prefix:", pad) + globs['out']);
+
+	printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 40);
+	printWrite(globs['logfilename'], globs['log-v'], "# Options info");	
+	printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Option", pad) + spacedOut("Current setting", pad) + "Current action");
+	printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 125);
 
 	if globs['pileup']:
-		printWrite(globs['logfilename'], globs['log-v'], "# --pileup : Input type set to pileup. Referee will calculate genotype likelihoods.");
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --pileup", pad) + 
+					spacedOut("True", pad) + 
+					"Input type set to pileup. Referee will calculate genotype likelihoods.");
 		if globs['mapq']:
-			printWrite(globs['logfilename'], globs['log-v'], "# --mapq : Incorporating mapping qualities (7th column of pileup file) into quality score calculations if they are present.");
+			printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --mapq", pad) + 
+						spacedOut("True", pad) + 
+						"Incorporating mapping qualities (7th column of pileup file) into quality score calculations if they are present.");
 		else:
-			printWrite(globs['logfilename'], globs['log-v'], "# --mapq not set : Ignoring mapping qualities in pileup file if they are present.");
+			printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --mapq", pad) + 
+						spacedOut("False", pad) + 
+						"Ignoring mapping qualities in pileup file if they are present.");
 	else:
-		printWrite(globs['logfilename'], globs['log-v'], "# --pileup not set : Input is pre-calculated genotype likelihoods.");
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --pileup", pad) + 
+					spacedOut("False", pad) + 
+					"Input is pre-calculated genotype log likelihoods.");
 		if globs['mapq']:
-			printWrite(globs['logfilename'], globs['log-v'], "# Ignoring --mapq option.");
+			printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --mapq", pad) + 
+						spacedOut("True", pad) +  
+						"--pileup not set. Ignoring --mapq option.");
 	# Reporting the pileup option.
 
 	if globs['fastq']:
-		printWrite(globs['logfilename'], globs['log-v'], "# --fastq : Writing output in FASTQ format in addition to tab delimited.");
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --fastq", pad) + 
+					spacedOut("True", pad) + 
+					"Writing output in FASTQ format in addition to tab delimited.");
 	else:
-		printWrite(globs['logfilename'], globs['log-v'], "# --fastq not set : Writing output in tab delimited format only.");
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --fastq", pad) + 
+					spacedOut("False", pad) + 
+					"Writing output in tab delimited format only.");
 	# Reporting the fastq option.
 
 	if globs['mapped']:
-		printWrite(globs['logfilename'], globs['log-v'], "# --mapped : Only calculating scores for positions with reads mapped to them.");
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --mapped", pad) + 
+					spacedOut("True", pad) + 
+					"Only calculating scores for positions with reads mapped to them.");
 	else:
-		printWrite(globs['logfilename'], globs['log-v'], "# --mapped not set : Calculating scores for every position in the reference genome.");
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --mapped", pad) + 
+					spacedOut("False", pad) + 
+					"Calculating scores for every position in the reference genome.");
 	# Reporting the mapped option.
 
 	if globs['correct-opt']:
-		printWrite(globs['logfilename'], globs['log-v'], "# --correct : Suggesting higher scoring alternative base when reference score is negative or reference base is N.");
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --correct", pad) + 
+					spacedOut("True", pad) + 
+					"Suggesting higher scoring alternative base when reference score is negative or reference base is N.");
+	else:
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --correct", pad) + 
+					spacedOut("False", pad) + 
+					"Not suggesting higher scoring alternative base when reference score is negative or reference base is N.");
 	# Reporting the correct option.
 
+	if globs['stats']:
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --quiet", pad) + 
+					spacedOut("True", pad) + 
+					"No further information will be output while Referee is running.");
+	else:
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --correct", pad) + 
+					spacedOut("False", pad) + 
+					"Time and memory (if psutil module is present) info will be output while Referee is running.");
+	# Reporting the correct option.
+
+	printWrite(globs['logfilename'], globs['log-v'], spacedOut("# -p", pad) + 
+				spacedOut(str(globs['num-procs']), pad) + 
+				"Referee will use this many processes to run.");
+
 	if globs['allcalc']:
-		printWrite(globs['logfilename'], globs['log-v'], "# --allcalcs : Using tab delimited output and reporting extra columns.");
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --allcalcs", pad) + 
+					spacedOut("True", pad) + 
+					"Using tab delimited output and reporting extra columns.");
 	# Reporting the allcalc option.
 
-	printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 40);
+	if globs['debug']:
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --debug", pad) + 
+					spacedOut("True", pad) + 
+					"Printing out a bit of debug info.");
+	# Reporting the allcalc option.
 
 	if not globs['pileup']:
 		printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40);
-		printWrite(globs['logfilename'], globs['log-v'], "** IMPORTANT!");
-		printWrite(globs['logfilename'], globs['log-v'], "** Input columns: Scaffold\tPosition\tAA\tAC\tAG\tAT\tCC\tCG\tCT\tGG\tGT\tTT");
-		printWrite(globs['logfilename'], globs['log-v'], "** Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order without headers.");
-		printWrite(globs['logfilename'], globs['log-v'], "** Failure to do so will result in inaccurate calculations!!");
+		printWrite(globs['logfilename'], globs['log-v'], "## IMPORTANT!");
+		printWrite(globs['logfilename'], globs['log-v'], "## Input columns: Scaffold\tPosition\tAA\tAC\tAG\tAT\tCC\tCG\tCT\tGG\tGT\tTT");
+		printWrite(globs['logfilename'], globs['log-v'], "## Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order without headers.");
+		printWrite(globs['logfilename'], globs['log-v'], "## Failure to do so will result in inaccurate calculations!!");
 		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 40 + "\n#");
+	
+	if not globs['stats']:
+		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 125);
+		printWrite(globs['logfilename'], globs['log-v'], "# Running...");
 
 #############################################################################
 
@@ -120,7 +180,14 @@ def printWrite(o_name, v, o_line1, o_line2="", pad=0):
 	f = open(o_name, "a");
 	f.write(outline + "\n");
 	f.close();
+
+#############################################################################
 	
+def spacedOut(string, totlen):
+#Properly adds spaces to the end of a message to make it a given length
+	spaces = " " * (totlen - len(string));
+	return string + spaces;
+
 #############################################################################
 
 def report_stats(globs, msg="", step_start=0, stat_start=False, stat_end=False):

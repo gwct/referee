@@ -112,19 +112,11 @@ def optParse(globs):
 			globs['mapq'] = True;
 	# Pileup option
 
-	RC.startProg(globs);
-	# After all the essential options have been set, call the welcome function.
+
 
 	if args.quiet_flag:
 		globs['stats'] = False;
 		step_start_time = "";
-	else:
-		if globs['psutil']:
-			import psutil
-			globs['pids'] = [psutil.Process(os.getpid())];	
-		globs['stats'] = True;
-		step_start_time = RC.report_stats(globs, stat_start=True);
-	# Initializing the stats options if --quiet is not set.
 
 	file_paths, file_num = {}, 1;
 	# Variables to store the file info.
@@ -132,6 +124,8 @@ def optParse(globs):
 	# If the input method is -i
 		if not os.path.isfile(args.input_list):
 			RC.errorOut(7, "Cannot find file specified by -i.", globs);
+		globs['infile'] = args.input_list;
+		globs['intype'] = "List of files";
 		# Make sure we can find the input file.
 
 		if not args.out_dest:
@@ -183,16 +177,20 @@ def optParse(globs):
 	# If the input method is -gl
 		if not os.path.isfile(args.gl_file):
 			RC.errorOut(9, "Cannot find genotype likelihood file specified by -gl.", globs);
+		globs['infile'] = args.gl_file;
+		globs['intype'] = "Single file";
 		# Check if the genotype likelihood file is a valid file.
 
 		if not args.out_dest:
 			outfiletab = "referee-out-" + globs['startdatetime'] + RC.getRandStr() + ".txt";
 			outfiletmp = "referee-tmp-" + globs['startdatetime'] + RC.getRandStr() + ".tmp";
 			outfilefq = "referee-out-" + globs['startdatetime'] + RC.getRandStr() + ".fq";
+			globs['out'] = "referee-out-[start datetime]-[random string]";
 		else:
 			outfiletab = args.out_dest + ".txt";
 			outfiletmp = args.out_dest + "-tmp-" + globs['startdatetime'] + "-" + RC.getRandStr() + ".tmp";
 			outfilefq = args.out_dest + ".fq";
+			globs['out'] = args.out_dest;
 		# Specify the output files.
 
 		file_paths[file_num] = { 'in' : args.gl_file, 'out' : outfiletab, 'tmpfile' : outfiletmp, 'outfq' : outfilefq };
@@ -202,6 +200,16 @@ def optParse(globs):
 		for file_num in file_paths:
 			if not RC.mapQCheck(file_paths[file_num]['in']):
 				RC.errorOut(10, "--mapq is set, but couldn't find mapping qualities on the first line of a file: " + file_paths[file_num]['in'], globs);
+
+	RC.startProg(globs);
+	# After all the essential options have been set, call the welcome function.
+	if globs['stats']:
+		if globs['psutil']:
+			import psutil
+			globs['pids'] = [psutil.Process(os.getpid())];	
+		globs['stats'] = True;
+		step_start_time = RC.report_stats(globs, stat_start=True);
+	# Initializing the stats options if --quiet is not set.
 
 	return file_paths, globs, step_start_time;
 
