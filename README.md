@@ -1,8 +1,8 @@
 # Referee
 ### Quality scoring for reference genomes
 
-## Author
-#### Gregg Thomas
+## Authors
+#### Gregg Thomas and Matthew Hahn
 
 ## About
 

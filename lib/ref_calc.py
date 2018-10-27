@@ -144,7 +144,9 @@ def glCalc(line, genotypes, log_probs, mapq):
                 log_gls[gt] += log_probs[qual_key][2];
     # Calculate the genotype likelihood for every genotype given the current reads and probabilities.
 
-    return ref, log_gls;
+    log_gls_scaled = { gt : log_gls[gt] - max(log_gls.values()) for gt in log_gls };
+
+    return ref, log_gls_scaled;
 #############################################################################
 
 def refCalc(file_item):
@@ -202,9 +204,11 @@ def refCalc(file_item):
                         'cor_ref' : cor_ref, 'cor_score' : cor_score };
             # Store the info from the current site to be written once returned.
 
-            #for gt in log_gls:
-            #    print gt, log_gls[gt];
-            #print rq, lr, l_match, l_mismatch;
+
+            if globs['debug']:
+                for gt in log_gls:
+                   print gt, log_gls[gt];
+                print rq, lr, l_match, l_mismatch;
             # Debug info
             
             OUT.outputTab(outdict, outfile, globs);

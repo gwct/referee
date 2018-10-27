@@ -42,6 +42,7 @@ def optParse(globs):
 	#parser.add_argument("-c", dest="score_cutoff", help="The cut-off score for --correct. Sites that score below this cut-off will have an alternate reference base suggested. If --correct isn't set, this option is ignored. Default: 1", default=False);
 	#parser.add_argument("--stats", dest="stats_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--allcalcs", dest="allcalc_opt", help=argparse.SUPPRESS, action="store_true", default=False);
+	parser.add_argument("--debug", dest="debug_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("-f", dest="fasta_opt", help=argparse.SUPPRESS, type=int, default=1);
 	parser.add_argument("-s", dest="score_opt", help=argparse.SUPPRESS, type=int, default=1);
 	# Performance tests
@@ -60,6 +61,8 @@ def optParse(globs):
 		globs['method'] = args.score_opt;
 	else:
 		RC.errorOut(0, "Invalid score method opt.", globs);
+	if args.debug_opt:
+		globs['debug'] = True;
 	# Hidden test options
 
 	if not args.input_list and not args.gl_file:
