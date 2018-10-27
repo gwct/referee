@@ -8,7 +8,7 @@
 #############################################################################
 
 import sys, os, multiprocessing as mp, shutil, lib.refcore as RC, lib.ref_calc as CALC, \
-	lib.opt_parse as OP, lib.ref_out as OUT, lib.ref_gl as GL, lib.global_vars as GV
+	lib.opt_parse as OP, lib.ref_out as OUT, lib.global_vars as GV
 
 #############################################################################
 

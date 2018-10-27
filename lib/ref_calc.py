@@ -133,7 +133,7 @@ def glCalc(line, genotypes, log_probs, mapq):
             qual_key = bqs[i];
             if mapq:
                 qual_key += mqs[i];
-            if '!' in qual_key:
+            if base == "*" or '!' in qual_key:
                 continue;
             # Skip the bad bases marked by pileup
             if gt[0] == gt[1] and base == gt[0]:
@@ -204,7 +204,7 @@ def refCalc(file_item):
 
             #for gt in log_gls:
             #    print gt, log_gls[gt];
-            # print rq, lr, l_match, l_mismatch;
+            #print rq, lr, l_match, l_mismatch;
             # Debug info
             
             OUT.outputTab(outdict, outfile, globs);
