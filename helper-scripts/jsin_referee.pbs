@@ -27,7 +27,7 @@ jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
 #time -p python referee.py -gl $jsindir/jsin.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-ref-pileup-s2 -p 24 -s 2
 # Referee with pileup input no mq, no baq
 
-time -p python referee.py -gl $jsindir/jsin-mq.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-ref-pileup-s1-mq -p 24 -s 1
+time -p python referee.py -gl $jsindir/jsin-mq.pileup -ref $jsindir/assembly/Trinity.fasta --pileup -mapq --fastq --correct -o $jsindir/jsin-ref-pileup-s1-mq -p 24 -s 1
 # Referee with pileup input WITH mq, no baq
 
 module load r/3.4.4
