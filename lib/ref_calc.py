@@ -144,9 +144,9 @@ def glCalc(line, genotypes, log_probs, mapq):
                 log_gls[gt] += log_probs[qual_key][2];
     # Calculate the genotype likelihood for every genotype given the current reads and probabilities.
 
-    log_gls_scaled = { gt : log_gls[gt] - max(log_gls.values()) for gt in log_gls };
+    #log_gls_scaled = { gt : log_gls[gt] - max(log_gls.values()) for gt in log_gls };
 
-    return ref, log_gls_scaled;
+    return ref, log_gls;#_scaled;
 #############################################################################
 
 def refCalc(file_item):
