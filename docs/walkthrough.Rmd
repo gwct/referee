@@ -1,0 +1,57 @@
+---
+title: "Walkthrough"
+---
+</br>
+
+This page will be a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee's quality scores.
+
+## Step 0: Software used
+
+The following walkthrough assumes you have these programs available to use:
+
+BWA
+Picard
+Samtools
+ANGSD
+Referee
+
+## Step 1: Mapping the reads back to your assembly.
+
+We'll start from the point of having a completed genome/transcriptome assembly in **fasta** format: `reference.fa`
+
+Logically we should also have all reads that were used to make this assembly in **fastq** format. These can be paired end or not, but for this example we will assume paired end reads: `reads_1.fq` and `reads_2.fq`
+
+If there were multiple sequencing runs there will be multiple fastq files that were used to make the assembly. This just means you'll have to run some of the following commands on each fastq file set.
+
+To map the reads back to the reference assembly, I use BWA. First, index the reference for mapping:
+
+```
+bwa index reference.fa
+```
+
+Though not necessary for mapping, it will be necessary to index the reference for samtools as well:
+
+```
+samtools faidx reference.fa
+```
+
+We can also create the sequence dictionary with Picard. This is necessary if BWA doesn't creat a proper header in the SAM file:
+
+```
+java -jar picard.jar CreateSequenceDictionary R=reference.fa O=reference.dict
+```
+
+
+These commands simply create files that make the reference easier to read for these programs.
+
+Next, we can map the reads:
+
+```
+bwa mem reference.fa reads_1.fq reads_2.fq > reads-mapped.sam
+```
+
+Remember, if you have multiple sequencing runs, you'll want to run BWA on each one, which will result in multiple SAM files.
+
+## Step 2: Preparing the BAM file.
+
+

@@ -6,7 +6,9 @@ navbar:
   - text: About
     href: index.html
   - text: Example calculation
-    href: example.html
+    href: calcs.html
+  - text: Walkthrough
+    href: walkthrough.html
   - text: Download & README
     href: https://github.com/gwct/referee
 output:
