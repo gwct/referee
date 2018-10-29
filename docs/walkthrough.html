@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Walkthrough</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link rel="shortcut icon" href="img/favicon.png">
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="lib\styles.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Referee</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">About</a>
+</li>
+<li>
+  <a href="calcs.html">Example calculation</a>
+</li>
+<li>
+  <a href="walkthrough.html">Walkthrough</a>
+</li>
+<li>
+  <a href="https://github.com/gwct/referee">Download &amp; README</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Walkthrough</h1>
+
+</div>
+
+
+<p></br></p>
+<p>This page will be a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee’s quality scores. The end goal is to have a single sorted BAM file from which to calculate genotype likelihoods with ANGSD or mpileup and Referee.</p>
+<div id="step-0-software-used" class="section level2">
+<h2>Step 0: Software used</h2>
+<p>The following walkthrough assumes you have these programs available to use:</p>
+<p><a href="https://github.com/lh3/bwa">BWA</a> / <a href="https://broadinstitute.github.io/picard/">Picard</a> / <a href="https://github.com/samtools/samtools">Samtools</a> / <a href="https://github.com/ANGSD/angsd">ANGSD</a> / <a href="https://github.com/gwct/referee">Referee</a></p>
+</div>
+<div id="step-1-mapping-the-reads-back-to-your-assembly." class="section level2">
+<h2>Step 1: Mapping the reads back to your assembly.</h2>
+<p>We’ll start from the point of having a completed genome/transcriptome assembly in <strong>fasta</strong> format: <code>reference.fa</code></p>
+<p>Logically we should also have all reads that were used to make this assembly in <strong>fastq</strong> format. These can be paired end or not, but for this example we will assume paired end reads: <code>reads_1.fq</code> and <code>reads_2.fq</code></p>
+<p>If there were multiple sequencing runs there will be multiple fastq files that were used to make the assembly. This just means you’ll have to run some of the following commands on each fastq file set.</p>
+<p>To map the reads back to the reference assembly, I use BWA. First, index the reference for mapping:</p>
+<pre><code>bwa index reference.fa</code></pre>
+<p>Though not necessary for mapping, it will be necessary to index the reference for samtools as well:</p>
+<pre><code>samtools faidx reference.fa</code></pre>
+<p>We can also create the sequence dictionary with Picard. This is necessary if BWA doesn’t creat a proper header in the SAM file:</p>
+<pre><code>java -jar picard.jar CreateSequenceDictionary R=reference.fa O=reference.dict</code></pre>
+<p>These commands simply create files that make the reference easier to read for these programs.</p>
+<p>Next, we can map the reads:</p>
+<pre><code>bwa mem reference.fa reads_1.fq reads_2.fq &gt; reads-mapped.sam</code></pre>
+<p>Remember, if you have multiple sequencing runs, you’ll want to run BWA on each one, which will result in multiple SAM files.</p>
+</div>
+<div id="step-2-preparing-the-bam-file." class="section level2">
+<h2>Step 2: Preparing the BAM file.</h2>
+<p>If the header of the SAM file is improperly formatted from BWA (first line does not start with <span class="citation">@HD</span>), you can use the reference dictionary created with Picard in Step 1 to fix it:</p>
+<pre><code>java -jar picard.jar ReplaceSamHeader I=reads-mapped.sam HEADER=reference.dict O=reads-mapped-hd.sam</code></pre>
+<p>Next, convert the SAM file to a BAM file with samtools:</p>
+<pre><code>samtools view -b reads-mapped-hd.sam &gt; reads-mapped-hd.bam</code></pre>
+<p>If you had multiple sequencing runs you should have multiple BAM files. At this point, we can merge them:</p>
+<pre><code>samtools merge reads-mapped-merged.bam reads-mapped-hd-1.bam reads-mapped-hd-2.bam ... etc.</code></pre>
+<p>Then we sort the single BAM file:</p>
+<pre><code>samtools sort reads-mapped-hd.bam -o reads-mapped-hd-sorted.bam</code></pre>
+</div>
+<div id="step-3a-calculating-genotype-log-likelihoods-with-angsd" class="section level2">
+<h2>Step 3a: Calculating genotype log likelihoods with ANGSD</h2>
+<p>If you want to pre-calculate genotype log likelihoods for Referee, use ANGSD:</p>
+<pre><code>angsd -GL 2 -i reads-mapped-hd-sorted.bam -ref reference.fa -minQ 0 -doGlf 4 -o reads-gl</code></pre>
+<p>This will produce 2 files: <code>reads-gl.glf.gz</code> which contains the genotype likelihoods and <code>reads-gl.arg</code> which is a log file produced by ANGSD.</p>
+<p>A brief explanation of the options used in the above command:</p>
+<p><code>-GL 2</code> : Indicates we want to calculate genotype likelihoods</p>
+<p><code>-minQ 0</code> : Sets the minimum mapping quality of a site to 0 to ensure all sites are used</p>
+<p><code>-doGlf 4</code>: Use the original GATK method for calculating genotype likelihoods (same as Referee)</p>
+</div>
+<div id="step-3b-generate-a-pileup-file-to-calculate-genotype-likelihoods-with-referee" class="section level2">
+<h2>Step 3b: Generate a pileup file to calculate genotype likelihoods with Referee</h2>
+<p>To have Referee calculate the genotype likelihoods, we’ll need the mapped reads in pileup format:</p>
+<pre><code>samtools mpileup -d 999999999 -f reference.fa -Q 0 -s -B -o reads.pileup reads-mapped-hd-sorted.bam</code></pre>
+<p>A brief explanation of the options used in the above command: <code>-d 999999999</code> : Sets the maximum read depth to count a site to a value high enough such that all sites will be counted. <code>-Q 0</code> : Sets te minumum quality score for a site to be counted to 0. Again this ensures all sites are counted. <code>-s</code> : Include mapping quality in the pileup output. <code>-B</code> : Disables mpileup’s BAQ adjustment to the base quality scores.</p>
+</div>
+<div id="step-4-calculate-reference-quality-scores-with-referee" class="section level2">
+<h2>Step 4: Calculate Reference quality scores with Referee</h2>
+<p>If you used pre-calculated genotype likelihoods with ANGSD:</p>
+<pre><code>referee.py -gl reads-gl.glf.gz -ref reference.fa --fastq --correct -o reference</code></pre>
+<p>Or if you have a pileup for referee to use:</p>
+<pre><code>referee.py -gl reads.pileup -ref reference.fa --pileup --correct -o reference</code></pre>
+<p>This will produce the following files:</p>
+<p>reference-log.log : A log containing info for the run.</p>
+<p>reference.txt : Tab delimited scores.</p>
+<p>reference.fq : FASTQ formatted reference genome.</p>
+</div>
+
+<footer>
+<div id="refFooter" class="footer">
+    <div class="footerContent">
+        <center>Site designed and maintained by <a href="https://gwct.github.io/index.html" target="_blank">Gregg Thomas</a>, 2018</center>
+    </div>
+</div>  
+</footer>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

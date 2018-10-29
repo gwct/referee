@@ -187,7 +187,10 @@ $(document).ready(function () {
   <a href="index.html">About</a>
 </li>
 <li>
-  <a href="example.html">Example calculation</a>
+  <a href="calcs.html">Example calculation</a>
+</li>
+<li>
+  <a href="walkthrough.html">Walkthrough</a>
 </li>
 <li>
   <a href="https://github.com/gwct/referee">Download &amp; README</a>
@@ -351,7 +354,7 @@ Map qual
 </table>
 <p>The above read sets were plugged into the relevant equations to calculate <span class="math inline">\(Q_\mathbb{R}\)</span> with one read varying in both base and mapping quality. The countour plots show how each behave with different reference base calls. For example, with read set 1 (all As) and a reference base call of A we see high scores regardless of varying quality of a single read (upper left panel). However, the same read set when the reference base is called as a C scores very low, indicating that the reads do not support a C as the called base (lower left panel).</p>
 <p><strong>Examples of <span class="math inline">\(Q_{ref}\)</span></strong></p>
-<p><img src="example_files/figure-html/method2-1.png" width="1344" style="display: block; margin: auto;" /></p>
+<p><img src="calcs_files/figure-html/method2-1.png" width="1344" style="display: block; margin: auto;" /></p>
 <p>This has the desired behavior of being a high score when we are sure the reference base is correct and a low score when we are sure the reference base is not correct. In fact, it has the nice property of being centered around 0, with positive scores indicating support for the called reference base and negative scores indicating support for the reference base being an error. The closer to 0 the score is (positive or negative) the less confident we are in our assertion.</p>
 </div>
 

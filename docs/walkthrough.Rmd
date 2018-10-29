@@ -3,17 +3,17 @@ title: "Walkthrough"
 ---
 </br>
 
-This page will be a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee's quality scores.
+This page will be a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee's quality scores. The end goal is to have a single sorted BAM file from which to calculate genotype likelihoods with ANGSD or mpileup and Referee.
 
 ## Step 0: Software used
 
 The following walkthrough assumes you have these programs available to use:
 
-BWA
-Picard
-Samtools
-ANGSD
-Referee
+[BWA](https://github.com/lh3/bwa) / 
+[Picard](https://broadinstitute.github.io/picard/) / 
+[Samtools](https://github.com/samtools/samtools) / 
+[ANGSD](https://github.com/ANGSD/angsd) / 
+[Referee](https://github.com/gwct/referee)
 
 ## Step 1: Mapping the reads back to your assembly.
 
@@ -54,4 +54,81 @@ Remember, if you have multiple sequencing runs, you'll want to run BWA on each o
 
 ## Step 2: Preparing the BAM file.
 
+If the header of the SAM file is improperly formatted from BWA (first line does not start with @HD), you can use the reference dictionary created with Picard in Step 1 to fix it:
+
+```
+java -jar picard.jar ReplaceSamHeader I=reads-mapped.sam HEADER=reference.dict O=reads-mapped-hd.sam
+```
+
+Next, convert the SAM file to a BAM file with samtools:
+
+```
+samtools view -b reads-mapped-hd.sam > reads-mapped-hd.bam
+```
+
+If you had multiple sequencing runs you should have multiple BAM files. At this point, we can merge them:
+
+```
+samtools merge reads-mapped-merged.bam reads-mapped-hd-1.bam reads-mapped-hd-2.bam ... etc.
+```
+
+Then we sort the single BAM file:
+
+```
+samtools sort reads-mapped-hd.bam -o reads-mapped-hd-sorted.bam
+```
+
+## Step 3a: Calculating genotype log likelihoods with ANGSD
+
+If you want to pre-calculate genotype log likelihoods for Referee, use ANGSD:
+
+```
+angsd -GL 2 -i reads-mapped-hd-sorted.bam -ref reference.fa -minQ 0 -doGlf 4 -o reads-gl
+```
+
+This will produce 2 files: `reads-gl.glf.gz` which contains the genotype likelihoods and `reads-gl.arg` which is a log file produced by ANGSD.
+
+A brief explanation of the options used in the above command:
+
+`-GL 2`   : Indicates we want to calculate genotype likelihoods
+
+`-minQ 0` : Sets the minimum mapping quality of a site to 0 to ensure all sites are used
+
+`-doGlf 4`: Use the original GATK method for calculating genotype likelihoods (same as Referee)
+
+## Step 3b: Generate a pileup file to calculate genotype likelihoods with Referee
+
+To have Referee calculate the genotype likelihoods, we'll need the mapped reads in pileup format:
+
+```
+samtools mpileup -d 999999999 -f reference.fa -Q 0 -s -B -o reads.pileup reads-mapped-hd-sorted.bam
+```
+
+A brief explanation of the options used in the above command:
+`-d 999999999` : Sets the maximum read depth to count a site to a value high enough such that all sites will be counted.
+`-Q 0` : Sets te minumum quality score for a site to be counted to 0. Again this ensures all sites are counted.
+`-s` : Include mapping quality in the pileup output.
+`-B` : Disables mpileup's BAQ adjustment to the base quality scores.
+
+## Step 4: Calculate Reference quality scores with Referee
+
+If you used pre-calculated genotype likelihoods with ANGSD:
+
+```
+referee.py -gl reads-gl.glf.gz -ref reference.fa --fastq --correct -o reference
+```
+
+Or if you have a pileup for referee to use:
+
+```
+referee.py -gl reads.pileup -ref reference.fa --pileup --correct -o reference
+```
+
+This will produce the following files:
+
+reference-log.log : A log containing info for the run.
+
+reference.txt : Tab delimited scores.
+
+reference.fq : FASTQ formatted reference genome.
 
