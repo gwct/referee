@@ -16,7 +16,7 @@ runCMD() {
     # Run ANGSD on all scaffolds
 
     module load samtools/1.9
-    samtools mpileup -d 999999999 -f $omref -Q 0 -B -x -o om-pileup/$1.pileup $1
+    samtools mpileup -d 999999999 -f $omref -Q 0 -B -x -o om-pileup/$1.pileup $omdir/split-bam-out/$1
     # pileup command for no mapping quality (-s) and no baq recalculation (-B)
 }
 
