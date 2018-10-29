@@ -5,7 +5,7 @@ navbar:
   left:
   - text: About
     href: index.html
-  - text: Example calculation
+  - text: Example calculations
     href: calcs.html
   - text: Walkthrough
     href: walkthrough.html

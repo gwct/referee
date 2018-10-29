@@ -18,15 +18,8 @@ def referee(files, globs, step_start_time):
 			import psutil
 		step_start_time = RC.report_stats(globs, "Index ref fasta", step_start=step_start_time);
 	# Initialize the stats output if --stats is set
-	if globs['fasta'] == 1:
-		globs['ref'] = RC.fastaReadInd(globs['reffile']);
-	# My fasta index functions
-	elif globs['fasta'] == 2:
-		globs['ref'] = RC.fastaRead(globs['reffile'], globs);
-	# My fasta dict function
-	elif globs['fasta'] == 3:
-		from Bio import SeqIO
-		globs['ref'] = SeqIO.to_dict(SeqIO.parse(globs['reffile'], "fasta"))
+
+	globs['ref'] = RC.fastaReadInd(globs['reffile']);
 	# Index the reference FASTA file.
 
 	if globs['pileup']:

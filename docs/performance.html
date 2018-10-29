@@ -69,7 +69,7 @@ h6 {
 }
 </style>
 
-<link rel="stylesheet" href="lib\styles.css" type="text/css" />
+<link rel="stylesheet" href="lib/styles.css" type="text/css" />
 
 </head>
 
@@ -186,7 +186,7 @@ $(document).ready(function () {
   <a href="index.html">About</a>
 </li>
 <li>
-  <a href="calcs.html">Example calculation</a>
+  <a href="calcs.html">Example calculations</a>
 </li>
 <li>
   <a href="walkthrough.html">Walkthrough</a>
@@ -337,70 +337,49 @@ $(document).ready(function () {
 </table>
 </center>
 </div>
-<div id="referee-score-distributions-and-read-depth-correlations-with-the-three-different-methods" class="section level3">
-<h3>Referee score distributions and read depth correlations with the three different methods</h3>
-<div id="angsd" class="section level4">
-<h4>ANGSD</h4>
-<p><strong>Figure 3: Referee score distribution on J. sinuosa with ANGSD genotype likelihoods</strong></p>
+<div id="referee-score-distributions-and-read-depth-correlations" class="section level3">
+<h3>Referee score distributions and read depth correlations</h3>
+<p><strong>Figure 3: Referee score 1 distribution on J. sinuosa</strong></p>
 <center>
-<img src="img/jsin-plots/jsin-referee-out-1proc-score-hist.png" style="width:75.0%" />
+<img src="img/jsin-plots/jsin-ref-angsd-s1-score-hist.png" style="width:75.0%" />
 </center>
 <p></br></p>
-<p><strong>Figure 4: Referee scores vs read depth on J. sinuosa with ANGSD genotype likelihoods</strong></p>
+<p><strong>Figure 4: Referee score 1 vs. read depth</strong></p>
 <center>
-<img src="img/jsin-plots/jsin-referee-out-1proc-score-v-depth.png" style="width:75.0%" />
+<img src="img/jsin-plots/jsin-ref-angsd-s1-score-v-depth.png" style="width:75.0%" />
 </center>
 <p></br></p>
-</div>
-<div id="pileup-no-mq" class="section level4">
-<h4>Pileup (no MQ)</h4>
-<p><strong>Figure 5: Referee score distribution on J. sinuosa with pileup genotype likelihoods (no mapping quality)</strong></p>
+<p><strong>Figure 5: ANGSD score 1 vs. Pileup score 1</strong></p>
 <center>
-<img src="img/jsin-plots/jsin-referee-out-1proc-glcalcs-score-hist.png" style="width:75.0%" />
+<img src="img/jsin-plots/jsin-angsds1-vs-pileups1-score-v-score.png" style="width:75.0%" />
 </center>
 <p></br></p>
-<p><strong>Figure 6: Referee scores vs. read depth on J. sinuosa with pileup genotype likelihoods (no mapping quality)</strong></p>
+<p><strong>Figure 5: ANGSD score 1 vs. Pileup score 2</strong></p>
 <center>
-<img src="img/jsin-plots/jsin-referee-out-1proc-glcalcs-score-v-depth.png" style="width:75.0%" />
+<img src="img/jsin-plots/jsin-angsds1-vs-angsds2-score-v-score.png" style="width:75.0%" />
 </center>
 <p></br></p>
-</div>
-<div id="pileup-with-mq" class="section level4">
-<h4>Pileup (with MQ)</h4>
-<p><strong>Figure 7: Referee score distribution on J. sinuosa with pileup genotype likelihoods (WITH mapping quality)</strong></p>
+<p><strong>Figure 6: Pileup score 1 vs. Pileup score 2</strong></p>
 <center>
-<img src="img/jsin-plots/jsin-referee-out-1proc-glcalcs-mq-score-hist.png" style="width:75.0%" />
-</center>
-<p></br></p>
-<p><strong>Figure 8: Referee scores vs. read depth on J. sinuosa with pileup genotype likelihoods (WITH mapping quality)</strong></p>
-<center>
-<img src="img/jsin-plots/jsin-referee-out-1proc-glcalcs-mq-score-v-depth.png" style="width:75.0%" />
+<img src="img/jsin-plots/jsin-pileups1-vs-pileups2-score-v-score.png" style="width:75.0%" />
 </center>
 <p></br></p>
 </div>
-</div>
-<div id="angsd-scores-vs.referee-pileup-scores-no-mq" class="section level3">
-<h3>ANGSD scores vs. Referee pileup scores (no MQ)</h3>
-<p><strong>Figure 9: Referee scores from ANGSD genotype likelihoods vs. pileup genotype likelihoods (no mapping quality)</strong></p>
+<div id="using-mapping-quality" class="section level3">
+<h3>Using mapping quality</h3>
+<p><strong>Figure 7: Referee score 1 distribution on J. sinuosa with mapping quality</strong></p>
 <center>
-<img src="img/jsin-plots/jsin-angsd-vs-glcalcs-score-v-score.png" style="width:75.0%" />
+<img src="img/jsin-plots/jsin-ref-pileup-s1-mq-score-hist.png" style="width:75.0%" />
 </center>
 <p></br></p>
-</div>
-<div id="referee-pileup-scores-no-mq-vs.referee-pileup-scores-with-mq" class="section level3">
-<h3>Referee pileup scores (no MQ) vs. Referee pileup scores (with MQ)</h3>
-<p><strong>Figure 10: Referee scores from pileup genotype likelihoods (no mapping quality) vs. pileup genotype likelihoods (WITH mapping quality)</strong></p>
+<p><strong>Figure 8: Referee score 1 with mapping quality vs. read depth</strong></p>
 <center>
-<img src="img/jsin-plots/jsin-glcalcs-vs-glcalcs-mq-score-v-score.png" style="width:75.0%" />
+<img src="img/jsin-plots/jsin-ref-pileup-s1-mq-score-v-depth.png" style="width:75.0%" />
 </center>
 <p></br></p>
-</div>
-<div id="angsd-scores-vs.referee-pileup-scores-no-mq-no-baq" class="section level3">
-<h3>ANGSD scores vs. Referee pileup scores (no MQ, no BAQ)</h3>
-<p>Samtools mpileup’s reported base quality scores actually undergo an adjustment. According to some <a href="http://samtools.sourceforge.net/mpileup.shtml">documentation</a>, this provides, “an efficient and effective way to rule out false SNPs caused by nearby INDELs.” and, “is the Phred-scaled probability of the base being misaligned.” This seems to take mapping quality into account, but it is unclear how. If I disabled this recalculation, Referee’s scores from a pileup are more consistent with scores from ANGSD.</p>
-<p><strong>Figure 11: Referee scores from ANGSD genotype likelihoods vs. pileup genotype likelihoods (no mapping quality, no BAQ)</strong></p>
+<p><strong>Figure 9: Pileup score 1 NO mapping quality vs. Pileup score 1 WITH mapping quality</strong></p>
 <center>
-<img src="img/jsin-plots/jsin-angsd-vs-glcalcs-nobaq-score-v-score.png" style="width:75.0%" />
+<img src="img/jsin-plots/jsin-pileups1-vs-pileups1-mq-score-v-score.png" style="width:75.0%" />
 </center>
 <p></br></p>
 </div>

@@ -178,15 +178,10 @@ def refCalc(file_item):
                 log_gls = { globs['genotypes'][x] : float(gl_list[x]) for x in range(len(gl_list)) };
                 # Parse the info from the current line -- scaffold, position, genotype likelihoods.
 
-                if globs['fasta'] == 1:
-                    if last_scaff != scaff:
-                        seq = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1];
-                        last_scaff = scaff;
-                    ref = seq[pos-1].upper();
-                elif globs['fasta'] == 2:
-                    ref = globs['ref'][scaff][pos-1].upper();
-                elif globs['fasta'] == 3:
-                    ref = globs['ref'][scaff][pos-1].upper();
+                if last_scaff != scaff:
+                    seq = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1];
+                    last_scaff = scaff;
+                ref = seq[pos-1].upper();
                 # Gets the called reference base at the current position.
 
             if calc_rq_flag:

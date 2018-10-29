@@ -314,3 +314,203 @@
 #     return outdict;
 
 #############################################################################
+# OLD CODE WHEN TESTING MULTIPLE FASTA READERS
+
+# parser.add_argument("-f", dest="fasta_opt", help=argparse.SUPPRESS, type=int, default=1);
+# if args.fasta_opt in [1,2,3]:
+# 	globs['fasta'] = args.fasta_opt;
+# else:
+# 	RC.errorOut(0, "Invalid fasta opt.", globs);
+# FROM OPT PARSE
+
+# if globs['fasta'] == 1:
+# 	globs['ref'] = RC.fastaReadInd(globs['reffile']);
+# # My fasta index functions
+# elif globs['fasta'] == 2:
+# 	globs['ref'] = RC.fastaRead(globs['reffile'], globs);
+# # My fasta dict function
+# elif globs['fasta'] == 3:
+# 	from Bio import SeqIO
+# 	globs['ref'] = SeqIO.to_dict(SeqIO.parse(globs['reffile'], "fasta"))
+# # Index the reference FASTA file.
+# FROM REFEREE
+
+# if globs['fasta'] == 1:
+# 	if last_scaff != scaff:
+# 		seq = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1];
+# 		last_scaff = scaff;
+# 	ref = seq[pos-1].upper();
+# elif globs['fasta'] == 2:
+# 	ref = globs['ref'][scaff][pos-1].upper();
+# elif globs['fasta'] == 3:
+# 	ref = globs['ref'][scaff][pos-1].upper();
+# # Gets the called reference base at the current position. 
+# FROM REF CALC
+
+# if globs['fasta'] == 1:
+# 	seq = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1];
+# elif globs['fasta'] == 2:
+# 	seq = globs['ref'][scaff];
+# elif globs['fasta'] == 3:
+# 	seq = globs['ref'][scaff];
+# FROM REF OUT
+
+#############################################################################
+# CHECK FOR BIOPYTHON
+
+# try:
+# 	from Bio import SeqIO
+# except:
+# 	sys.exit("\n*** ERROR: Your installation of Python is missing the Biopython module. Please install the module with: pip install biopython\n")
+# First check if the argparse module is installed. If not, the input options cannot be parsed.
+
+#############################################################################
+# OLD FASTA DICTIONARY READER
+
+# def fastaRead(i_name, globs):
+# 	# This function reads a FASTA file into a dictionary.
+# 	try:
+# 		gzip_check = gzip.open(i_name).read(1);
+# 		reader = gzip.open;
+# 	except:
+# 		reader = open;
+# 	# Check if the reference file is gzipped, and if so set gzip as the file reader. Otherwise, read as a normal text file.
+
+# 	seqdict = {};
+# 	for line in reader(i_name):
+# 		line = line.strip();
+# 		if line[0] == '>':
+# 			curkey = line[1:];
+# 			seqdict[curkey] = "";
+# 		else:
+# 			seqdict[curkey] = seqdict[curkey] + line;
+
+# 	if len(seqdict) == 0:
+# 		errorOut(10, "Failed to read reference genome as FASTA file.", globs);
+# 	else:
+# 		return seqdict;
+
+#############################################################################
+# OLD EXAMPLE CALCS FOR SCORE TYPE 1 FOR CALCS.RMD
+
+# First, we sum up the likelihoods of all genotypes that contain the reference allele ($L_{match}$) and separately sum up the likelihoods of all the genotypes that do not contain the reference allele ($L_{mismatch}$). 
+
+# **Equation 4**
+
+# $$ L_{match} = \sum_g^\mathbb{G} P(R\;|\;g) \; \text{if} \; B_R \in g $$
+
+# **Equation 5**
+
+# $$ L_{mismatch} = \sum_g^\mathbb{G} P(R\;|\;g) \; \text{if} \; B_R \notin g $$
+
+# For instance, if our reference base was an A, then:
+
+# $$ L_{match} = P(R|\{A,A\}) + P(R|\{A,T\}) + P(R|\{A,C\}) + P(R|\{A,G\})$$
+
+# and:
+
+# $$ L_{mismatch} = P(R|\{T,T\}) + P(R|\{T,C\}) + P(R|\{T,G\}) + P(R|\{C,C\}) + P(R|\{C,G\}) + P(R|\{G,G\})$$
+
+# with the probabilities being calculated with Equation 1.
+
+# We can then set up a likelihood ratio $LR$ by divding $L_{match}$ by $L_{mismatch}$:
+
+# **Equation 6**
+
+# $$ LR = \frac{L_{match}}{L_{mismatch}} $$
+
+# And this can be log-scaled to get us an informative value for a quality score:
+
+# **Equation 7**
+
+# $$ Q_\mathbb{R} = \log{LR} $$
+
+# ## III. Calculation of $Q_\mathbb{R}$ on example read sets
+
+# **Example read sets:**
+
+# ```{r read-sets, echo=FALSE}
+# read_set = c("A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A")
+# read_set_1a = list(num=1,reads=read_set,ref="A",ans="(correct)")
+# read_set_1t = list(num=1,reads=read_set,ref="T",ans="(incorrect)")
+# read_set_1c = list(num=1,reads=read_set,ref="C",ans="(incorrect)")
+# read_set = c("A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","T")
+# read_set_2a = list(num=2,reads=read_set,ref="A",ans="(correct)")
+# read_set_2t = list(num=2,reads=read_set,ref="T",ans="(incorrect)")
+# read_set_2c = list(num=2,reads=read_set,ref="C",ans="(incorrect)")
+# read_set = c("A","A","A","A","A","A","A","A","A","A","T","T","T","T","T","T","T","T","T","T")
+# read_set_3a = list(num=3,reads=read_set,ref="A",ans="(correct)")
+# read_set_3t = list(num=3,reads=read_set,ref="T",ans="(correct)")
+# read_set_3c = list(num=3,reads=read_set,ref="C",ans="(incorrect)")
+
+# rs1_df = data.frame(read_set=c("Reads","Base qual","Map qual"),
+#                        reads=c("A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A",
+#                                "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40",
+#                                "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40"))
+
+# rs1_table = kable(rs1_df, "html", caption="Read set 1") %>%
+#   kable_styling(bootstrap_options=c("striped", "condensed", "responsive"), full_width=F)
+# gsub("<thead>.*</thead>", "", rs1_table)
+
+# rs2_df = data.frame(read_set=c("Reads","Base qual","Map qual"),
+#                        reads=c("A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  T",
+#                                "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40",
+#                                "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40"))
+
+# rs2_table = kable(rs2_df, "html", caption="Read set 2") %>%
+#   kable_styling(bootstrap_options=c("striped", "condensed", "responsive"), full_width=F)
+# gsub("<thead>.*</thead>", "", rs2_table)
+
+# rs3_df = data.frame(read_set=c("Reads","Base qual","Map qual"),
+#                        reads=c("A  A  A  A  A  A  A  A  A  A  T  T  T  T  T  T  T  T  T  T",
+#                                "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40",
+#                                "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40"))
+
+# rs3_table = kable(rs3_df, "html", caption="Read set 3") %>%
+#   kable_styling(bootstrap_options=c("striped", "condensed", "responsive"), full_width=F)
+# gsub("<thead>.*</thead>", "", rs3_table)
+# ```
+
+# The above read sets were plugged into the relevant equations to calculate $Q_\mathbb{R}$ with one read varying in both base and mapping quality. The countour plots show how each behave with different reference base calls. For example, with read set 1 (all As) and a reference base call of A we see high scores regardless of varying quality of a single read (upper left panel). However, the same read set when the reference base is called as a C scores very low, indicating that the reads do not support a C as the called base (lower left panel).
+
+# **Examples of $Q_{ref}$**
+
+# ```{r method2, fig.width=14, fig.height=11.2, fig.align="center", echo=FALSE, message=FALSE}
+# method = 2
+# read_set_1a_results = cycleReads(read_set_1a, method)
+# rs1a_p = plotScores(read_set_1a_results, read_set_1a$num, read_set_1a$ref, read_set_1a$ans)
+# read_set_1t_results = cycleReads(read_set_1t, method)
+# rs1t_p = plotScores(read_set_1t_results, read_set_1t$num, read_set_1t$ref, read_set_1t$ans)
+# read_set_1c_results = cycleReads(read_set_1c, method)
+# rs1c_p = plotScores(read_set_1c_results, read_set_1c$num, read_set_1c$ref, read_set_1c$ans)
+# read_set_2a_results = cycleReads(read_set_2a, method)
+# rs2a_p = plotScores(read_set_2a_results, read_set_2a$num, read_set_2a$ref, read_set_2a$ans)
+# read_set_2t_results = cycleReads(read_set_2t, method)
+# rs2t_p = plotScores(read_set_2t_results, read_set_2t$num, read_set_2t$ref, read_set_2t$ans)
+# read_set_2c_results = cycleReads(read_set_2c, method)
+# rs2c_p = plotScores(read_set_2c_results, read_set_2c$num, read_set_2c$ref, read_set_2c$ans)
+# read_set_3a_results = cycleReads(read_set_3a, method)
+# rs3a_p = plotScores(read_set_3a_results, read_set_3a$num, read_set_3a$ref, read_set_3a$ans)
+# read_set_3t_results = cycleReads(read_set_3t, method)
+# rs3t_p = plotScores(read_set_3t_results, read_set_3t$num, read_set_3t$ref, read_set_3t$ans)
+# read_set_3c_results = cycleReads(read_set_3c, method)
+# rs3c_p = plotScores(read_set_3c_results, read_set_3c$num, read_set_3c$ref, read_set_3c$ans)
+
+# method2 = grid.arrange(rs1a_p,rs2a_p,rs3a_p,rs1t_p,rs2t_p,rs3t_p,rs1c_p,rs2c_p,rs3c_p, ncol=3,nrow=3)
+
+# result_list = list(read_set_1a_results, read_set_2a_results, read_set_3a_results,
+#                     read_set_1t_results, read_set_2t_results, read_set_3t_results,
+#                     read_set_1c_results, read_set_2c_results, read_set_3c_results)
+# #topScores(result_list, 40)
+# #topScores(result_list, 1)
+# ```
+
+# This has the desired behavior of being a high score when we are sure the reference base is correct and a low score when we are sure the reference base is not correct. In fact, it has the nice property of being centered around 0, with positive scores indicating support for the called reference base and negative scores indicating support for the reference base being an error. The closer to 0 the score is (positive or negative) the less confident we are in our assertion.
+
+#############################################################################
+# UNUSED OPTIONS
+
+#parser.add_argument("-s", dest="startpos", help="Set the starting position for the input file(s). Default: 1", default=False);
+#parser.add_argument("-e", dest="endpos", help="Set the end position for the input file(s). Default: last position in assembly/scaffold", default=False);
+#parser.add_argument("-c", dest="score_cutoff", help="The cut-off score for --correct. Sites that score below this cut-off will have an alternate reference base suggested. If --correct isn't set, this option is ignored. Default: 1", default=False);
+#parser.add_argument("--stats", dest="stats_opt", help=argparse.SUPPRESS, action="store_true", default=False);

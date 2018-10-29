@@ -7,8 +7,6 @@ def init():
     globs = {
         'starttime' : timeit.default_timer(),
         'startdatetime' : RC.getOutTime(),
-        'start-pos' : False,
-        'end-pos' : False,
         'infile' : "",
         'intype' : "",
         'out' : "",
@@ -28,7 +26,6 @@ def init():
         'progstarttime' : 0,
         'stepstarttime' : 0,
         'pids' : "",
-        'fasta' : 1,
         'method' : 1,
         'genotypes' : ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"],
         'psutil' : "",

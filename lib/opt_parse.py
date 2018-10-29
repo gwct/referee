@@ -3,11 +3,6 @@ import sys, os, refcore as RC
 
 def optParse(globs):
 # This function handles the command line options and prepares the output directory and files.
-	#try:
-	#	from Bio import SeqIO
-	#except:
-	#	sys.exit("\n*** ERROR: Your installation of Python is missing the Biopython module. Please install the module with: pip install biopython\n")
-	# First check if the argparse module is installed. If not, the input options cannot be parsed.
 	try:
 		import argparse;
 	except:
@@ -37,13 +32,8 @@ def optParse(globs):
 	parser.add_argument("--mapq", dest="mapq_flag", help="Set with --pileup to indicate whether to consider mapping quality scores in the final score calculation. These should be in the seventh column of the pileup file.", action="store_true", default=False);
 	parser.add_argument("--quiet", dest="quiet_flag", help="Set this flag to prevent Referee from reporting detailed information about each step.", action="store_true", default=False);
 	# User options	
-	#parser.add_argument("-s", dest="startpos", help="Set the starting position for the input file(s). Default: 1", default=False);
-	#parser.add_argument("-e", dest="endpos", help="Set the end position for the input file(s). Default: last position in assembly/scaffold", default=False);
-	#parser.add_argument("-c", dest="score_cutoff", help="The cut-off score for --correct. Sites that score below this cut-off will have an alternate reference base suggested. If --correct isn't set, this option is ignored. Default: 1", default=False);
-	#parser.add_argument("--stats", dest="stats_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--allcalcs", dest="allcalc_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--debug", dest="debug_opt", help=argparse.SUPPRESS, action="store_true", default=False);
-	parser.add_argument("-f", dest="fasta_opt", help=argparse.SUPPRESS, type=int, default=1);
 	parser.add_argument("-s", dest="score_opt", help=argparse.SUPPRESS, type=int, default=1);
 	# Performance tests
 
@@ -53,11 +43,8 @@ def optParse(globs):
 	if args.out_dest:
 		globs['logfilename'] = args.out_dest + "-log.log";
 
-	if args.fasta_opt in [1,2,3]:
-		globs['fasta'] = args.fasta_opt;
-	else:
-		RC.errorOut(0, "Invalid fasta opt.", globs);
-	if args.fasta_opt in [1,2]:
+
+	if args.score_opt in [1,2]:
 		globs['method'] = args.score_opt;
 	else:
 		RC.errorOut(0, "Invalid score method opt.", globs);

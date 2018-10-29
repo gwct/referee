@@ -64,6 +64,8 @@ gl <- function(reads, base_probs, map_probs, ref, meth){
     rq = -10 * log(p_correct, 10)
   }else if(meth==5){
     rq = -10 * log(max(match_gt$probs), 10)
+  }else if(meth==6){
+    rq = -1 * log(p_incorrect)
   }
   
   gl_result = c(as.character(min_gt), gq[1], rq)
