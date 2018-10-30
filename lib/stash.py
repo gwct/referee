@@ -514,3 +514,129 @@
 #parser.add_argument("-e", dest="endpos", help="Set the end position for the input file(s). Default: last position in assembly/scaffold", default=False);
 #parser.add_argument("-c", dest="score_cutoff", help="The cut-off score for --correct. Sites that score below this cut-off will have an alternate reference base suggested. If --correct isn't set, this option is ignored. Default: 1", default=False);
 #parser.add_argument("--stats", dest="stats_opt", help=argparse.SUPPRESS, action="store_true", default=False);
+
+#############################################################################
+# SCORE METHOD 2 EXPLANATION
+
+#  We also scale the genotype log-likelihoods by subtracting the largest likelihood from each score:
+
+# **Equation 5**
+
+# $$ P_{scaled}(R|\mathbb{G}) = P_{log}(R|\mathbb{G}) - \max{P_{log}(R|\mathbb{G})} $$
+
+
+# Now we wish to compute a quality value $Q_{ref}$ for a reference base given a set of reads $R$ that map to that position. We want this number to represent the probability that the called base is an error such that it will be high when we are sure the reference base $B_R$ is correct and low when we are sure the reference base is incorrect.
+
+# To do this, we simply sum up all of the likelihoods for genotypes that do not contain the reference base. First, we get out of the log scale:
+
+# **Equation 6**
+
+# $$ P(R|\mathbb{G}) = e^{P_{log}(R|\mathbb{G})} $$
+
+# And then sum the appropriate likelihoods:
+
+# **Equation 7**
+
+# $$ L_{mismatch} = \sum_g^\mathbb{G} P(R\;|\;g) \; \text{if} \; B_R \notin g $$
+
+# For instance, if our reference base was an A, then:
+
+# $$ L_{mismatch} = P(R|\{T,T\}) + P(R|\{T,C\}) + P(R|\{T,G\}) + P(R|\{C,C\}) + P(R|\{C,G\}) + P(R|\{G,G\})$$
+
+# Then we convert this to the Phred scale by taking the negative log to obatin a reference quality score, $Q_\mathbb{R}$:
+
+# **Equation 8**
+
+# $$ Q_\mathbb{R} = -\log{L_{mismatch}} $$
+
+# We limit scores to a max of 90, with a few special cases (see [README](https://github.com/gwct/referee)). For fastq format, scores are translated as:
+
+# **Equation 9**
+
+# FASTQ score char = ascii(numerical score + 35)
+
+# -----
+
+# ## III. Calculation of $Q_\mathbb{R}$ on example read sets
+
+# **Example read sets:**
+
+# ```{r read-sets, echo=FALSE}
+# read_set = c("A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A")
+# read_set_1a = list(num=1,reads=read_set,ref="A",ans="(correct)")
+# read_set_1t = list(num=1,reads=read_set,ref="T",ans="(incorrect)")
+# read_set_1c = list(num=1,reads=read_set,ref="C",ans="(incorrect)")
+# read_set = c("A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","T")
+# read_set_2a = list(num=2,reads=read_set,ref="A",ans="(correct)")
+# read_set_2t = list(num=2,reads=read_set,ref="T",ans="(incorrect)")
+# read_set_2c = list(num=2,reads=read_set,ref="C",ans="(incorrect)")
+# read_set = c("A","A","A","A","A","A","A","A","A","A","T","T","T","T","T","T","T","T","T","T")
+# read_set_3a = list(num=3,reads=read_set,ref="A",ans="(correct)")
+# read_set_3t = list(num=3,reads=read_set,ref="T",ans="(correct)")
+# read_set_3c = list(num=3,reads=read_set,ref="C",ans="(incorrect)")
+
+# rs1_df = data.frame(read_set=c("Reads","Base qual","Map qual"),
+#                        reads=c("A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A",
+#                                "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40",
+#                                "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40"))
+
+# rs1_table = kable(rs1_df, "html", caption="Read set 1") %>%
+#   kable_styling(bootstrap_options=c("striped", "condensed", "responsive"), full_width=F)
+# gsub("<thead>.*</thead>", "", rs1_table)
+
+# rs2_df = data.frame(read_set=c("Reads","Base qual","Map qual"),
+#                        reads=c("A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  A  T",
+#                                "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40",
+#                                "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40"))
+
+# rs2_table = kable(rs2_df, "html", caption="Read set 2") %>%
+#   kable_styling(bootstrap_options=c("striped", "condensed", "responsive"), full_width=F)
+# gsub("<thead>.*</thead>", "", rs2_table)
+
+# rs3_df = data.frame(read_set=c("Reads","Base qual","Map qual"),
+#                        reads=c("A  A  A  A  A  A  A  A  A  A  T  T  T  T  T  T  T  T  T  T",
+#                                "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40",
+#                                "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 1-40"))
+
+# rs3_table = kable(rs3_df, "html", caption="Read set 3") %>%
+#   kable_styling(bootstrap_options=c("striped", "condensed", "responsive"), full_width=F)
+# gsub("<thead>.*</thead>", "", rs3_table)
+# ```
+
+# The above read sets were plugged into the relevant equations to calculate $Q_\mathbb{R}$ with one read varying in both base and mapping quality. The countour plots show how each behave with different reference base calls. 
+
+# In the figure below, each panel represents the results of genotype likelihood calculations and reference quality score calculations on a combination of one reference base and one read set with single read varying in base (x-axis) and mapping quality (y-axis). The shading indicates the most likely genotype, while the labeled dashed lines indicate the reference quality scores.
+
+# For example, in the upper left panel with read set 1 (all As) and a reference base call of A we see high scores regardless of varying quality of a single read. However, in the lower left panel the same read set when the reference base is called as a C scores very low, indicating that the reads do not support a C as the called base.
+
+# **Examples of $Q_{ref}$**
+
+# ```{r method2, fig.width=14, fig.height=11.2, fig.align="center", echo=FALSE, message=FALSE}
+# method = 6
+# read_set_1a_results = cycleReads(read_set_1a, method)
+# rs1a_p = plotScores(read_set_1a_results, read_set_1a$num, read_set_1a$ref, read_set_1a$ans)
+# read_set_1t_results = cycleReads(read_set_1t, method)
+# rs1t_p = plotScores(read_set_1t_results, read_set_1t$num, read_set_1t$ref, read_set_1t$ans)
+# read_set_1c_results = cycleReads(read_set_1c, method)
+# rs1c_p = plotScores(read_set_1c_results, read_set_1c$num, read_set_1c$ref, read_set_1c$ans)
+# read_set_2a_results = cycleReads(read_set_2a, method)
+# rs2a_p = plotScores(read_set_2a_results, read_set_2a$num, read_set_2a$ref, read_set_2a$ans)
+# read_set_2t_results = cycleReads(read_set_2t, method)
+# rs2t_p = plotScores(read_set_2t_results, read_set_2t$num, read_set_2t$ref, read_set_2t$ans)
+# read_set_2c_results = cycleReads(read_set_2c, method)
+# rs2c_p = plotScores(read_set_2c_results, read_set_2c$num, read_set_2c$ref, read_set_2c$ans)
+# read_set_3a_results = cycleReads(read_set_3a, method)
+# rs3a_p = plotScores(read_set_3a_results, read_set_3a$num, read_set_3a$ref, read_set_3a$ans)
+# read_set_3t_results = cycleReads(read_set_3t, method)
+# rs3t_p = plotScores(read_set_3t_results, read_set_3t$num, read_set_3t$ref, read_set_3t$ans)
+# read_set_3c_results = cycleReads(read_set_3c, method)
+# rs3c_p = plotScores(read_set_3c_results, read_set_3c$num, read_set_3c$ref, read_set_3c$ans)
+
+# method2 = grid.arrange(rs1a_p,rs2a_p,rs3a_p,rs1t_p,rs2t_p,rs3t_p,rs1c_p,rs2c_p,rs3c_p, ncol=3,nrow=3)
+
+# result_list = list(read_set_1a_results, read_set_2a_results, read_set_3a_results,
+#                     read_set_1t_results, read_set_2t_results, read_set_3t_results,
+#                     read_set_1c_results, read_set_2c_results, read_set_3c_results)
+# #topScores(result_list, 40)
+# #topScores(result_list, 1)
+# ```

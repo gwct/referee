@@ -22,7 +22,6 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 <link rel="shortcut icon" href="img/favicon.png">
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -70,7 +69,7 @@ h6 {
 }
 </style>
 
-<link rel="stylesheet" href="lib/styles.css" type="text/css" />
+<link rel="stylesheet" href="lib\styles.css" type="text/css" />
 
 </head>
 
@@ -92,9 +91,6 @@ img {
 }
 .tabbed-pane {
   padding-top: 12px;
-}
-.html-widget {
-  margin-bottom: 20px;
 }
 button.code-folding-btn:focus {
   outline: none;
@@ -237,29 +233,27 @@ $(document).ready(function () {
 <p>Practically, the multiplication of many small probabilities in <strong>Equation 1</strong> can lead to underflow errors. To resolve this, we simply take the log of the probabilities and add them instead:</p>
 <p><strong>Equation 4</strong></p>
 <p><span class="math display">\[ P_{log}(R|\mathbb{G} = \{A_1,A_2\}) = \sum_{r}^{R} \log(\frac{1}{2}P(b_r|A_1) + \frac{1}{2}P(b_r|A_2)) \]</span></p>
-<p>The log-likelihood of each genotype is obtained in this fashion. The log-likelihood for each of the 10 genotypes (<span class="math inline">\(P_{log}(R|\mathbb{G} = \{A_1,A_2\})\)</span>) is all we need for the purpose of calculating a reference quality score. (Note: ANGSD does not consider mapping quality when calculating genotype likelihoods). We also scale the genotype log-likelihoods by subtracting the largest likelihood from each score:</p>
-<p><strong>Equation 5</strong></p>
-<p><span class="math display">\[ P_{scaled}(R|\mathbb{G}) = P_{log}(R|\mathbb{G}) - \max{P_{log}(R|\mathbb{G})} \]</span></p>
+<p>The log-likelihood of each genotype is obtained in this fashion. The log-likelihood for each of the 10 genotypes (<span class="math inline">\(P_{log}(R|\mathbb{G} = \{A_1,A_2\})\)</span>) is all we need for the purpose of calculating a reference quality score. (Note: ANGSD does not consider mapping quality when calculating genotype likelihoods).</p>
 <hr />
 </div>
 <div id="ii.-a-reference-quality-score" class="section level2">
 <h2>II. A reference quality score</h2>
-<p>Now we wish to compute a quality value <span class="math inline">\(Q_{ref}\)</span> for a reference base given a set of reads <span class="math inline">\(R\)</span> that map to that position. We want this number to represent the probability that the called base is an error such that it will be high when we are sure the reference base <span class="math inline">\(B_R\)</span> is correct and low when we are sure the reference base is incorrect.</p>
-<p>To do this, we simply sum up all of the likelihoods for genotypes that do not contain the reference base. First, we get out of the log scale:</p>
+<p>First, we sum up the likelihoods of all genotypes that contain the reference allele (<span class="math inline">\(L_{match}\)</span>) and separately sum up the likelihoods of all the genotypes that do not contain the reference allele (<span class="math inline">\(L_{mismatch}\)</span>).</p>
+<p><strong>Equation 5</strong></p>
+<p><span class="math display">\[ L_{match} = \sum_g^\mathbb{G} P(R\;|\;g) \; \text{if} \; B_R \in g \]</span></p>
 <p><strong>Equation 6</strong></p>
-<p><span class="math display">\[ P(R|\mathbb{G}) = e^{P_{log}(R|\mathbb{G})} \]</span></p>
-<p>And then sum the appropriate likelihoods:</p>
-<p><strong>Equation 7</strong></p>
 <p><span class="math display">\[ L_{mismatch} = \sum_g^\mathbb{G} P(R\;|\;g) \; \text{if} \; B_R \notin g \]</span></p>
 <p>For instance, if our reference base was an A, then:</p>
+<p><span class="math display">\[ L_{match} = P(R|\{A,A\}) + P(R|\{A,T\}) + P(R|\{A,C\}) + P(R|\{A,G\})\]</span></p>
+<p>and:</p>
 <p><span class="math display">\[ L_{mismatch} = P(R|\{T,T\}) + P(R|\{T,C\}) + P(R|\{T,G\}) + P(R|\{C,C\}) + P(R|\{C,G\}) + P(R|\{G,G\})\]</span></p>
-<p>Then we convert this to the Phred scale by taking the negative log to obatin a reference quality score, <span class="math inline">\(Q_\mathbb{R}\)</span>:</p>
+<p>with the probabilities being calculated with Equation 1.</p>
+<p>We can then set up a likelihood ratio <span class="math inline">\(LR\)</span> by divding <span class="math inline">\(L_{match}\)</span> by <span class="math inline">\(L_{mismatch}\)</span>:</p>
+<p><strong>Equation 7</strong></p>
+<p><span class="math display">\[ LR = \frac{L_{match}}{L_{mismatch}} \]</span></p>
+<p>And this can be log-scaled to get us an informative value for a quality score:</p>
 <p><strong>Equation 8</strong></p>
-<p><span class="math display">\[ Q_\mathbb{R} = -\log{L_{mismatch}} \]</span></p>
-<p>We limit scores to a max of 90, with a few special cases (see <a href="https://github.com/gwct/referee">README</a>). For fastq format, scores are translated as:</p>
-<p><strong>Equation 9</strong></p>
-<p>FASTQ score char = ascii(numerical score + 35)</p>
-<hr />
+<p><span class="math display">\[ Q_\mathbb{R} = \log{LR} \]</span></p>
 </div>
 <div id="iii.-calculation-of-q_mathbbr-on-example-read-sets" class="section level2">
 <h2>III. Calculation of <span class="math inline">\(Q_\mathbb{R}\)</span> on example read sets</h2>
@@ -357,9 +351,7 @@ Map qual
 </tr>
 </tbody>
 </table>
-<p>The above read sets were plugged into the relevant equations to calculate <span class="math inline">\(Q_\mathbb{R}\)</span> with one read varying in both base and mapping quality. The countour plots show how each behave with different reference base calls.</p>
-<p>In the figure below, each panel represents the results of genotype likelihood calculations and reference quality score calculations on a combination of one reference base and one read set with single read varying in base (x-axis) and mapping quality (y-axis). The shading indicates the most likely genotype, while the labeled dashed lines indicate the reference quality scores.</p>
-<p>For example, in the upper left panel with read set 1 (all As) and a reference base call of A we see high scores regardless of varying quality of a single read. However, in the lower left panel the same read set when the reference base is called as a C scores very low, indicating that the reads do not support a C as the called base.</p>
+<p>The above read sets were plugged into the relevant equations to calculate <span class="math inline">\(Q_\mathbb{R}\)</span> with one read varying in both base and mapping quality. The countour plots show how each behave with different reference base calls. For example, with read set 1 (all As) and a reference base call of A we see high scores regardless of varying quality of a single read (upper left panel). However, the same read set when the reference base is called as a C scores very low, indicating that the reads do not support a C as the called base (lower left panel).</p>
 <p><strong>Examples of <span class="math inline">\(Q_{ref}\)</span></strong></p>
 <p><img src="calcs_files/figure-html/method2-1.png" width="1344" style="display: block; margin: auto;" /></p>
 <p>This has the desired behavior of being a high score when we are sure the reference base is correct and a low score when we are sure the reference base is not correct. In fact, it has the nice property of being centered around 0, with positive scores indicating support for the called reference base and negative scores indicating support for the reference base being an error. The closer to 0 the score is (positive or negative) the less confident we are in our assertion.</p>
