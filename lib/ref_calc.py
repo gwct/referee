@@ -57,12 +57,13 @@ def calcScore(ref, gls, method):
                 l_mismatch += gls[gt];
         # Sum the genotypes that match the called reference base and those that don't (mismatch).
 
-        if l_mismatch == 0:
+        if l_match == 0:
+            score, lr = -3, "NA";
+        elif l_mismatch == 0:
             score, lr = 91, 0;
         # If the sum of the genotypes that don't match the called reference base is 0, assign maximum score.
         # This should scale with read depth somehow, though...
-        elif l_match == 0:
-            score, lr = -3, "NA";
+
         # If the sum of the genotyps that match the called reference base is 0, assign a score of -3. This should never happen.
         else:
             if method == 1:
