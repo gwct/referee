@@ -1,9 +1,8 @@
 ---
 title: "Walkthrough"
 ---
-</br>
 
-This page will be a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee's quality scores. The end goal is to have a single sorted BAM file from which to calculate genotype likelihoods with ANGSD or mpileup and Referee.
+This page is a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee's quality scores. The end goal is to have a single sorted BAM file from which to calculate genotype likelihoods with ANGSD or mpileup and Referee.
 
 ## Step 0: Software used
 

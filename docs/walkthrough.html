@@ -208,8 +208,7 @@ $(document).ready(function () {
 </div>
 
 
-<p></br></p>
-<p>This page will be a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee’s quality scores. The end goal is to have a single sorted BAM file from which to calculate genotype likelihoods with ANGSD or mpileup and Referee.</p>
+<p>This page is a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee’s quality scores. The end goal is to have a single sorted BAM file from which to calculate genotype likelihoods with ANGSD or mpileup and Referee.</p>
 <div id="step-0-software-used" class="section level2">
 <h2>Step 0: Software used</h2>
 <p>The following walkthrough assumes you have these programs available to use:</p>
@@ -291,14 +290,14 @@ $(document).ready(function () {
 <p>Or if you have a pileup for Referee to use:</p>
 <pre><code>referee.py -gl reads.pileup -ref reference.fa --pileup --fastq --correct -o reference</code></pre>
 <p>A brief explanation of the options used in the above command:</p>
-<p><code>-gl</code> : The output file from step 3, either the .glf.gz file from ANGSD or the pileup file. This is the input file for Referee.</p>
+<p><code>-gl</code> : This is the input file for Referee. It is the output file from step 3, either the .glf.gz file from ANGSD or the pileup file.</p>
 <p><code>-ref</code> : The reference fasta file.</p>
 <p><code>--pileup</code> : This flag indicates that the input specified with <code>-gl</code> is in pileup format. If you have a .glf.gz file from ANGSD, leave this off.</p>
 <p><code>--fastq</code> : This tells Referee to produce the FASTQ output file.</p>
 <p><code>--correct</code> : This tells Referee to correct sites that have more support for an alternate base than the one called in the assembly.</p>
 <p><code>-o</code> : This is the prefix for all output created by Referee.</p>
 <p>This will produce the following files:</p>
-<p><strong>reference-log.log</strong> : A log containing info for the run.</p>
+<p><strong>reference.log</strong> : A log containing info for the run.</p>
 <p><strong>reference.txt</strong> : Tab delimited scores (columns: scaffold, position, Referee score, corrected base, corrected base score).</p>
 <p><strong>reference.fq</strong> : FASTQ formatted reference genome.</p>
 <p>See the <a href="https://github.com/gwct/referee">README</a> for more information on these file formats.</p>
