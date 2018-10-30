@@ -9,13 +9,15 @@ This page will be a brief guide with command examples to go from reads and assem
 
 The following walkthrough assumes you have these programs available to use:
 
-[BWA](https://github.com/lh3/bwa) / 
-[Picard](https://broadinstitute.github.io/picard/) / 
-[Samtools](https://github.com/samtools/samtools) / 
-[ANGSD](https://github.com/ANGSD/angsd) / 
-[Referee](https://github.com/gwct/referee)
+[BWA](https://github.com/lh3/bwa) and [Picard](https://broadinstitute.github.io/picard/) for read mapping.
 
-## Step 1: Mapping the reads back to your assembly.
+[Samtools](https://github.com/samtools/samtools) for manipulation of SAM/BAM files and creating a pileup file (if necessary).
+
+If you want to pre-calculate genotype log-likelihoods instead of creating a pileup and having Referee calculate them, we use [ANGSD](https://github.com/ANGSD/angsd).
+
+[Referee](https://github.com/gwct/referee) for quality score calculation.
+
+## Step 1: Preparing the reference FASTA file.
 
 We'll start from the point of having a completed genome/transcriptome assembly in **fasta** format: `reference.fa`
 
@@ -23,28 +25,38 @@ Logically we should also have all reads that were used to make this assembly in 
 
 If there were multiple sequencing runs there will be multiple fastq files that were used to make the assembly. This just means you'll have to run some of the following commands on each fastq file set.
 
-To map the reads back to the reference assembly, I use BWA. First, index the reference for mapping:
+First we'll need to do the following 3 things to prepare the reference fasta file.
+
+1. Index the reference for mapping. 
 
 ```
 bwa index reference.fa
 ```
 
-Though not necessary for mapping, it will be necessary to index the reference for samtools as well:
+This command will produce 5 files (i.) **reference.fa.amb**, (ii.) **reference.fa.ann**, (iii.) **reference.fa.bwt**, (iv.) **reference.fa.pac**, (v.) **reference.fa.sa**. You won't need to look at these files, but they are used by BWA later on.
+
+
+2. Index the reference for samtools. Though not necessary for mapping, it will be necessary to have this index later on:
 
 ```
 samtools faidx reference.fa
 ```
 
-We can also create the sequence dictionary with Picard. This is necessary if BWA doesn't creat a proper header in the SAM file:
+This command will produce the file **reference.fai**. You won't need to look at this file, but it will be used by samtools later on.
+
+3. We can also create the sequence dictionary with Picard. This is necessary if BWA doesn't creat a proper header in the SAM file:
 
 ```
 java -jar picard.jar CreateSequenceDictionary R=reference.fa O=reference.dict
 ```
 
+This command will produce the file **reference.dict**.
 
-These commands simply create files that make the reference easier to read for these programs.
+In all, these commands simply create files that make the reference easier to read for these programs.
 
-Next, we can map the reads:
+## Step 2: Mapping the reads back to your assembly.
+
+To map the reads back to the reference assembly, I use BWA, but any mapping software can be used.
 
 ```
 bwa mem reference.fa reads_1.fq reads_2.fq > reads-mapped.sam
@@ -52,9 +64,9 @@ bwa mem reference.fa reads_1.fq reads_2.fq > reads-mapped.sam
 
 Remember, if you have multiple sequencing runs, you'll want to run BWA on each one, which will result in multiple SAM files.
 
-## Step 2: Preparing the BAM file.
+## Step 3: Preparing the BAM file.
 
-If the header of the SAM file is improperly formatted from BWA (first line does not start with @HD), you can use the reference dictionary created with Picard in Step 1 to fix it:
+If the header of the SAM file is improperly formatted from BWA (i.e. the first line does not start with @HD), you can use the reference dictionary created with Picard in Step 1 to fix it:
 
 ```
 java -jar picard.jar ReplaceSamHeader I=reads-mapped.sam HEADER=reference.dict O=reads-mapped-hd.sam
@@ -78,15 +90,21 @@ Then we sort the single BAM file:
 samtools sort reads-mapped-hd.bam -o reads-mapped-hd-sorted.bam
 ```
 
-## Step 3a: Calculating genotype log likelihoods with ANGSD
+As a result of these steps, you should have a single **.bam** file, regardless of how many sequencing runs you had as input (thanks to the `merge` step).
 
-If you want to pre-calculate genotype log likelihoods for Referee, use ANGSD:
+## Step 3: Preparing inputs for Referee
+
+At this point, you could either pre-calculate genotype log-likelihoods with whatever method you choose (see (README)[https://github.com/gwct/referee] for proper file format), or make a pileup file so Referee can calulate genotype likelihoods. You only need to do one of Steps 3a or 3b.
+
+### Step 3a: Calculating genotype log-likelihoods with ANGSD
+
+If you want to pre-calculate genotype log-likelihoods for Referee, you can use any program you want. However, [ANGSD](https://github.com/ANGSD/angsd) is easy and provides the likelihoods in a format that Referee can read. Here is how to use ANGSD for genotype log-likelihood calculation:
 
 ```
 angsd -GL 2 -i reads-mapped-hd-sorted.bam -ref reference.fa -minQ 0 -doGlf 4 -o reads-gl
 ```
 
-This will produce 2 files: `reads-gl.glf.gz` which contains the genotype likelihoods and `reads-gl.arg` which is a log file produced by ANGSD.
+This will produce 2 files: **reads-gl.glf.gz** which contains the genotype log-likelihoods and **reads-gl.arg** which is a log file produced by ANGSD.
 
 A brief explanation of the options used in the above command:
 
@@ -96,7 +114,7 @@ A brief explanation of the options used in the above command:
 
 `-doGlf 4`: Use the original GATK method for calculating genotype likelihoods (same as Referee)
 
-## Step 3b: Generate a pileup file to calculate genotype likelihoods with Referee
+### Step 3b: Generate a pileup file to calculate genotype likelihoods with Referee
 
 To have Referee calculate the genotype likelihoods, we'll need the mapped reads in pileup format:
 
@@ -104,31 +122,53 @@ To have Referee calculate the genotype likelihoods, we'll need the mapped reads 
 samtools mpileup -d 999999999 -f reference.fa -Q 0 -s -B -o reads.pileup reads-mapped-hd-sorted.bam
 ```
 
+This will produce a single file, **reads.pileup**
+
 A brief explanation of the options used in the above command:
+
 `-d 999999999` : Sets the maximum read depth to count a site to a value high enough such that all sites will be counted.
+
 `-Q 0` : Sets te minumum quality score for a site to be counted to 0. Again this ensures all sites are counted.
-`-s` : Include mapping quality in the pileup output.
+
+`-s` : Include mapping quality in the pileup output (optional).
+
 `-B` : Disables mpileup's BAQ adjustment to the base quality scores.
 
-## Step 4: Calculate Reference quality scores with Referee
+## Step 4: Calculate reference quality scores with Referee
 
-If you used pre-calculated genotype likelihoods with ANGSD:
+If you used pre-calculated genotype log-likelihoods with ANGSD:
 
 ```
 referee.py -gl reads-gl.glf.gz -ref reference.fa --fastq --correct -o reference
 ```
 
-Or if you have a pileup for referee to use:
+Or if you have a pileup for Referee to use:
 
 ```
-referee.py -gl reads.pileup -ref reference.fa --pileup --correct -o reference
+referee.py -gl reads.pileup -ref reference.fa --pileup --fastq --correct -o reference
 ```
+
+A brief explanation of the options used in the above command:
+
+`-gl` : This is the input file for Referee. It is the output file from step 3, either the .glf.gz file from ANGSD or the pileup file. 
+
+`-ref` : The reference fasta file.
+
+`--pileup` : This flag indicates that the input specified with `-gl` is in pileup format. If you have a .glf.gz file from ANGSD, leave this off.
+
+`--fastq` : This tells Referee to produce the FASTQ output file.
+
+`--correct` : This tells Referee to correct sites that have more support for an alternate base than the one called in the assembly.
+
+`-o` : This is the prefix for all output created by Referee.
 
 This will produce the following files:
 
-reference-log.log : A log containing info for the run.
+**reference.log** : A log containing info for the run.
 
-reference.txt : Tab delimited scores.
+**reference.txt** : Tab delimited scores (columns: scaffold, position, Referee score, corrected base, corrected base score).
 
-reference.fq : FASTQ formatted reference genome.
+**reference.fq** : FASTQ formatted reference genome.
+
+See the [README](https://github.com/gwct/referee) for more information on these file formats.
 

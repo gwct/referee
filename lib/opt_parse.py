@@ -41,8 +41,7 @@ def optParse(globs):
 	# The input options and help messages
 
 	if args.out_dest:
-		globs['logfilename'] = args.out_dest + "-log.log";
-
+		globs['logfilename'] = args.out_dest + ".log";
 
 	if args.score_opt in [1,2]:
 		globs['method'] = args.score_opt;
