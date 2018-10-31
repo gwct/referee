@@ -208,7 +208,7 @@ $(document).ready(function () {
 </div>
 
 
-<p>This page is a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee’s quality scores. The end goal is to have a single sorted BAM file from which to calculate genotype likelihoods with ANGSD or mpileup and Referee.</p>
+<p>This page is a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee’s quality scores. The end goal is to have a single sorted BAM file from which to calculate genotype likelihoods with ANGSD or mpileup and Referee. We will first map all the reads used to make the assembly back to the assembly to obtain a single BAM file. From there we show multiple ways to calculate genotype likelihoods used by Referee to score the genome and produce a FASTQ reference file.</p>
 <div id="step-0-software-used" class="section level2">
 <h2>Step 0: Software used</h2>
 <p>The following walkthrough assumes you have these programs available to use:</p>
@@ -242,7 +242,7 @@ $(document).ready(function () {
 </div>
 <div id="step-2-mapping-the-reads-back-to-your-assembly." class="section level2">
 <h2>Step 2: Mapping the reads back to your assembly.</h2>
-<p>To map the reads back to the reference assembly, I use BWA, but any mapping software can be used.</p>
+<p>To map the reads back to the reference assembly, we use BWA, but any mapping software can be used as long as it makes sense in the subsequent steps (i.e. produces SAM files as output).</p>
 <pre><code>bwa mem reference.fa reads_1.fq reads_2.fq &gt; reads-mapped.sam</code></pre>
 <p>Remember, if you have multiple sequencing runs, you’ll want to run BWA on each one, which will result in multiple SAM files.</p>
 </div>
@@ -252,7 +252,7 @@ $(document).ready(function () {
 <pre><code>java -jar picard.jar ReplaceSamHeader I=reads-mapped.sam HEADER=reference.dict O=reads-mapped-hd.sam</code></pre>
 <p>Next, convert the SAM file to a BAM file with samtools:</p>
 <pre><code>samtools view -b reads-mapped-hd.sam &gt; reads-mapped-hd.bam</code></pre>
-<p>If you had multiple sequencing runs you should have multiple BAM files. At this point, we can merge them:</p>
+<p>If you had multiple sequencing runs you should have run <code>bwa mem</code> and <code>samtools view</code> (and possibly <code>picard.jar ReplaceSamHeader</code>) on each read set, resulting multiple BAM files. If this is the case, we can merge the BAM files now:</p>
 <pre><code>samtools merge reads-mapped-merged.bam reads-mapped-hd-1.bam reads-mapped-hd-2.bam ... etc.</code></pre>
 <p>Then we sort the single BAM file:</p>
 <pre><code>samtools sort reads-mapped-hd.bam -o reads-mapped-hd-sorted.bam</code></pre>
@@ -260,7 +260,7 @@ $(document).ready(function () {
 </div>
 <div id="step-3-preparing-inputs-for-referee" class="section level2">
 <h2>Step 3: Preparing inputs for Referee</h2>
-<p>At this point, you could either pre-calculate genotype log-likelihoods with whatever method you choose (see (README)[<a href="https://github.com/gwct/referee" class="uri">https://github.com/gwct/referee</a>] for proper file format), or make a pileup file so Referee can calulate genotype likelihoods. You only need to do one of Steps 3a or 3b.</p>
+<p>At this point, you could either pre-calculate genotype log-likelihoods with whatever method you choose (see <a href="https://github.com/gwct/referee">README</a> for proper file format), or make a pileup file so Referee can calulate genotype likelihoods. You only need to do one of Steps 3a or 3b.</p>
 <div id="step-3a-calculating-genotype-log-likelihoods-with-angsd" class="section level3">
 <h3>Step 3a: Calculating genotype log-likelihoods with ANGSD</h3>
 <p>If you want to pre-calculate genotype log-likelihoods for Referee, you can use any program you want. However, <a href="https://github.com/ANGSD/angsd">ANGSD</a> is easy and provides the likelihoods in a format that Referee can read. Here is how to use ANGSD for genotype log-likelihood calculation:</p>

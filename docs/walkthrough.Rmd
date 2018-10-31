@@ -2,7 +2,7 @@
 title: "Walkthrough"
 ---
 
-This page is a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee's quality scores. The end goal is to have a single sorted BAM file from which to calculate genotype likelihoods with ANGSD or mpileup and Referee.
+This page is a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee's quality scores. The end goal is to have a single sorted BAM file from which to calculate genotype likelihoods with ANGSD or mpileup and Referee. We will first map all the reads used to make the assembly back to the assembly to obtain a single BAM file. From there we show multiple ways to calculate genotype likelihoods used by Referee to score the genome and produce a FASTQ reference file.
 
 ## Step 0: Software used
 
@@ -55,7 +55,7 @@ In all, these commands simply create files that make the reference easier to rea
 
 ## Step 2: Mapping the reads back to your assembly.
 
-To map the reads back to the reference assembly, I use BWA, but any mapping software can be used.
+To map the reads back to the reference assembly, we use BWA, but any mapping software can be used as long as it makes sense in the subsequent steps (i.e. produces SAM files as output).
 
 ```
 bwa mem reference.fa reads_1.fq reads_2.fq > reads-mapped.sam
@@ -77,7 +77,7 @@ Next, convert the SAM file to a BAM file with samtools:
 samtools view -b reads-mapped-hd.sam > reads-mapped-hd.bam
 ```
 
-If you had multiple sequencing runs you should have multiple BAM files. At this point, we can merge them:
+If you had multiple sequencing runs you should have run `bwa mem` and `samtools view` (and possibly `picard.jar ReplaceSamHeader`) on each read set, resulting multiple BAM files. If this is the case, we can merge the BAM files now:
 
 ```
 samtools merge reads-mapped-merged.bam reads-mapped-hd-1.bam reads-mapped-hd-2.bam ... etc.
@@ -93,7 +93,7 @@ As a result of these steps, you should have a single **.bam** file, regardless o
 
 ## Step 3: Preparing inputs for Referee
 
-At this point, you could either pre-calculate genotype log-likelihoods with whatever method you choose (see (README)[https://github.com/gwct/referee] for proper file format), or make a pileup file so Referee can calulate genotype likelihoods. You only need to do one of Steps 3a or 3b.
+At this point, you could either pre-calculate genotype log-likelihoods with whatever method you choose (see [README](https://github.com/gwct/referee) for proper file format), or make a pileup file so Referee can calulate genotype likelihoods. You only need to do one of Steps 3a or 3b.
 
 ### Step 3a: Calculating genotype log-likelihoods with ANGSD
 
