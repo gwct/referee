@@ -83,6 +83,7 @@ def addUnmapped(file_item):
                     first = False
                 else:
                     scaff_pos, fq_vars = fillUnmapped(scaff_pos, seqlen, last_scaff, seq, tmpoutfile, globs, fq_vars);
+                    writeBed();
                 # If this is not the first scaffold, fill in all positions from the last position on the last scaffold.
                 # until the end of that scaffold.
 
@@ -91,6 +92,24 @@ def addUnmapped(file_item):
                 scaff_pos = 1;
                 last_scaff = scaff;
                 # When the scaffold changes, get the new seq, seqlen, last_scaff, and reset scaff_pos to 1.
+
+                cur_bed = 
+                    [
+                        scaff, 0, seqlen-1, 
+                        {
+                            (-3,0) : ['<=0', "255,0,0", 0, [], []],
+                            (1,10) : ['1-10', "255,0,0", 0, [], []],
+                            (11,20) : ['11-20', "255,0,0", 0, [], []],
+                            (21,30) : ['21-30', "255,0,0", 0, [], []],
+                            (31,40) : ['31-40', "255,0,0", 0, [], []],
+                            (41,50) : ['41-50', "255,0,0", 0, [], []],
+                            (51,60) : ['51-60', "255,0,0", 0, [], []],
+                            (61,70) : ['61-70', "255,0,0", 0, [], []],
+                            (71,80) : ['71-80', "255,0,0", 0, [], []],
+                            (81,91) : ['81+', "255,0,0", 0, [], []],
+                        }
+                    ];
+                cur_bin = line[2];
 
             scaff_pos, fq_vars = fillUnmapped(scaff_pos, pos-1, scaff, seq, tmpoutfile, globs, fq_vars);
             # If the current scaff_pos is below the pos in the output file, we need to fill in the unmapped positions

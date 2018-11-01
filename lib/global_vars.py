@@ -16,6 +16,8 @@ def init():
         'num-procs' : 1,
         'fastq' : False,
         'fastq-len' : 100,
+        'bed' : False,
+        'beddir' : "",
         'correct-opt' : False,
         'log-v' : 1,
         'mapped' : False,

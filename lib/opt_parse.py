@@ -27,6 +27,7 @@ def optParse(globs):
 	# User params
 	parser.add_argument("--pileup", dest="pileup_flag", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--fastq", dest="fastq_flag", help="Set this option to output in FASTQ format in addition to the default tab delimited format.", action="store_true", default=False);
+	parser.add_argument("--bed", dest="bed_flag", help="Set this option to output in BED format in addition to the default tab delimited format. BED files can be viewed as tracks in genome browsers.", action="store_true", default=False);
 	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score 0.", action="store_true", default=False);
 	parser.add_argument("--mapped", dest="mapped_flag", help="Set this to calculate scores only for positions that have reads mapped to them.", action="store_true", default=False);
 	parser.add_argument("--mapq", dest="mapq_flag", help="Set with --pileup to indicate whether to consider mapping quality scores in the final score calculation. These should be in the seventh column of the pileup file.", action="store_true", default=False);
@@ -75,6 +76,10 @@ def optParse(globs):
 		globs['fastq'] = True;
 	# Checking the fastq option.
 
+	if args.bed_flag:
+		globs['bed'] = True;
+	# Checking the BED option.
+
 	if args.mapped_flag:
 		if args.fastq_flag:
 			RC.errorOut(6, "Cannot output to --fastq when only doing --mapped positions. Pick one.", globs);
@@ -97,8 +102,6 @@ def optParse(globs):
 		if args.mapq_flag:
 			globs['mapq'] = True;
 	# Pileup option
-
-
 
 	if args.quiet_flag:
 		globs['stats'] = False;
@@ -123,6 +126,13 @@ def optParse(globs):
 			os.makedirs(globs['outdir']);
 		# Specifiy and create the output directory, if necessary.
 
+		if globs['bed']:
+			globs['beddir'] = os.path.join(globs['outdir'], "bed-files");
+		if not os.path.isdir(globs['beddir']):
+			RC.printWrite(globs['logfilename'], globs['log-v'], "+ Making BED directory: " + globs['beddir']);
+			os.makedirs(globs['beddir']);
+		# Specifiy and create the BED directory, if necessary.			
+
 		if globs['stats']:
 			step_start_time  = RC.report_stats(globs, "Reading input", step_start=step_start_time);
 		else:
@@ -145,16 +155,6 @@ def optParse(globs):
 			cur_outfiletmp = os.path.join(globs['outdir'], basename + "-" + globs['startdatetime'] + "-" + RC.getRandStr() + ".tmp");
 			cur_outfilefq = os.path.join(globs['outdir'], basename + ".fq");
 
-			# if not args.out_dest:
-			# 	cur_outfiletab = os.path.join(globs['outdir'], os.path.splitext(cur_gl_file)[0] + "-referee-out.txt");
-			# 	cur_outfiletmp = os.path.join(globs['outdir'], os.path.splitext(cur_gl_file)[0] + str(file_num) + "-referee-tmp-" + globs['startdatetime'] + ".tmp");
-			# 	cur_outfilefq = os.path.join(globs['outdir'], os.path.splitext(cur_gl_file)[0] + "-referee-out.fq");
-			# else:
-			# 	cur_outfiletab = os.path.join(globs['outdir'], args.out_dest + "-" + str(file_num) + ".txt");
-			# 	cur_outfiletmp = os.path.join(globs['outdir'], args.out_dest + "-" + str(file_num) + ".tmp");
-			# 	cur_outfilefq = os.path.join(globs['outdir'], args.out_dest + "-" + str(file_num) + ".fq");				
-			# Output file names.
-
 			file_paths[file_num] = { 'in' : cur_gl_file, 'out' : cur_outfiletab, 'tmpfile' : cur_outfiletmp, 'outfq' : cur_outfilefq };
 			file_num += 1;
 		# Read the input file and get all the file paths. Also specify output file paths.
@@ -171,13 +171,22 @@ def optParse(globs):
 			outfiletab = "referee-out-" + globs['startdatetime'] + RC.getRandStr() + ".txt";
 			outfiletmp = "referee-tmp-" + globs['startdatetime'] + RC.getRandStr() + ".tmp";
 			outfilefq = "referee-out-" + globs['startdatetime'] + RC.getRandStr() + ".fq";
+			if globs['bed']:
+				globs['beddir'] = "referee-bed-files-" + globs['startdatetime'] + RC.getRandStr()
 			globs['out'] = "referee-out-[start datetime]-[random string]";
 		else:
 			outfiletab = args.out_dest + ".txt";
 			outfiletmp = args.out_dest + "-tmp-" + globs['startdatetime'] + "-" + RC.getRandStr() + ".tmp";
 			outfilefq = args.out_dest + ".fq";
+			if globs['bed']:
+				globs['beddir'] = os.path.join(args.out_dest, "bed-files");
 			globs['out'] = args.out_dest;
 		# Specify the output files.
+
+		if not os.path.isdir(globs['beddir']):
+			RC.printWrite(globs['logfilename'], globs['log-v'], "+ Making BED directory: " + globs['beddir']);
+			os.makedirs(globs['beddir']);
+		# Specifiy and create the BED directory, if necessary.
 
 		file_paths[file_num] = { 'in' : args.gl_file, 'out' : outfiletab, 'tmpfile' : outfiletmp, 'outfq' : outfilefq };
 	# Get the file paths for the current files.

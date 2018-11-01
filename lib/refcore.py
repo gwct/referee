@@ -75,7 +75,17 @@ def startProg(globs):
 	else:
 		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --fastq", pad) + 
 					spacedOut("False", pad) + 
-					"Writing output in tab delimited format only.");
+					"Not writing output in FASTQ format.");
+	# Reporting the fastq option.
+
+	if globs['bed']:
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --bed", pad) + 
+					spacedOut("True", pad) + 
+					"Writing output in BED format in addition to tab delimited.");
+	else:
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --fastq", pad) + 
+					spacedOut("False", pad) + 
+					"Not writing output in BED format.");
 	# Reporting the fastq option.
 
 	if globs['mapped']:
