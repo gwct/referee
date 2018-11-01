@@ -30,6 +30,20 @@ def outputFastq(outdict, fq_vars, globs, final=False):
     return fq_vars;
 #############################################################################
 
+def outputBed(bed, bed_vars):
+    with open(bed_vars['out'], "w") as bedfile:
+        bedfile.write("browser position " + bed['scaff'] + "\n");
+        bedfile.write("browser hide all\n");
+        bedfile.write("track name=\"" + bed['scaff'] + " Referee\" description=\"Quality scores calculated by Referee\" visibility=2\n");
+
+        for b in bed['bins']:
+            outline = ""
+
+
+
+
+#############################################################################
+
 def outputTab(outdict, outfile, globs):
 # For output to tab delimited format.
     outline = [outdict['scaff'], str(outdict['pos']), str(int(round(outdict['rq'])))];
@@ -74,6 +88,10 @@ def addUnmapped(file_item):
             fq_vars = { "fqoutfile" : fqoutfile, "fq_seq" : "", "fq_scores" : "", "filled" : False }
         # Variables for FASTQ output.
 
+        bed_vars = {};
+        if globs['bed']:
+            bed_vars = { 'bedout' : "", 'chunk_start' : 0, 'last_chunk_end' : 0 };
+
         for line in open(file_info['out']):
             linelist = line.strip().split("\t");
             scaff, pos = linelist[0], int(linelist[1]);
@@ -83,7 +101,7 @@ def addUnmapped(file_item):
                     first = False
                 else:
                     scaff_pos, fq_vars = fillUnmapped(scaff_pos, seqlen, last_scaff, seq, tmpoutfile, globs, fq_vars);
-                    writeBed();
+                    outputBed(cur_bed, bed_vars);
                 # If this is not the first scaffold, fill in all positions from the last position on the last scaffold.
                 # until the end of that scaffold.
 
@@ -94,8 +112,9 @@ def addUnmapped(file_item):
                 # When the scaffold changes, get the new seq, seqlen, last_scaff, and reset scaff_pos to 1.
 
                 cur_bed = 
-                    [
-                        scaff, 0, seqlen-1, 
+                    {
+                        'scaff' : scaff, 'scaff-start' : 0, 'scaff-end' : seqlen-1, 
+                        'bins' : 
                         {
                             (-3,0) : ['<=0', "255,0,0", 0, [], []],
                             (1,10) : ['1-10', "255,0,0", 0, [], []],
@@ -108,7 +127,8 @@ def addUnmapped(file_item):
                             (71,80) : ['71-80', "255,0,0", 0, [], []],
                             (81,91) : ['81+', "255,0,0", 0, [], []],
                         }
-                    ];
+                    };
+                bed_vars = { 'bedout' : os.path.join(globs['beddir'], scaff + ".bed"), 'chunk_start' : 0, 'last_chunk_end' : 0 };
                 cur_bin = line[2];
 
             scaff_pos, fq_vars = fillUnmapped(scaff_pos, pos-1, scaff, seq, tmpoutfile, globs, fq_vars);
