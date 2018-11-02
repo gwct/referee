@@ -121,17 +121,11 @@ def optParse(globs):
 			globs['outdir'] = "referee-out-" + globs['startdatetime'] + RC.getRandStr();
 		else:
 			globs['outdir'] = args.out_dest;
-		if not os.path.isdir(globs['outdir']):
-			RC.printWrite(globs['logfilename'], globs['log-v'], "+ Making output directory: " + globs['outdir']);
-			os.makedirs(globs['outdir']);
-		# Specifiy and create the output directory, if necessary.
+		# Specifiy the output directory, if necessary.
 
 		if globs['bed']:
 			globs['beddir'] = os.path.join(globs['outdir'], "bed-files");
-		if not os.path.isdir(globs['beddir']):
-			RC.printWrite(globs['logfilename'], globs['log-v'], "+ Making BED directory: " + globs['beddir']);
-			os.makedirs(globs['beddir']);
-		# Specifiy and create the BED directory, if necessary.			
+		# Specifiy the BED directory, if necessary.			
 
 		if globs['stats']:
 			step_start_time  = RC.report_stats(globs, "Reading input", step_start=step_start_time);
@@ -179,14 +173,9 @@ def optParse(globs):
 			outfiletmp = args.out_dest + "-tmp-" + globs['startdatetime'] + "-" + RC.getRandStr() + ".tmp";
 			outfilefq = args.out_dest + ".fq";
 			if globs['bed']:
-				globs['beddir'] = os.path.join(args.out_dest, "bed-files");
+				globs['beddir'] = args.out_dest + "-bed-files";
 			globs['out'] = args.out_dest;
 		# Specify the output files.
-
-		if not os.path.isdir(globs['beddir']):
-			RC.printWrite(globs['logfilename'], globs['log-v'], "+ Making BED directory: " + globs['beddir']);
-			os.makedirs(globs['beddir']);
-		# Specifiy and create the BED directory, if necessary.
 
 		file_paths[file_num] = { 'in' : args.gl_file, 'out' : outfiletab, 'tmpfile' : outfiletmp, 'outfq' : outfilefq };
 	# Get the file paths for the current files.

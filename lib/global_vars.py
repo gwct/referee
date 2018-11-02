@@ -17,7 +17,7 @@ def init():
         'fastq' : False,
         'fastq-len' : 100,
         'bed' : False,
-        'beddir' : "",
+        'beddir' : False,
         'correct-opt' : False,
         'log-v' : 1,
         'mapped' : False,

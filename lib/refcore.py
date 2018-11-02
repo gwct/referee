@@ -38,6 +38,9 @@ def startProg(globs):
 	printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Input type:", pad) + globs['intype']);
 	if globs['intype'] == "List of files":
 		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Output directory:", pad) + globs['outdir']);
+		if not os.path.isdir(globs['outdir']):
+			printWrite(globs['logfilename'], globs['log-v'], "+ Making output directory: " + globs['outdir']);
+			os.makedirs(globs['outdir']);
 	else:
 		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Output prefix:", pad) + globs['out']);
 
@@ -82,6 +85,10 @@ def startProg(globs):
 		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --bed", pad) + 
 					spacedOut("True", pad) + 
 					"Writing output in BED format in addition to tab delimited.");
+		printWrite(globs['logfilename'], globs['log-v'], "+ Making BED directory: " + globs['beddir']);
+		if globs['beddir'] and not os.path.isdir(globs['beddir']):
+			os.makedirs(globs['beddir']);
+		# Specifiy and create the BED directory, if necessary.
 	else:
 		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --fastq", pad) + 
 					spacedOut("False", pad) + 
