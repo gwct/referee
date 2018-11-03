@@ -31,6 +31,7 @@ def outputFastq(outdict, fq_vars, globs, final=False):
 #############################################################################
 
 def outputBed(bed_vars):
+    #print bed_vars;
     bed = bed_vars['cur-bed'];
     with open(bed_vars['bedout'], "w") as bedfile:
         bedfile.write("browser position " + bed['scaff'] + "\n");
@@ -38,29 +39,49 @@ def outputBed(bed_vars):
         bedfile.write("track name=\"" + bed['scaff'] + " Referee\" description=\"Quality scores calculated by Referee\" visibility=2\n");
 
         for b in bed['bins']:
-            outline = "\t".join([bed['scaff'], "0", str(bed['scaff-end']), bed['bins'][b]['name'], ".", "0", str(bed['scaff-end']), bed['bins'][b]['rgb']]);
-            outline += "\t" + str(bed['bins'][b]['num-chunks']);
-            outline += "\t" + ",".join(bed['bins'][b]['chunk-sizes']);
-            outline += "\t" + ",".join(bed['bins'][b]['chunk-starts']);
-            bedfile.write(outline + "\n");
+            if bed['bins'][b]['found']:
+
+                bed['bins'][b]['chunk-starts'] = [ str(int(s) - bed['bins'][b]['first-pos']) for s in bed['bins'][b]['chunk-starts'] ]
+
+
+            #bed['bins'][b]['chunk-sizes'].append("0");
+            #bed['bins'][b]['chunk-starts'].append(str(bed['scaff-end']));
+            #bed['bins'][b]['num-chunks'] += 1;
+
+            #print b, bed['bins'][b], ",".join(bed['bins'][b]['chunk-sizes']), ",".join(bed['bins'][b]['chunk-starts']);
+                outline = "\t".join([bed['scaff'], 
+                    str(bed['bins'][b]['first-pos']), 
+                    str(bed['bins'][b]['last-pos']), 
+                    bed['bins'][b]['name'], 
+                    "1000", 
+                    ".", 
+                    str(bed['bins'][b]['first-pos']), 
+                    str(bed['bins'][b]['last-pos']), 
+                    bed['bins'][b]['rgb']]
+                    );
+                outline += "\t" + str(bed['bins'][b]['num-chunks']);
+                outline += "\t" + ",".join(bed['bins'][b]['chunk-sizes']);
+                outline += "\t" + ",".join(bed['bins'][b]['chunk-starts']);
+                bedfile.write(outline + "\n");
+            #print bed;
 
 #############################################################################
 
 def bedInit(scaff, seqlen, globs, score):
     cur_bed = {
-            'scaff' : scaff, 'scaff-start' : 0, 'scaff-end' : seqlen, 
+            'scaff' : scaff, 'scaff-start' : 0, 'scaff-end' : seqlen-1, 
             'bins' : 
             {
-                1 : { 'name' : '<=0', 'rgb' : "255,0,0", 'num-chunks' : 0, 'chunk-sizes' : [], 'chunk-starts' : []},
-                2 : { 'name' : '1-10', 'rgb' : "255,0,0", 'num-chunks' : 0, 'chunk-sizes' : [], 'chunk-starts' : []},
-                3 : { 'name' : '11-20', 'rgb' : "255,0,0", 'num-chunks' : 0, 'chunk-sizes' : [], 'chunk-starts' : []},
-                4 : { 'name' : '21-30', 'rgb' : "255,0,0", 'num-chunks' : 0, 'chunk-sizes' : [], 'chunk-starts' : []},
-                5 : { 'name' : '31-40', 'rgb' : "255,0,0", 'num-chunks' : 0, 'chunk-sizes' : [], 'chunk-starts' : []},
-                6 : { 'name' : '41-50', 'rgb' : "255,0,0", 'num-chunks' : 0, 'chunk-sizes' : [], 'chunk-starts' : []},
-                7 : { 'name' : '51-60', 'rgb' : "255,0,0", 'num-chunks' : 0, 'chunk-sizes' : [], 'chunk-starts' : []},
-                8 : { 'name' : '61-70', 'rgb' : "255,0,0", 'num-chunks' : 0, 'chunk-sizes' : [], 'chunk-starts' : []},
-                9 : { 'name' : '71-80', 'rgb' : "255,0,0", 'num-chunks' : 0, 'chunk-sizes' : [], 'chunk-starts' : []},
-                10 : { 'name' : '81+', 'rgb' : "255,0,0", 'num-chunks' : 0, 'chunk-sizes' : [], 'chunk-starts' : []}
+                1 : { 'name' : '<=0', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True },
+                2 : { 'name' : '1-10', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
+                3 : { 'name' : '11-20', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
+                4 : { 'name' : '21-30', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
+                5 : { 'name' : '31-40', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
+                6 : { 'name' : '41-50', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
+                7 : { 'name' : '51-60', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
+                8 : { 'name' : '61-70', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
+                9 : { 'name' : '71-80', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
+                10 : { 'name' : '81+', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  }
             }
         };
     bed_vars = { 'bedout' : os.path.join(globs['beddir'], scaff + ".bed"),
@@ -98,15 +119,23 @@ def getBedBin(score):
 
 #############################################################################
 
-def finishBedBin(bed_vars, pos):
-    bed_vars['cur-bed']['bins'][bed_vars['cur-bin']]['num-chunks'] += 1;
-    cur_size = pos - bed_vars['chunk-start'] - 1
-    bed_vars['cur-bed']['bins'][bed_vars['cur-bin']]['chunk-sizes'].append(str(cur_size));
-    bed_vars['cur-bed']['bins'][bed_vars['cur-bin']]['chunk-starts'].append(str(bed_vars['chunk-start']));
+def finishBedBin(bed_vars, pos, seqlen=""):
+    #print "finishing bin", bed_vars['last-bin'], pos, bed_vars['chunk-start'];
+    bed_vars['cur-bed']['bins'][bed_vars['last-bin']]['num-chunks'] += 1;
+    cur_size = pos - bed_vars['chunk-start'];
 
-    bed_vars['chunk-start'] = pos;
+    if not bed_vars['cur-bed']['bins'][bed_vars['last-bin']]['found']:
+        bed_vars['cur-bed']['bins'][bed_vars['last-bin']]['found'] = True;
+        bed_vars['cur-bed']['bins'][bed_vars['last-bin']]['first-pos'] = bed_vars['chunk-start'];
+    bed_vars['cur-bed']['bins'][bed_vars['last-bin']]['last-pos'] = pos - 1;
+
+    #if pos != seqlen:
+    cur_size = cur_size - 1;
+    bed_vars['cur-bed']['bins'][bed_vars['last-bin']]['chunk-sizes'].append(str(cur_size));
+    bed_vars['cur-bed']['bins'][bed_vars['last-bin']]['chunk-starts'].append(str(bed_vars['chunk-start']));
+
+    bed_vars['chunk-start'] = pos-1;
     bed_vars['last-bin'] = bed_vars['cur-bin'];
-    #print cur_size
     return bed_vars;
 
 #############################################################################
@@ -155,14 +184,12 @@ def addUnmapped(file_item):
             fq_vars = { "fqoutfile" : fqoutfile, "fq_seq" : "", "fq_scores" : "", "filled" : False }
         # Variables for FASTQ output.
 
-        bed_vars = { 'last-bin' : "" };
+        bed_vars = { 'last-bin' : "", 'cur-bin' : 0 };
         # A dummy bed_vars to pass to functions when --bed isn't called.
 
         for line in open(file_info['out']):
             linelist = line.strip().split("\t");
             scaff, pos, score = linelist[0], int(linelist[1]), int(linelist[2]);
-            if globs['bed']:
-                globs['cur-bin'] = getBedBin(score);
 
             if scaff != last_scaff:
                 if first:
@@ -202,13 +229,21 @@ def addUnmapped(file_item):
             # Since the pass to fillUnmapped passed the INDEX (pos-1), I need to add one to get it back into POSITION. Then I need to
             # add one more to go to the next position... hence += 2.
 
-            if bed_vars['cur-bin'] != bed_vars['last-bin']:
-                bed_vars = finishBedBin(bed_vars, pos);
+            if globs['bed']:
+                if pos == 142:
+                    score = 82;
+                bed_vars['cur-bin'] = getBedBin(score);
+                #print pos, score, bed_vars['cur-bin'], bed_vars['last-bin'];
+                if bed_vars['cur-bin'] != bed_vars['last-bin']:
+                    #print "fb inner";
+                    bed_vars = finishBedBin(bed_vars, pos);
             # If the bin of the current score is different from the bin of the last score,
             # finish the BED bin.
 
-        if globs['bed']:
-            bed_vars = finishBedBin(bed_vars, pos);
+        # if globs['bed'] and bed_vars['cur-bin'] != 1:
+        #     #print bed_vars;
+        #     print "fb pre-final"
+        #     bed_vars = finishBedBin(bed_vars, pos);
         # If we're at the end of the loop and the bin isn't 1, we need to finish it before checking for
         # unmapped positions.
 
@@ -221,6 +256,8 @@ def addUnmapped(file_item):
         # Write the final FASTQ line if the last position was mapped and had a score and close the FASTQ output file.
 
         if globs['bed']:
+            #print "fb final";
+            bed_vars = finishBedBin(bed_vars, seqlen, seqlen);
             outputBed(bed_vars);
         # Write the last scaffold to the bed file.
 
@@ -233,17 +270,23 @@ def fillUnmapped(start, stop, scaff, seq, outfile, globs, fq_vars, bed_vars, fin
 # up to the stop position. The score for unmapped positions is -2.
     filled = False;
     while start <= stop:
-        if first and globs['bed'] and bed_vars['cur_bin'] != 1:
-            bed_vars = finishBedBin(bed_vars, start);
+        #print start, -2, bed_vars['cur-bin'], bed_vars['last-bin'];
+        if first:
             filled = True;
-            cur_bin = bed_vars['cur-bin'];
-            bed_vars['cur-bin'] = 1;
+            first = False;
+            if globs['bed'] and bed_vars['cur-bin'] != 1:
+                #print start;
+                if start != 1:
+                   # print "fb func"
+                    bed_vars = finishBedBin(bed_vars, start);
+                bed_vars['last-bin'] = 1;
+                bed_vars['cur-bin'] = 1;
 
-        if final and first:
-            first, fq_vars['filled'] = False, True;
-        # If its the last call, we need to know if the last position is unmapped for FASTQ output.
-        # If it is, then we call the final FASTQ output here. If not, then we call it back in addUnmapped
-        # with the last scored base.
+            if final:
+                fq_vars['filled'] = True;
+            # If its the last call, we need to know if the last position is unmapped for FASTQ output.
+            # If it is, then we call the final FASTQ output here. If not, then we call it back in addUnmapped
+            # with the last scored base.
 
         outdict = { 'scaff' : scaff, 'pos' : start, 'ref' : seq[start-1], 
                     'rq' : -2, 'lr' : "NA", 'l_match' : "NA", 'l_mismatch' : "NA", 
@@ -262,10 +305,6 @@ def fillUnmapped(start, stop, scaff, seq, outfile, globs, fq_vars, bed_vars, fin
     if globs['fastq'] and final and fq_vars['filled'] and fq_vars['fq_seq'] != "":
         fq_vars = outputFastq(outdict, fq_vars, globs, final=True);
     # If this is the final call and the last position was unmapped, we call the final FASTQ output here.
-
-    if filled and globs['bed']:
-        bed_vars['cur-bin'] = cur_bin;
-        bed_vars['last-bin'] = 1;
 
     return stop, fq_vars, bed_vars;
 
