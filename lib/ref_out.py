@@ -36,7 +36,7 @@ def outputBed(bed_vars):
     with open(bed_vars['bedout'], "w") as bedfile:
         bedfile.write("browser position " + bed['scaff'] + "\n");
         bedfile.write("browser hide all\n");
-        bedfile.write("track name=\"" + bed['scaff'] + " Referee\" description=\"Quality scores calculated by Referee\" visibility=2\n");
+        bedfile.write("track name=\"" + bed['scaff'] + " Referee\" description=\"Quality scores calculated by Referee\" visibility=2 itemRgb=\"On\"\n");
 
         for b in bed['bins']:
             if bed['bins'][b]['found']:
@@ -53,7 +53,7 @@ def outputBed(bed_vars):
                     str(bed['bins'][b]['first-pos']), 
                     str(bed['bins'][b]['last-pos']), 
                     bed['bins'][b]['name'], 
-                    "1000", 
+                    str(bed['bins'][b]['shade']),  
                     ".", 
                     str(bed['bins'][b]['first-pos']), 
                     str(bed['bins'][b]['last-pos']), 
@@ -72,16 +72,16 @@ def bedInit(scaff, seqlen, globs, score):
             'scaff' : scaff, 'scaff-start' : 0, 'scaff-end' : seqlen-1, 
             'bins' : 
             {
-                1 : { 'name' : '<=0', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True },
-                2 : { 'name' : '1-10', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
-                3 : { 'name' : '11-20', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
-                4 : { 'name' : '21-30', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
-                5 : { 'name' : '31-40', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
-                6 : { 'name' : '41-50', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
-                7 : { 'name' : '51-60', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
-                8 : { 'name' : '61-70', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
-                9 : { 'name' : '71-80', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  },
-                10 : { 'name' : '81+', 'rgb' : "255,0,0", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True  }
+                1 : { 'name' : '<=0', 'rgb' : "165,0,38", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True, 'shade' : 1000 },
+                2 : { 'name' : '1-10', 'rgb' : "221,61,45", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True, 'shade' : 900  },
+                3 : { 'name' : '11-20', 'rgb' : "246,126,75", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True, 'shade' : 800  },
+                4 : { 'name' : '21-30', 'rgb' : "253,179,102", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True, 'shade' : 700  },
+                5 : { 'name' : '31-40', 'rgb' : "254,218,139", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True, 'shade' : 600  },
+                6 : { 'name' : '41-50', 'rgb' : "194,228,239", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True, 'shade' : 500  },
+                7 : { 'name' : '51-60', 'rgb' : "152,202,225", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True, 'shade' : 400  },
+                8 : { 'name' : '61-70', 'rgb' : "110,166,205", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True, 'shade' : 300  },
+                9 : { 'name' : '71-80', 'rgb' : "74,123,183", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True, 'shade' : 200  },
+                10 : { 'name' : '81+', 'rgb' : "54,75,154", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'found' : True, 'shade' : 100  }
             }
         };
     bed_vars = { 'bedout' : os.path.join(globs['beddir'], scaff + ".bed"),

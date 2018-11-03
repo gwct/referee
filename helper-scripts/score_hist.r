@@ -8,12 +8,12 @@
 library(ggplot2)
 cat("----------\n")
 
-args = commandArgs(trailingOnly=TRUE)
+#args = commandArgs(trailingOnly=TRUE)
 # Command line entry of input files
 
-#this.dir <- dirname(parent.frame(2)$ofile)
-#setwd(this.dir)
-#args = c("../data/om-scaff/JYKP02038398.1-out.txt", "../data/om-scaff/plots/", "../data/om-scaff/39093-JYKP02038398.1.pileup")
+this.dir <- dirname(parent.frame(2)$ofile)
+setwd(this.dir)
+args = c("../bab-bed-test.txt", "..", "../data/baboon/chr1-pileup-snippet.txt.gz")
 # Manual entry of input files
 
 if(!length(args) %in% c(2,3) || "-h" %in% args){
@@ -90,7 +90,8 @@ score_p = ggplot(in_data, aes(x=score)) +
   )
 
 outfile = paste(outfile_prefix, "-score-hist.png", sep="")
-ggsave(file=outfile, score_p, width=8, height=6, units="in")
+#ggsave(file=outfile, score_p, width=8, height=6, units="in")
+print(score_p)
 
 if(length(args)==3){
   print("Reading pileup...")
@@ -117,36 +118,39 @@ if(length(args)==3){
     )
   
   outfile = paste(outfile_prefix, "-score-v-depth.png", sep="")
-  ggsave(file=outfile, depth_p, width=8, height=6, units="in")
+  #ggsave(file=outfile, depth_p, width=8, height=6, units="in")
+  print(depth_p)
 }
+barp=T
+print("Generating barplots...")
+if(barp){
+ rm(score_p, depth_p, pileup_data)
+ scaff_scores = split(in_combo, in_combo[,"scaff"])
+ rm(in_data)
+ for(df in scaff_scores){
+   outfile = paste(outdir, "/", df[1,1], "-depth.png", sep="")
+   print(outfile)
+   #png(outfile)
+   #barplot(df$score, names.arg=df$pos, ylim=c(-2,92), xlab="Position", ylab="Score", border=NA, space=0)
+   #axis(1,at=bp,labels=df$pos)
+   #dev.off()
 
-# print("Generating barplots...")
-# if(barp){
-#   rm(score_p, depth_p,pileup_data)
-#   scaff_scores = split(in_data, in_data[,"scaff"])
-#   rm(in_data)
-#   for(df in scaff_scores){
-#     outfile = paste(outdir, "/", df[1,1], "-scores.png", sep="")
-#     print(outfile)
-#     png(outfile)
-#     barplot(df$score, names.arg=df$pos, ylim=c(-2,92), xlab="Position", ylab="Score", border=NA, space=0)
-#     #axis(1,at=bp,labels=df$pos)
-#     dev.off()
-    
-#     #bar_p = ggplot(df, aes(x=pos, y=score)) +
-#     #  geom_bar(stat="identity") +
-#     #  labs(x="Position", y="Referee score") +
-#     #  theme_classic() +
-#     #  theme(axis.text=element_text(size=10), 
-#     #        axis.title=element_text(size=12), 
-#     #        axis.title.y=element_text(margin=margin(t=0,r=20,b=0,l=0),color="black"), 
-#     #        axis.title.x=element_text(margin=margin(t=20,r=0,b=0,l=0),color="black"),
-#     #        axis.line=element_line(colour='#595959',size=0.75),
-#     #        axis.ticks=element_line(colour="#595959",size = 1),
-#     #        axis.ticks.length=unit(0.2,"cm"),
-#     #        legend.position="none"
-#     #  )
-#     #ggsave(file=outfile, bar_p, width=8, height=6, units="in")
-#   }
+   df = subset(df, pos > 510000 & pos <= 520000)
+   
+   bar_p = ggplot(df, aes(x=pos, y=depth)) +
+     geom_line() +
+     labs(x="Position", y="Depth") +
+     theme_classic() +
+     theme(axis.text=element_text(size=10), 
+           axis.title=element_text(size=12), 
+           axis.title.y=element_text(margin=margin(t=0,r=20,b=0,l=0),color="black"), 
+           axis.title.x=element_text(margin=margin(t=20,r=0,b=0,l=0),color="black"),
+           axis.line=element_line(colour='#595959',size=0.75),
+           axis.ticks=element_line(colour="#595959",size = 1),
+           axis.ticks.length=unit(0.2,"cm"),
+           legend.position="none"
+     )
+   ggsave(file=outfile, bar_p, width=8, height=6, units="in")
+ }
   
-# }
+}
