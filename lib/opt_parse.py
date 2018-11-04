@@ -81,9 +81,9 @@ def optParse(globs):
 	# Checking the BED option.
 
 	if args.mapped_flag:
-		if args.fastq_flag:
-			RC.errorOut(6, "Cannot output to --fastq when only doing --mapped positions. Pick one.", globs);
-			# Raise error if both --fastq and --mapped are selected. FASTQ output without all positions would be confusing.
+		if args.fastq_flag or args.bed_flag:
+			RC.errorOut(6, "Cannot output to --fastq or --bed when only doing --mapped positions. Pick one.", globs);
+			# Raise error if both --fastq or --bed and --mapped are selected. FASTQ output without all positions would be confusing.
 		else:
 			globs['mapped'] = True;
 	# Checking the mapped option.
