@@ -2,7 +2,9 @@
 title: "Walkthrough"
 ---
 
-This page is a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee's quality scores. The end goal is to have a single sorted BAM file from which to calculate genotype likelihoods with ANGSD or mpileup and Referee. We will first map all the reads used to make the assembly back to the assembly to obtain a single BAM file. From there we show multiple ways to calculate genotype likelihoods used by Referee to score the genome and produce a FASTQ reference file.
+This page is a brief guide with command examples to go from reads and assembly to an assembly annotated with Referee's quality scores. We will show how to get a single sorted BAM file from which to calculate genotype likelihoods with ANGSD or mpileup and Referee. We will first map all the reads used to make the assembly back to the assembly to obtain a single BAM file. From there we show multiple ways to calculate genotype likelihoods used by Referee to score the genome and produce a FASTQ reference file.
+
+**Important note:** The following example is for Illumina reads. If you have reads from other technologies, the tools and steps may be different.
 
 ## Step 0: Software used
 

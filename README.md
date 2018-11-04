@@ -56,8 +56,9 @@ If you have pre-calculated genotype log likelihoods as input, exclude the `--pil
 | --pileup | If this option is set, Referee will read the input file(s) in pileup format and use this info to calculate genotype likelihoods prior to the reference quality score (see below) |
 | --mapq | If pileup file(s) are given as input, set this to incorporate mapping quality into Referee's quality score calculation. Mapping quality can be output by samtools mpileup with the `-s` option, and will appear in the 7th column of the file. If `--mapq` is not set, mapping qualities will be ignored even if they are present. |
 | --fastq | Referee outputs quality scores for every position in tab delimited format (see below), but with this option scores can also be output in FASTQ format. Scores will be converted to [ASCII](https://en.wikipedia.org/wiki/ASCII) characters: score + 35 = ASCII char. Note 1: If `--correct` is set, corrected bases will appear as lower case. Note 2: This option cannot be set with `--mapped`. |
+| --bed | Referee can output scores in binned BED format for visualizing tracks of scores in most genome browsers. One .bed file will be created for each scaffold scored and these will be placed in a directory ending with -bed-files. Note: This option cannot be set with `--mapped`. |
 | --correct | With this option, sites where reads do not support the called reference base will have a higher scoring base suggested. In the tab delimited output, the corrected base and score is reported in additional columns. In FASTQ output, the corrected positions are indicated by lower case bases. |
-| --mapped | Only report scores for sites with reads mapped to them. Note: This option cannot be set with `--fastq`. |
+| --mapped | Only report scores for sites with reads mapped to them. Note: This option cannot be set with `--fastq` or `--bed`. |
 | --quiet | Set this option to prevent Referee from printing out runtime statistics for each step. |
 | -p |The number of processes Referee can use. |
 
