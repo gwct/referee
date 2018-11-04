@@ -1,505 +1,257 @@
-<!DOCTYPE html>
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-
-<head>
-
-<meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="pandoc" />
-
-
-
-
-<title>Performance</title>
-
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
-<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
-<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
-<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
-<script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link rel="shortcut icon" href="img/favicon.png">
-
-<style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-  pre:not([class]) {
-    background-color: white;
-  }
-</style>
-<script type="text/javascript">
-if (window.hljs) {
-  hljs.configure({languages: []});
-  hljs.initHighlightingOnLoad();
-  if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
-  }
-}
-</script>
-
-
-
-<style type="text/css">
-h1 {
-  font-size: 34px;
-}
-h1.title {
-  font-size: 38px;
-}
-h2 {
-  font-size: 30px;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 12px;
-}
-.table th:not([align]) {
-  text-align: left;
-}
-</style>
-
-<link rel="stylesheet" href="lib\styles.css" type="text/css" />
-
-</head>
+<!doctype html>
+	<head>
+		<title>Performance</title>
+		<link type="text/css" rel="stylesheet" href="css/pure.css"  media="screen,projection" />
+		<link type="text/css" rel="stylesheet" href="css/scaffold.css"  media="screen,projection" />
+		<link rel='shortcut icon' href='img/favicon.png' type='image/x-icon'/ >
+	</head>
 
 <body>
+	<div class="pure-g" id="nav_row">
+		<div class="pure-u-1-5" id="margin"></div>
+		<div class="pure-u-3-5" id="nav_col">
+			<a href="#"><img class="pure_img" id="logo_nav" src="img/favicon.png"></a>
+			<a class="title" href="#">Referee</a>
+			<div class="pure-menu pure-menu-horizontal" id="nav_bar">
+				<ul class="pure-menu-list" id="nav_list">
+					<li class="pure-menu-item"><a href="index.html" class="nav_link" id="active">About</a></li>
+					<li class="pure-menu-item"><a href="calcs.html" class="nav_link">Math background</a></li>
+					<li class="pure-menu-item"><a href="readme.html" class="nav_link">README</a></li>
+					<li class="pure-menu-item"><a href="walkthrough.html" class="nav_link">Walkthrough</a></li>
+					<li class="pure-menu-item"><a href="https://github.com/gwct/referee" target="_blank" class="nav_link">Download</a></li>
+					<!-- <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+						<a href="#" id="menuLink1" class="pure-menu-link">Examples</a>
+							<ul class="pure-menu-children">
+								<li class="pure-menu-item"><a href="grampa/example1.html" class="pure-menu-link">Identify mode of polyploidy</a></li>
+								<li class="pure-menu-item"><a href="grampa/example2.html" class="pure-menu-link">Place WGD on phylogeny</a></li>
+								<li class="pure-menu-item"><a href="grampa/example3.html" class="pure-menu-link">Count duplications and losses</a></li>
+							</ul>
+					</li>
+					<li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+						<a href="#" id="menuLink1" class="pure-menu-link">Results</a>
+							<ul class="pure-menu-children">
+								<li class="pure-menu-item"><a href="grampa/results/yeast/yeast.html" class="pure-menu-link">Baker's Yeast</a></li>
+								<li class="pure-menu-item"><a href="grampa/results/wheat/wheat_all.html" class="pure-menu-link">Bread Wheat</a></li>
+								<li class="pure-menu-item"><a href="grampa/performance.html" class="pure-menu-link">Performance</a></li>
+							</ul>
+					</li> -->
+					<li class="pure-menu-item"><a href="links.html" class="nav_link">Other links</a></li>
+				</ul>
 
-<style type = "text/css">
-.main-container {
-  max-width: 940px;
-  margin-left: auto;
-  margin-right: auto;
-}
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
-}
-img {
-  max-width:100%;
-  height: auto;
-}
-.tabbed-pane {
-  padding-top: 12px;
-}
-button.code-folding-btn:focus {
-  outline: none;
-}
-</style>
+				<div class="mobile_dropdown" id="mobile_nav">
+					<a href="#" id="nav_link_dropdown">Navigation</a>
+					<div class="mobile_dropdown_links">
+						<ul class="pure-menu-list">
+							<li><a href="index.html" class="mobile_nav_link" id="active_drop">About</a></li>
+							<li><a href="calcs.html" class="mobile_nav_link">Math background</a></li>
+							<li><a href="readme.html" class="mobile_nav_link">README</a></li>
+							<li><a href="walkthrough.html" class="mobile_nav_link">Walkthrough</a></li>	
+							<li><a href="https://github.com/gwct/referee" target="_blank" class="mobile_nav_link">Download</a></li>
+							<li><a href="links.html" class="mobile_nav_link">Other links</a></li>
+					</div>
+				</div>				
+			</div>
+		</div>
+		<div class="pure-u-1-5" id="margin"></div>
+	</div>
+
+	<div class="pure-g"><div class="pure-u-1" id="divider_row"></div></div>
+
+	<div class="pure-g" id="main_row">
+		<div class="pure-u-1-5" id="margin"></div>
+		<div class="pure-u-3-5" id="main_col">
+			<div id="main_content">
+				<img class="pure-img" id="logo_main" src="img/ref-logo.png">
+                <h1>Referee perfomance tests</h1>
+                
+                <h2><em>J. sinuosa</em> transcriptome</h2>
+                    <p>The <em>J. sinuosa</em> reads for vegetative tissues were downloaded with fastq-dump from NCBI 
+                        <a href="https://www.ncbi.nlm.nih.gov/sra/SRX2676125%5Baccn%5D">SRA SRX2676125</a>. These reads were 
+                        assembled with Trinity using default parameters:</p>
+                    <pre><code>Trinity --seqType fq --max_memory 100G  --left SRR5380902_1.fastq  --right SRR5380902_2.fastq --CPU 8</code></pre>
+
+                    <p>The reads were mapped back to the resulting transcriptome assembly:</p>
+                    <pre><code>bwa mem Trinity.fasta SRR5380902_1.fastq SRR5380902_2.fastq &gt; SRR5380902.sam</code></pre>
+
+                    <p>A few additional steps were performed: 1) create the sequence dictionary to add to the SAM header because this output 
+                        lacked the <span class="citation">@HD</span> line needed later on, 2) Add the header from the dict, 3) Convert to BAM, 4) Sort BAM.</p>
+
+                    <p>Next, genotype likelihoods were calculated with ANGSD:</p>
+                    <pre><code>angsd -GL 2 -i SRR5380902-sorted.bam -ref Trinity.fasta -minQ 0 -doGlf 4 -out jsinuosa-angsd</code></pre>
+
+                    <p>And reference quality scores calculated with Referee:</p>
+                    <pre><code>referee.py -gl jsinuosa-angsd.glf.gz -ref Trinity.fasta --fastq --correct -o jsinuosa-referee</code></pre>
+
+                    <p>Additionally, two pileup files were created from the BAM file to test Referee’s genotype likelihood calculations. One with mapping quality and one without (the -s flag controls mapping quality output):</p>
+                    <pre><code>samtools mpileup -d 999999999 -f &lt;reference.fa&gt; -Q 0 -s -o jsinuosa-mq.pileup SRR5380902-sorted.bam</code></pre>
+
+                    <p>The pileup was used by Referee to calculate genotype likelihoods and quality scores:</p>
+                    <pre><code>referee.py -gl jsinuosa-mq.pileup -ref Trinity.fasta --pileup --fastq --correct -o jsinuosa-referee-glcalcs-mq</code></pre>
+
+                    <p>Here are some statistics from this process:</p>
+                    <center><table class="pure-table pure-table-bordered pure-table-striped">
+                        <thead><th>Description</th><th>Value</th></thead>
+                        <tbody>
+                            <tr><td>File size of assembled transcriptome</td> <td>53.96 MB</td></tr>
+                            <tr><td># transcripts</td> <td>55,567</td></tr>
+                            <tr><td># bases</td> <td>50,283,993</td></tr>
+                            <tr><td>Size of sorted BAM file</td> <td>1.01 GB</td></tr>
+                            <tr><td>Average read depth</td> <td>19.53</td></tr>
+                            <tr><td>Time to run ANGSD</td> <td>7.98 minutes</td></tr>
+                            <tr><td>Sites with ANGSD calcs</td> <td>48,791,504</td></tr>
+                            <tr><td>Time to run Referee (1 proc)</td> <td>18.69 minutes</td></tr>
+                            <tr><td>Size of Referee output (tab)</td> <td>1.67 GB</td></tr>
+                            <tr><td>Size of Referee output (fastq)</td> <td>124.97 MB</td></tr>
+                        </tbody>
+                    </table></center>
+
+                    <h3>Referee run time on <em>J. sinuosa</em> data</h3>
+                        <p><strong>Figure 1: Referee runtime on J. sinuosa data with 3 different genotype likelihood methods</strong></p>
+                        <center>
+                        <img src="img/performance-plots/jsin-time.png" style="width:75.0%" />
+                        </center>
+                        <p></br></p>
 
 
-<style type="text/css">
-/* padding for bootstrap navbar */
-body {
-  padding-top: 60px;
-  padding-bottom: 40px;
-}
-/* offset scroll position for anchor links (for fixed navbar)  */
-.section h1 {
-  padding-top: 65px;
-  margin-top: -65px;
-}
-
-.section h2 {
-  padding-top: 65px;
-  margin-top: -65px;
-}
-.section h3 {
-  padding-top: 65px;
-  margin-top: -65px;
-}
-.section h4 {
-  padding-top: 65px;
-  margin-top: -65px;
-}
-.section h5 {
-  padding-top: 65px;
-  margin-top: -65px;
-}
-.section h6 {
-  padding-top: 65px;
-  margin-top: -65px;
-}
-</style>
-
-<script>
-// manage active state of menu based on current page
-$(document).ready(function () {
-  // active menu anchor
-  href = window.location.pathname
-  href = href.substr(href.lastIndexOf('/') + 1)
-  if (href === "")
-    href = "index.html";
-  var menuAnchor = $('a[href="' + href + '"]');
-
-  // mark it active
-  menuAnchor.parent().addClass('active');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
-});
-</script>
+                    <h3>Referee memory usage on <em>J. sinuosa</em> data</h3>
+                        <p><strong>Figure 2: Referee max memory use on J. sinuosa data with 3 different genotype likelihood methods</strong></p>
+                        <center>
+                        <img src="img/performance-plots/jsin-mem.png" style="width:75.0%" />
+                        </center>
+                        <p></br></p>
 
 
-<div class="container-fluid main-container">
+                <h3>Comparing scores from different genotype likelihood methods on <em>J. sinuosa</em> data</h3>
+                    <center><table class="pure-table pure-table-bordered pure-table-striped">
+                        <thead>
+                            <th>Calculation method</th>
+                            <th><span class="math inline">\(L_{mismatch}\)</span> = 0 (<span class="math inline">\(R_Q\)</span> = 91)</th>
+                            <th>Reference is N (<span class="math inline">\(R_Q\)</span> = -1)</th>
+                            <th>No reads mapped (<span class="math inline">\(R_Q\)</span> = -2)</th>
+                        </thead>
+                        <tbody>
+                            <tr><td>ANGSD</td> <td>1646845</td> <td>0</td> <td>1487227</td></tr>
+                            <tr><td>Pileup without MQ</td> <td>1648828</td> <td>0</td> <td>1478554</td></tr>
+                            <tr><td>Pileup with MQ</td> <td>4113594</td> <td>0</td> <td>1478554</td></tr>
+                        </tbody>
+                    </table></center>
 
-<!-- tabsets -->
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-</script>
 
-<!-- code folding -->
+                <h3>Referee score distributions and read depth correlations</h3>
+                    <p><strong>Figure 3: Referee score 1 distribution on J. sinuosa</strong></p>
+                    <center>
+                    <img src="img/jsin-plots/jsin-ref-angsd-s1-score-hist.png" style="width:75.0%" />
+                    </center>
+                    <p></br></p>
+
+                    <p><strong>Figure 4: Referee score 1 vs. read depth</strong></p>
+                    <center>
+                    <img src="img/jsin-plots/jsin-ref-angsd-s1-score-v-depth.png" style="width:75.0%" />
+                    </center>
+                    <p></br></p>
+
+                    <p><strong>Figure 5: ANGSD score 1 vs. Pileup score 1</strong></p>
+                    <center>
+                    <img src="img/jsin-plots/jsin-angsds1-vs-pileups1-score-v-score.png" style="width:75.0%" />
+                    </center>
+                    <p></br></p>
+
+                    <p><strong>Figure 5: ANGSD score 1 vs. Pileup score 2</strong></p>
+                    <center>
+                    <img src="img/jsin-plots/jsin-angsds1-vs-angsds2-score-v-score.png" style="width:75.0%" />
+                    </center>
+                    <p></br></p>
+
+                    <p><strong>Figure 6: Pileup score 1 vs. Pileup score 2</strong></p>
+                    <center>
+                    <img src="img/jsin-plots/jsin-pileups1-vs-pileups2-score-v-score.png" style="width:75.0%" />
+                    </center>
+                    <p></br></p>
 
 
 
+                <h3>Using mapping quality</h3>
+                    <p><strong>Figure 7: Referee score 1 distribution on J. sinuosa with mapping quality</strong></p>
+                    <center>
+                    <img src="img/jsin-plots/jsin-ref-pileup-s1-mq-score-hist.png" style="width:75.0%" />
+                    </center>
+                    <p></br></p>
 
+                    <p><strong>Figure 8: Referee score 1 with mapping quality vs. read depth</strong></p>
+                    <center>
+                    <img src="img/jsin-plots/jsin-ref-pileup-s1-mq-score-v-depth.png" style="width:75.0%" />
+                    </center>
+                    <p></br></p>
 
+                    <p><strong>Figure 9: Pileup score 1 NO mapping quality vs. Pileup score 1 WITH mapping quality</strong></p>
+                    <center>
+                    <img src="img/jsin-plots/jsin-pileups1-vs-pileups1-mq-score-v-score.png" style="width:75.0%" />
+                    </center>
+                    <p></br></p>
 
-<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="index.html">Referee</a>
+            <h2>Owl monkey genome</h2>
+                <p>The owl monkey reference genome was obtained from NCBI 
+                    <a href="ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/952/055/GCA_000952055.2_Anan_2.0">GCA_000952055.2_Anan_2.0</a> and the 
+                    reads were mapped back to this assembly by colleagues at Baylor for the Owl monkey pedigree project. The BAM file was split by 
+                    scaffold for parallelizaiton of ANGSD calcs. This splitting shouldn’t effect the Referee performance, though it means I don’t 
+                    have genome-wide score distributions.</p>
+
+                <p>Here are some statistics from this genome:</p>
+                <center><table class="pure-table pure-table-bordered pure-table-striped">
+                    <thead><th>Description</th><th>Value</th></thead>
+                    <tbody>
+                        <tr><td>File size of assembled genome</td> <td>2.90 GB</td></tr>
+                        <tr><td># scaffolds</td> <td>22,922</td></tr>
+                        <tr><td># bases</td> <td>2,861,668,348</td></tr>
+                        <tr><td>Size of sorted BAM file</td> <td>561.67 GB</td></tr>
+                        <tr><td>Average read depth</td> <td>152.988</td></tr>
+                        <tr><td>Time to run ANGSD</td> <td>54.38 minutes</td></tr>
+                        <tr><td>Sites with ANGSD calcs</td> <td>2,664,619,299</td></tr>
+                        <tr><td>Time to run Referee (1 proc)</td> <td>17.33 hours</td></tr>
+                        <tr><td>Size of Referee output (tab)</td> <td>7.6 GB</td></tr>
+                        <tr><td>Size of Referee output (fastq)</td> <td>608 MB</td></tr>
+                        <tr><td><span class="math inline">\(L_{mismatch}\)</span> = 0 (<span class="math inline">\(R_Q\)</span> = 91)</td> <td>2,385,493,538</td></tr>
+                        <tr><td>Reference is N (<span class="math inline">\(R_Q\)</span> = -1)</td> <td>173,395</td></tr>
+                        <tr><td>No reads mapped (<span class="math inline">\(R_Q\)</</td> <td>197,049,049</td></tr>
+                    </tbody>
+                </table></center>
+
+                    <h3>Referee run time on Owl monkey and <em>J. sinuosa</em> data</h3>
+                        <p><strong>Figure 12: Referee runtime on J. sinuosa and owl monkey data with 3 different genotype likelihood methods</strong></p>
+                        <center>
+                        <img src="img/performance-plots/time.png" style="width:75.0%" />
+                        </center>
+                        <p></br></p>
+
+                    <h3>Referee memory usage on Owl monkey and <em>J. sinuosa</em> data</h3>
+                        <p><strong>Figure 13: Referee max memory use on J. sinuosa and owl monkey data with 3 different genotype likelihood methods</strong></p>
+                        <center>
+                        <img src="img/performance-plots/mem.png" style="width:75.0%" />
+                        </center>
+			</div>
+		</div>
+		<div class="pure-u-1-5" id="margin"></div>
+	</div>
+
+	<div class="pure-g"><div class="pure-u-1" id="divider_row"></div></div>
+	<div class="pure-g" id="footer">
+		<div class="pure-u-1">
+			<div id="footer_text">
+				<center>Site designed and maintained by <a href="https://gwct.github.io/index.html" target="_blank">Gregg Thomas</a> | Some of the CSS used to design
+					this site is from the <a href="https://purecss.io/" target="_blank">Pure CSS</a> project.</center>
+			</div>
+		</div>
     </div>
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-        <li>
-  <a href="index.html">About</a>
-</li>
-<li>
-  <a href="calcs.html">Example calculations</a>
-</li>
-<li>
-  <a href="walkthrough.html">Walkthrough</a>
-</li>
-<li>
-  <a href="https://github.com/gwct/referee">Download &amp; README</a>
-</li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        
-      </ul>
-    </div><!--/.nav-collapse -->
-  </div><!--/.container -->
-</div><!--/.navbar -->
 
-<div class="fluid-row" id="header">
-
-
-
-<h1 class="title toc-ignore">Performance</h1>
-
-</div>
-
-
-<div id="j.-sinuosa-transcriptome" class="section level2">
-<h2><em>J. sinuosa</em> transcriptome</h2>
-<p>The <em>J. sinuosa</em> reads for vegetative tissues were downloaded with fastq-dump from NCBI <a href="https://www.ncbi.nlm.nih.gov/sra/SRX2676125%5Baccn%5D">SRA SRX2676125</a>. These reads were assembled with Trinity using default parameters:</p>
-<pre><code>Trinity --seqType fq --max_memory 100G  --left SRR5380902_1.fastq  --right SRR5380902_2.fastq --CPU 8</code></pre>
-<p>The reads were mapped back to the resulting transcriptome assembly:</p>
-<pre><code>bwa mem Trinity.fasta SRR5380902_1.fastq SRR5380902_2.fastq &gt; SRR5380902.sam</code></pre>
-<p>A few additional steps were performed: 1) create the sequence dictionary to add to the SAM header because this output lacked the <span class="citation">@HD</span> line needed later on, 2) Add the header from the dict, 3) Convert to BAM, 4) Sort BAM.</p>
-<p>Next, genotype likelihoods were calculated with ANGSD:</p>
-<pre><code>angsd -GL 2 -i SRR5380902-sorted.bam -ref Trinity.fasta -minQ 0 -doGlf 4 -out jsinuosa-angsd</code></pre>
-<p>And reference quality scores calculated with Referee:</p>
-<pre><code>referee.py -gl jsinuosa-angsd.glf.gz -ref Trinity.fasta --fastq --correct -o jsinuosa-referee</code></pre>
-<p>Additionally, two pileup files were created from the BAM file to test Referee’s genotype likelihood calculations. One with mapping quality and one without (the -s flag controls mapping quality output):</p>
-<pre><code>samtools mpileup -d 999999999 -f &lt;reference.fa&gt; -Q 0 -s -o jsinuosa-mq.pileup SRR5380902-sorted.bam</code></pre>
-<p>The pileup was used by Referee to calculate genotype likelihoods and quality scores:</p>
-<pre><code>referee.py -gl jsinuosa-mq.pileup -ref Trinity.fasta --pileup --fastq --correct -o jsinuosa-referee-glcalcs-mq</code></pre>
-<p>Here are some statistics from this process:</p>
-<center>
-<table>
-<thead>
-<tr class="header">
-<th>Description</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Size of assmembled transcriptome</td>
-<td>53.96 MB</td>
-</tr>
-<tr class="even">
-<td># Transcripts</td>
-<td>55,567</td>
-</tr>
-<tr class="odd">
-<td>Bases</td>
-<td>50,283,993</td>
-</tr>
-<tr class="even">
-<td>Size of sorted BAM file</td>
-<td>1.01 GB</td>
-</tr>
-<tr class="odd">
-<td>Average read depth</td>
-<td>19.53</td>
-</tr>
-<tr class="even">
-<td>Time to run ANGSD</td>
-<td>7.98 min</td>
-</tr>
-<tr class="odd">
-<td>Mapped sites with ANGSD calcs</td>
-<td>48,791,504</td>
-</tr>
-<tr class="even">
-<td>Time to run Referee (1 proc)</td>
-<td>18.69 min</td>
-</tr>
-<tr class="odd">
-<td>Size of Referee output (tab)</td>
-<td>1.67 GB</td>
-</tr>
-<tr class="even">
-<td>Size of Referee output (fastq)</td>
-<td>124.97 MB</td>
-</tr>
-</tbody>
-</table>
-</center>
-<div id="referee-run-time-on-j.-sinuosa-data" class="section level3">
-<h3>Referee run time on <em>J. sinuosa</em> data</h3>
-<p><strong>Figure 1: Referee runtime on J. sinuosa data with 3 different genotype likelihood methods</strong></p>
-<center>
-<img src="img/performance-plots/jsin-time.png" style="width:75.0%" />
-</center>
-<p></br></p>
-</div>
-<div id="referee-memory-usage-on-j.-sinuosa-data" class="section level3">
-<h3>Referee memory usage on <em>J. sinuosa</em> data</h3>
-<p><strong>Figure 2: Referee max memory use on J. sinuosa data with 3 different genotype likelihood methods</strong></p>
-<center>
-<img src="img/performance-plots/jsin-mem.png" style="width:75.0%" />
-</center>
-<p></br></p>
-</div>
-<div id="comparing-scores-from-different-genotype-likelihood-methods-on-j.-sinuosa-data" class="section level3">
-<h3>Comparing scores from different genotype likelihood methods on <em>J. sinuosa</em> data</h3>
-</br>
-<center>
-<table style="width:100%;">
-<colgroup>
-<col width="18%" />
-<col width="27%" />
-<col width="25%" />
-<col width="28%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Calculation method</th>
-<th><span class="math inline">\(L_{mismatch}\)</span> = 0 (<span class="math inline">\(R_Q\)</span> = 91)</th>
-<th>Reference is N (<span class="math inline">\(R_Q\)</span> = -1)</th>
-<th>No reads mapped (<span class="math inline">\(R_Q\)</span> = -2)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>ANGSD</td>
-<td>1646845</td>
-<td>0</td>
-<td>1487227</td>
-</tr>
-<tr class="even">
-<td>Pileup without MQ</td>
-<td>1648828</td>
-<td>0</td>
-<td>1478554</td>
-</tr>
-<tr class="odd">
-<td>Pileup with MQ</td>
-<td>4113594</td>
-<td>0</td>
-<td>1478554</td>
-</tr>
-</tbody>
-</table>
-</center>
-</div>
-<div id="referee-score-distributions-and-read-depth-correlations" class="section level3">
-<h3>Referee score distributions and read depth correlations</h3>
-<p><strong>Figure 3: Referee score 1 distribution on J. sinuosa</strong></p>
-<center>
-<img src="img/jsin-plots/jsin-ref-angsd-s1-score-hist.png" style="width:75.0%" />
-</center>
-<p></br></p>
-<p><strong>Figure 4: Referee score 1 vs. read depth</strong></p>
-<center>
-<img src="img/jsin-plots/jsin-ref-angsd-s1-score-v-depth.png" style="width:75.0%" />
-</center>
-<p></br></p>
-<p><strong>Figure 5: ANGSD score 1 vs. Pileup score 1</strong></p>
-<center>
-<img src="img/jsin-plots/jsin-angsds1-vs-pileups1-score-v-score.png" style="width:75.0%" />
-</center>
-<p></br></p>
-<p><strong>Figure 5: ANGSD score 1 vs. Pileup score 2</strong></p>
-<center>
-<img src="img/jsin-plots/jsin-angsds1-vs-angsds2-score-v-score.png" style="width:75.0%" />
-</center>
-<p></br></p>
-<p><strong>Figure 6: Pileup score 1 vs. Pileup score 2</strong></p>
-<center>
-<img src="img/jsin-plots/jsin-pileups1-vs-pileups2-score-v-score.png" style="width:75.0%" />
-</center>
-<p></br></p>
-</div>
-<div id="using-mapping-quality" class="section level3">
-<h3>Using mapping quality</h3>
-<p><strong>Figure 7: Referee score 1 distribution on J. sinuosa with mapping quality</strong></p>
-<center>
-<img src="img/jsin-plots/jsin-ref-pileup-s1-mq-score-hist.png" style="width:75.0%" />
-</center>
-<p></br></p>
-<p><strong>Figure 8: Referee score 1 with mapping quality vs. read depth</strong></p>
-<center>
-<img src="img/jsin-plots/jsin-ref-pileup-s1-mq-score-v-depth.png" style="width:75.0%" />
-</center>
-<p></br></p>
-<p><strong>Figure 9: Pileup score 1 NO mapping quality vs. Pileup score 1 WITH mapping quality</strong></p>
-<center>
-<img src="img/jsin-plots/jsin-pileups1-vs-pileups1-mq-score-v-score.png" style="width:75.0%" />
-</center>
-<p></br></p>
-</div>
-</div>
-<div id="owl-monkey-genome" class="section level2">
-<h2>Owl monkey genome</h2>
-<p>The owl monkey reference genome was obtained from NCBI <a href="ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/952/055/GCA_000952055.2_Anan_2.0">GCA_000952055.2_Anan_2.0</a> and the reads were mapped back to this assembly by colleagues at Baylor for the Owl monkey pedigree project. The BAM file was split by scaffold for parallelizaiton of ANGSD calcs. This splitting shouldn’t effect the Referee performance, though it means I don’t have genome-wide score distributions.</p>
-<p>Here are some statistics from this genome:</p>
-<center>
-<table>
-<thead>
-<tr class="header">
-<th>Description</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Size of assmembled genome</td>
-<td>2.90 GB</td>
-</tr>
-<tr class="even">
-<td># Scaffolds</td>
-<td>22,922</td>
-</tr>
-<tr class="odd">
-<td>Bases</td>
-<td>2,861,668,348</td>
-</tr>
-<tr class="even">
-<td>Size of sorted BAM file</td>
-<td>561.67 GB</td>
-</tr>
-<tr class="odd">
-<td>Average read depth</td>
-<td>152.988</td>
-</tr>
-<tr class="even">
-<td>Time to run ANGSD</td>
-<td>54.38 min</td>
-</tr>
-<tr class="odd">
-<td>Mapped sites with ANGSD calcs</td>
-<td>2,664,619,299</td>
-</tr>
-<tr class="even">
-<td>Time to run Referee (1 proc)</td>
-<td>17.33 hrs</td>
-</tr>
-<tr class="odd">
-<td>Size of Referee output (tab)</td>
-<td>7.6 GB</td>
-</tr>
-<tr class="even">
-<td>Size of Referee output (fastq)</td>
-<td>608 MB</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(L_{mismatch}\)</span> = 0 (<span class="math inline">\(R_Q\)</span> = 91)</td>
-<td>2,385,493,538</td>
-</tr>
-<tr class="even">
-<td>Reference is N (<span class="math inline">\(R_Q\)</span> = -1)</td>
-<td>173,395</td>
-</tr>
-<tr class="odd">
-<td>No reads mapped (<span class="math inline">\(R_Q\)</span> = -2)</td>
-<td>197,049,049</td>
-</tr>
-</tbody>
-</table>
-</center>
-<div id="referee-run-time-on-owl-monkey-and-j.-sinuosa-data" class="section level3">
-<h3>Referee run time on Owl monkey and <em>J. sinuosa</em> data</h3>
-<p><strong>Figure 12: Referee runtime on J. sinuosa and owl monkey data with 3 different genotype likelihood methods</strong></p>
-<center>
-<img src="img/performance-plots/time.png" style="width:75.0%" />
-</center>
-<p></br></p>
-</div>
-<div id="referee-memory-usage-on-owl-monkey-and-j.-sinuosa-data" class="section level3">
-<h3>Referee memory usage on Owl monkey and <em>J. sinuosa</em> data</h3>
-<p><strong>Figure 13: Referee max memory use on J. sinuosa and owl monkey data with 3 different genotype likelihood methods</strong></p>
-<center>
-<img src="img/performance-plots/mem.png" style="width:75.0%" />
-</center>
-</div>
-</div>
-
-<footer>
-<div id="refFooter" class="footer">
-    <div class="footerContent">
-        <center>Site designed and maintained by <a href="https://gwct.github.io/index.html" target="_blank">Gregg Thomas</a>, 2018</center>
-    </div>
-</div>  
-</footer>
-
-
-
-</div>
-
-<script>
-
-// add bootstrap table styles to pandoc tables
-function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
-}
-$(document).ready(function () {
-  bootstrapStylePandocTables();
-});
-
-
-</script>
-
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-  (function () {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
-    document.getElementsByTagName("head")[0].appendChild(script);
-  })();
-</script>
+    <!-- dynamically load mathjax for compatibility with self-contained -->
+    <script>
+        (function () {
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+            document.getElementsByTagName("head")[0].appendChild(script);
+        })();
+    </script>
 
 </body>
 </html>

@@ -1,0 +1,30 @@
+#nav_row_results {
+	color:#000;
+	background-color:#c8c8ea;
+}
+
+#nav_link_results {
+	display:block;
+	text-decoration:none;
+	white-space:nowrap;
+	padding-left:.5em;
+	color:#777;
+	padding:.5em 1em;
+}
+
+#spec_table {
+	color:#777;
+}
+
+#results_col {
+	padding: 10px;
+	margin-bottom: 30px;
+	font-size: 18px;
+	font-weight: 200;
+	line-height: 30px;
+	color: inherit;
+	background-color: rgb(238, 238, 238, 0.95);
+	-webkit-border-radius: 6px;
+	 -moz-border-radius: 6px;
+	      border-radius: 6px;
+}

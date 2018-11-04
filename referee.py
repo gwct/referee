@@ -3,7 +3,7 @@
 # Reference genome quality score annotation
 # This is the main interface.
 #
-# Gres Thomagg
+# Gregg Thomas
 # Fall 2018
 #############################################################################
 
