@@ -18,7 +18,7 @@ source("lib/utils.r")
 
 ## I. Genotype likelihoods
 
-Referee can accept genotype likelihoods calculated with any method as long as they are properly formatted. For Referee's internal genotype likelihood calculations we use the simple method [described in the initial GATK publication (McKenna et al 2010)](https://dx.doi.org/10.1101/gr.107524.110). What follows is a description of that method, with the additional consideration of mapping quality.
+Referee can accept genotype log-likelihoods calculated with any method as long as they are properly formatted (see [README](https://github.com/gwct/referee)). For Referee's internal genotype likelihood calculations we use the simple method [described in the initial GATK publication (McKenna et al 2010)](https://dx.doi.org/10.1101/gr.107524.110). What follows is a description of that method, with the additional consideration of mapping quality.
 
 There are 10 possible genotypes at a biallelic site:
 
@@ -28,7 +28,7 @@ Given a set of reads $R$ at a site, we can calculate the likelihood of each geno
 
 **Equation 1**
 
-$$ P(R|\mathbb{G} = \{A_1,A_2\}) = \prod_{r}^{R} (\frac{1}{2}P(b_r|A_1) + \frac{1}{2}P(b_r|A_2) ) $$
+$$ P(R\;|\;g = \{A_1,A_2\}) = \prod_{r}^{R} (\frac{1}{2}P(b_r|A_1) + \frac{1}{2}P(b_r|A_2) ) $$
 
 To calculate the probability of the mapped base at the current read $b_r$ given each allele in the genotype $A_i$, we can use the Phred scaled base quality score $Q_b$ and Phred scaled mapping quality score $Q_m$ for that base. First we convert the Phred scale scores into probabilities of error:
 
@@ -54,7 +54,7 @@ Practically, the multiplication of many small probabilities in **Equation 1** ca
 
 **Equation 4**
 
-$$ P_{log}(R|\mathbb{G} = \{A_1,A_2\}) = \sum_{r}^{R} \log(\frac{1}{2}P(b_r|A_1) + \frac{1}{2}P(b_r|A_2)) $$
+$$ P_{log}(R\;|\;g = \{A_1,A_2\}) = \sum_{r}^{R} \log(\frac{1}{2}P(b_r|A_1) + \frac{1}{2}P(b_r|A_2)) $$
 
 The log-likelihood of each genotype is obtained in this fashion. The log-likelihood for each of the 10 genotypes ($P_{log}(R|\mathbb{G} = \{A_1,A_2\})$) is all we need for the purpose of calculating a reference quality score. (Note: ANGSD does not consider mapping quality when calculating genotype likelihoods).
 
