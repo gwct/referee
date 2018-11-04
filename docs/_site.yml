@@ -1,5 +1,5 @@
 name: referee
-output_dir: .
+output_dir: "."
 navbar:
   title: Referee
   left:
@@ -20,4 +20,5 @@ output:
     css: lib/styles.css
     lib_dir: site_libs
     self_contained: no
+
 
