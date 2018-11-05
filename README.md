@@ -20,7 +20,7 @@
 #### This is version Beta 1.2, released November 04, 2018
 
 Change log:
-* Added bed output option with `-bed`, redesigned website
+* Added bed output option with `--bed`, redesigned website
 
 ###### Version Beta 1.1 (October 14, 2018): Implemented in-house genotype likelihood calculations with `--pileup` input.
 ###### Version Beta 1.0 (October 6, 2018): First release and implementation of reference quality algorithm

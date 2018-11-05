@@ -1,6 +1,8 @@
 <!doctype html>
 	<head>
-		<title>README</title>
+        <title>README</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">	
 		<link type="text/css" rel="stylesheet" href="css/pure.css"  media="screen,projection" />
 		<link type="text/css" rel="stylesheet" href="css/scaffold.css"  media="screen,projection" />
 		<link rel='shortcut icon' href='img/favicon.png' type='image/x-icon'/ >
@@ -8,8 +10,8 @@
 
 <body>
 	<div class="pure-g" id="nav_row">
-		<div class="pure-u-1-5" id="margin"></div>
-		<div class="pure-u-3-5" id="nav_col">
+		<div class="pure-u-3-24" id="margin"></div>
+		<div class="pure-u-18-24" id="nav_col">
 			<a href="#"><img class="pure_img" id="logo_nav" src="img/favicon.png"></a>
 			<a class="title" href="index.html">Referee</a>
 			<div class="pure-menu pure-menu-horizontal" id="nav_bar">
@@ -42,7 +44,7 @@
 					<a href="#" id="nav_link_dropdown">Navigation</a>
 					<div class="mobile_dropdown_links">
 						<ul class="pure-menu-list">
-							<li><a href="index.html" class="mobile_nav_link"">About</a></li>
+							<li><a href="index.html" class="mobile_nav_link">About</a></li>
                             <li><a href="calcs.html" class="mobile_nav_link">Calculations</a></li>
                             <li><a href="#" class="mobile_nav_link" id="active_drop">README</a></li>
 							<li><a href="walkthrough.html" class="mobile_nav_link">Walkthrough</a></li>
@@ -52,7 +54,7 @@
 				</div>				
 			</div>
 		</div>
-		<div class="pure-u-1-5" id="margin"></div>
+		<div class="pure-u-3-24" id="margin"></div>
 	</div>
 
 	<div class="pure-g"><div class="pure-u-1" id="divider_row"></div></div>
@@ -78,13 +80,15 @@
                         <li><p>Compile a pileup file for Referee to calculate genotype likelihoods OR pre-calculate genotype 
                             log-likelihoods for all 10 genotypes at every position in the genome (we recommend <a href="https://github.com/ANGSD/angsd">ANGSD</a> 
                             for this).</p></li>
-                        <li><p>Score your genome with one of the following Referee commands:</p></li>
+                        <li><p>Score your genome with one of the following Referee commands:</p>
+                            <pre><code>python referee.py -gl [genotype likelihood file] -ref [reference genome FASTA file] --pileup</code></pre>
+                            <p>Alternatively, if you have multiple genotype likelihood files you wish to score with the same reference genome, you 
+                                could put the paths to each file in a text file with one file path per line for Referee to score them all:</p>
+                            <pre><code>python referee.py -i [text file with paths to genotype likelihood files] -ref [reference genome FASTA file] --pileup</code></pre>
+                            <p>If you have pre-calculated genotype likelihoods as input, exclude the <code>--pileup</code> flag.</p>
+                        </li>
                     </ol>
-                    <pre><code>python referee.py -gl [genotype likelihood file] -ref [reference genome FASTA file] --pileup</code></pre>
-                    <p>Alternatively, if you have multiple genotype likelihood files you wish to score with the same reference genome, you 
-                        could put the paths to each file in a text file with one file path per line for Referee to score them all:</p>
-                    <pre><code>python referee.py -i [text file with paths to genotype likelihood files] -ref [reference genome FASTA file] --pileup</code></pre>
-                    <p>If you have pre-calculated genotype likelihoods as input, exclude the <code>--pileup</code> flag.</p>
+
                 
                     <h3>Input</h3>
                         <p>There are two main inputs for the program:</p>
@@ -96,7 +100,7 @@
                                 <p>If you use a pileup file as input, be sure to use the <code class="cb">--pileup</code> flag.</p>
 
                                 <p>If you have pre-calculated genotype log-likelihoods, they must be formatted in a tab delimited file with the following columns
-                                (no column headers):
+                                    and no column headers:
 
                                 <pre><code>Scaffold ID  Position    AA  AC  AG  AT  CC  CG  CT  GG  GT  TT</code></pre>
 
@@ -126,7 +130,12 @@ scaffold_0	10	-8.689986	0.000000	-10.076280	-10.076280	-29.821151	-30.514277	-30
                                 
                             </li>
 
-                            <li>A reference FASTA file containing the sequences used to calculate genotype log-likelihoods (<code class="cb">-ref</code>).</li>
+                            <li>A reference FASTA file containing the sequences used to calculate genotype log-likelihoods (<code class="cb">-ref</code>).
+                                <strong>The FASTA headers in this file must match those in the first column of the ANGSD or pileup file(s) specified with 
+                                <code class="cb">-i</code> or <code class="cb">-gl</code></strong>. By default, Referee will trim the FASTA headers at
+                                the first occurrence of a space character, so be sure to account for this. I admit this is a shaky workaround, but given
+                                the non-standard nature of FASTA files its what I came up with. Please contact me if you would like some other header
+                                format implemented.</li>
                         </ol>
 
                     <h3>Output</h3>
@@ -135,7 +144,7 @@ scaffold_0	10	-8.689986	0.000000	-10.076280	-10.076280	-29.821151	-30.514277	-30
 
                         <p>By default, all outputs created by Referee will be files beginning with 
                             <code>referee-out-[start date]-[start time]-[random 6 char string]</code>. To change this, use the <code>-o</code> option.
-                            For the following examples we assume <code>-o ref-out</code></p>
+                            For the following examples we assume <code>-o ref-out</code> has beend specified.</p>
 
 
                         <ol>
@@ -269,19 +278,19 @@ GGTGTAGCCAGAGAGTAAANAATATGGTGAAGCCAGAGAG
                         reference base while negative scores indicate more support for some other base.</p>
 
                     <p>We cap Referee's scores from 0 to 90. This means that all sites that score negative are converted to a score of 0, and any sites
-                        that score higher than 90 simply get a score of 90. This scaling is practical in that it makes scores easily interpratable and
+                        that score higher than 90 simply get a score of 90. This scaling is practical because it makes scores easily interpratable and
                         allows for the converstion to ASCII characters in the FASTQ output.</p>
                         
                     <p>However, here are several scenarios where the scoring calculation is impossible. We have reserved some scores for these situations.
 
-                        <table class="pure-table pure-table-striped">
+                        <center><table class="pure-table pure-table-striped">
                             <thead><tr><th>Scenario</th><th>Score</th></tr></thead>
                             <tbody>
                                 <tr><td>The sum of the genotype likelihoods that do not contain the reference base is 0</td> <td>91</td></tr>
                                 <tr><td>The reference base is called as N</td> <td>-1</td></tr>
                                 <tr><td>No reads mapped to this site</td> <td>-2</td></tr>
                             </tbody>
-                        </table>
+                        </table></center>
                     </p>
 
                     <p>For the case of the reference base being called as N, Referee can calculate the highest scoring base and report 

@@ -43,6 +43,7 @@ h1 {
 /*	position:sticky;
 	position: -webkit-sticky;
 	top:-1px;*/
+	z-index:999;
 }
 
 #nav_bar {
@@ -77,7 +78,7 @@ h1 {
 	#nav_row {position:sticky; position: -webkit-sticky; top:0; padding:5px; }
 	#nav_list { display: none; }
 	#nav_col { width: 100% }
-	#mobile_nav { display: inline-block; float:right; padding-right:100px; }
+	#mobile_nav { display: inline-block; float:right; }
 }
 
 
@@ -237,83 +238,7 @@ pre {
 
 
 
-.custom-wrapper {
-  background-color: #ffd390;
-  margin-bottom: 1em;
-  -webkit-font-smoothing: antialiased;
-  height: 2.1em;
-  overflow: hidden;
-  -webkit-transition: height 0.5s;
-  -moz-transition: height 0.5s;
-  -ms-transition: height 0.5s;
-  transition: height 0.5s;
-}
 
-.custom-wrapper.open {
-  height: 14em;
-}
-
-.custom-menu-3 {
-  text-align: right;
-}
-
-.custom-toggle {
-  width: 34px;
-  height: 34px;
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: none;
-}
-
-.custom-toggle .bar {
-  background-color: #777;
-  display: block;
-  width: 20px;
-  height: 2px;
-  border-radius: 100px;
-  position: absolute;
-  top: 18px;
-  right: 7px;
-  -webkit-transition: all 0.5s;
-  -moz-transition: all 0.5s;
-  -ms-transition: all 0.5s;
-  transition: all 0.5s;
-}
-
-.custom-toggle .bar:first-child {
-  -webkit-transform: translateY(-6px);
-  -moz-transform: translateY(-6px);
-  -ms-transform: translateY(-6px);
-  transform: translateY(-6px);
-}
-
-.custom-toggle.x .bar {
-  -webkit-transform: rotate(45deg);
-  -moz-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  transform: rotate(45deg);
-}
-
-.custom-toggle.x .bar:first-child {
-  -webkit-transform: rotate(-45deg);
-  -moz-transform: rotate(-45deg);
-  -ms-transform: rotate(-45deg);
-  transform: rotate(-45deg);
-}
-
-@media (max-width: 47.999em) {
-
-  .custom-menu-3 {
-      text-align: left;
-  }
-
-  .custom-toggle {
-      display: block;
-  }
-
-}
 
 @media (max-width: 960px) {
 	#buttons_container { display: none; }
@@ -357,7 +282,7 @@ pre {
     background-color: rgb(182, 173, 184);
  	padding:5px 15px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    margin-left:-65px;
+    margin-left:-15px;
 }
 
 /* Links inside the dropdown */

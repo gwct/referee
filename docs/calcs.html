@@ -1,6 +1,8 @@
 <!doctype html>
 	<head>
-		<title>Referee calcs</title>
+        <title>Referee calcs</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">	
 		<link type="text/css" rel="stylesheet" href="css/pure.css"  media="screen,projection" />
 		<link type="text/css" rel="stylesheet" href="css/scaffold.css"  media="screen,projection" />
 		<link rel='shortcut icon' href='img/favicon.png' type='image/x-icon'/ >
@@ -8,8 +10,8 @@
 
 <body>
 	<div class="pure-g" id="nav_row">
-		<div class="pure-u-1-5" id="margin"></div>
-		<div class="pure-u-3-5" id="nav_col">
+		<div class="pure-u-3-24" id="margin"></div>
+		<div class="pure-u-18-24" id="nav_col">
 			<a href="#"><img class="pure_img" id="logo_nav" src="img/favicon.png"></a>
 			<a class="title" href="index.html">Referee</a>
 			<div class="pure-menu pure-menu-horizontal" id="nav_bar">
@@ -52,7 +54,7 @@
 				</div>				
 			</div>
 		</div>
-		<div class="pure-u-1-524" id="margin"></div>
+		<div class="pure-u-3-24" id="margin"></div>
 	</div>
 
 	<div class="pure-g"><div class="pure-u-1" id="divider_row"></div></div>
@@ -68,8 +70,8 @@
 
 				<h2>I. Genotype likelihoods</h2>
                 <p>Referee can accept genotype log-likelihoods calculated with any method as long as they are properly 
-                    formatted (see <a href="https://github.com/gwct/referee">README</a>). For Referee's internal genotype likelihood 
-                    calculations we use the simple method <a href="https://dx.doi.org/10.1101/gr.107524.110">described in the 
+                    formatted (see <a href="readme.html">README</a>). For Referee's internal genotype likelihood 
+                    calculations we use the simple method <a href="https://dx.doi.org/10.1101/gr.107524.110" target="_blank">described in the 
                     initial GATK publication (McKenna et al 2010)</a>. What follows is a description of that method, with the 
                     additional consideration of mapping quality.</p>
 
@@ -77,9 +79,10 @@
 
                 <p><span class="math display">\[ \mathbb{G} = \{\{A,A\}, \{A,T\}, \{A,C\}, \{A,G\}, \{T,T\}, \{T,C\}, \{T,G\}, \{C,C\}, \{C,G\}, \{G,G\}\} \]</span></p>
                 
-                <p>Given a set of reads <span class="math inline">\(R\)</span> at a site, we can calculate the likelihood of each genotype.</p>
+                <p>Given a set of reads <span class="math inline">\(R\)</span> at a site, we can calculate the likelihood of each genotype:</p>
 
                 <p><strong>Equation 1</strong></p>
+                
                 <p><span class="math display">\[ P(R\;|\;g = \{A_1,A_2\}) = \prod_{r}^{R} (\frac{1}{2}P(b_r|A_1) + \frac{1}{2}P(b_r|A_2) ) \]</span></p>
 
                 <p>To calculate the probability of the mapped base at the current read <span class="math inline">\(b_r\)</span> given each allele in the 
@@ -100,8 +103,8 @@
                 <span class="math display">\[\begin{equation}
                   P(b_r|A_i) =
                     \begin{cases}
-                      \frac{(e_s * e_m)}{3} &amp; \text{: $b \neq A_i$}\\
-                      1 - (e_s * e_m) &amp; \text{: $b = A_i$}\\
+                      \frac{(e_b * e_m)}{3} &amp; \text{: $b \neq A_i$}\\
+                      1 - (e_b * e_m) &amp; \text{: $b = A_i$}\\
                     \end{cases}       
                 \end{equation}\]</span>
 
@@ -111,7 +114,7 @@
                 <p><strong>Equation 4</strong></p>
                 <p><span class="math display">\[ P_{log}(R\;|\;g = \{A_1,A_2\}) = \sum_{r}^{R} \log(\frac{1}{2}P(b_r|A_1) + \frac{1}{2}P(b_r|A_2)) \]</span></p>
                 <p>The log-likelihood of each genotype is obtained in this fashion. The log-likelihood for each of the 10 genotypes
-                    <span class="math inline">\(P_{log}(R|\mathbb{G} = \{A_1,A_2\})\)</span> is all we need for the purpose of calculating a reference 
+                    <span class="math inline">\(P_{log}(R;|\;g = \{A_1,A_2\})\)</span> is all we need for the purpose of calculating a reference 
                     quality score. (Note: ANGSD does not consider mapping quality when calculating genotype likelihoods).</p>
 
                 <hr />
@@ -216,7 +219,7 @@
                     quality (y-axis). The shading indicates the most likely genotype, while the labeled dashed lines indicate the reference quality scores.</p>
                 <p>For example, in the upper left panel with read set 1 (all As) and a reference base call of A we see high scores regardless of 
                     varying quality of a single read. However, in the lower left panel the same read set when the reference base is called as a C 
-                    scores very low, indicating that the reads do not support a C as the called base.</p>
+                    scores are very low, indicating that the reads do not support a C as the called base.</p>
                
                 <p><strong>Examples of <span class="math inline">\(Q_{ref}\)</span></strong></p>
                 <p><img src="img/method2-1.png" class="pure_img" id="contour_plot" /></p>
