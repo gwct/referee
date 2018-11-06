@@ -14,7 +14,9 @@ pilein="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin.pileup"
 pilemqin="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin-mq.pileup"
 outdir="/N/dc2/scratch/grthomas/qtip/jsinuosa/time-tests"
 
-for i in {1..24}; do 
+ps=(1 4 8 12 16 20 24)
+
+for i in ${ps[*]}; do 
     time -p python referee.py -gl $angsdin -ref $reffile --fastq --correct -o $outdir/angsd-$i -p $i
     time -p python referee.py -gl $pilemqin -ref $reffile --fastq --correct --pileup -o $outdir/pileup-$i -p $i
     time -p python referee.py -gl $pilemqin -ref $reffile --fastq --correct --pileup --mapq -o $outdir/pileup-mq-$i -p $i

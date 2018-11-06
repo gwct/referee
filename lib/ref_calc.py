@@ -102,13 +102,15 @@ def correctRef(max_score, ref, gls, method):
 #############################################################################
 
 def glCalc(line, genotypes, log_probs, mapq):
-    if not mapq:
+    if len(line) == 6:
         scaff, pos, ref, depth, reads, bqs = line;
-        mqs = [unichr(1+33) for char in bqs];
-    # If there are no mapping qualities, just assign dummy values of 1 for mapping probs for every read.
-    elif mapq:
+    elif len(line) == 7:
         scaff, pos, ref, depth, reads, bqs, mqs = line;
-    # If there are mapping qualities, convert them to probabilities here.
+    if not mapq:
+        mqs = [unichr(1+33) for char in bqs];
+    # Read the pileup line. If there are mapping qualities, read them, but if mapq isn't set, 
+    # just assign dummy values of 1 for mapping probs for every read.
+
     pos = int(pos);
     ref = ref.upper();
     while True:
