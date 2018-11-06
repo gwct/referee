@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -k o
-#PBS -l nodes=1:ppn=24,walltime=8:00:00,vmem=48GB
+#PBS -l nodes=1:ppn=24,walltime=24:00:00,vmem=48GB
 #PBS -M grthomas@indiana.edu
 #PBS -m abe
 #PBS -N jsin-referee
@@ -8,6 +8,18 @@
 
 cd /N/u/grthomas/Carbonate/bin/referee/
 jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
+reffile="/N/dc2/scratch/grthomas/qtip/jsinuosa/assembly/Trinity.fasta"
+angsdin="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin-angsd.glf.gz"
+pilein="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin.pileup"
+pilemqin="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin-mq.pileup"
+outdir="/N/dc2/scratch/grthomas/qtip/jsinuosa/time-tests"
+
+for i in {1..24}; do 
+    time -p python referee.py -gl $angsdin -ref $reffile --fastq --bed --correct -o $outdir/angsd-$i -p $i
+    time -p python referee.py -gl $pilein -ref $reffile --fastq --bed --correct -o $outdir/pileup-$i -p $i
+    time -p python referee.py -gl $pilemqin -ref $reffile --fastq --bed --correct -o $outdir/pileup-mq-$i -p $i
+done
+
 
 # time -p angsd -GL 2 -i /N/dc2/scratch/grthomas/qtip/jsinuosa/mapped/SRR5380902-sorted.bam -ref /N/dc2/scratch/grthomas/qtip/jsinuosa/assembly/Trinity.fasta -minQ 0 -doGlf 4 -remove_bads 0 -out jsin-angsd
 # ANGSD command
@@ -23,27 +35,27 @@ jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
 #time -p python referee.py -gl $jsindir/jsin-angsd.glf.gz -ref $jsindir/assembly/Trinity.fasta --fastq --correct -o $jsindir/jsin-ref-angsd-s2 -p 24 -s 2
 # Referee with ANGSD input
 
-time -p python referee.py -gl $jsindir/jsin.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-ref-pileup-s1-unscaled -p 24 -s 1
+#time -p python referee.py -gl $jsindir/jsin.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-ref-pileup-s1-unscaled -p 24 -s 1
 #time -p python referee.py -gl $jsindir/jsin.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --fastq --correct -o $jsindir/jsin-ref-pileup-s2 -p 24 -s 2
 # Referee with pileup input no mq, no baq
 
-time -p python referee.py -gl $jsindir/jsin-mq.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --mapq --fastq --correct -o $jsindir/jsin-ref-pileup-s1-mq-unscaled -p 24 -s 1
+#time -p python referee.py -gl $jsindir/jsin-mq.pileup -ref $jsindir/assembly/Trinity.fasta --pileup --mapq --fastq --correct -o $jsindir/jsin-ref-pileup-s1-mq-unscaled -p 24 -s 1
 # Referee with pileup input WITH mq, no baq
 
-module load r/3.4.4
+#module load r/3.4.4
 #time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s1.txt $jsindir/jsin-ref-angsd-s2.txt $jsindir/jsin-plots jsin-angsds1-vs-angsds2
 # Compare angsd s1 vs angsd s2
 
 #time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-pileup-s1.txt $jsindir/jsin-ref-pileup-s2.txt $jsindir/jsin-plots jsin-pileups1-vs-pileups2
 # Compare pileup s1 vs pileup s2
 
-time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s1.txt $jsindir/jsin-ref-pileup-s1-unscaled.txt $jsindir/jsin-plots jsin-angsds1-vs-pileups1-unscaled
+#time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s1.txt $jsindir/jsin-ref-pileup-s1-unscaled.txt $jsindir/jsin-plots jsin-angsds1-vs-pileups1-unscaled
 # Compare angsd s1 vs pileup s1
 
 #time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-angsd-s2.txt $jsindir/jsin-ref-pileup-s2.txt $jsindir/jsin-plots jsin-angsds2-vs-pileups2
 # Compare angsd s2 vs pileup s2
 
-time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-pileup-s1-unscaled.txt $jsindir/jsin-ref-pileup-s1-mq-unscaled.txt $jsindir/jsin-plots jsin-pileups1-vs-pileups1-mq-unscaled
+#time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/comp_scores.r $jsindir/jsin-ref-pileup-s1-unscaled.txt $jsindir/jsin-ref-pileup-s1-mq-unscaled.txt $jsindir/jsin-plots jsin-pileups1-vs-pileups1-mq-unscaled
 # Compare pileup s1 no mq vs pileup s1 with mq
 
 #time -p Rscript /N/u/grthomas/Carbonate/bin/referee/helper-scripts/score_hist.r $jsindir/jsin-ref-angsd-s1.txt $jsindir/jsin-plots $jsindir/jsin.pileup
