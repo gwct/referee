@@ -20,8 +20,8 @@ runCMD() {
     # pileup command for no mapping quality and no baq recalculation (-B)
 }
 
-# export -f runCMD
-# module load gnu-parallel/20170622
+export -f runCMD
+module load gnu-parallel/20170622
 refdir="/N/u/grthomas/Carbonate/bin/referee"
 omdir="/N/dc2/scratch/grthomas/qtip/owl-monkey"
 reffile="/N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna"
