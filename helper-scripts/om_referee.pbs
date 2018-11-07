@@ -6,19 +6,19 @@
 #PBS -N om-pileup
 #PBS -j oe
 
-# runCMD() {
-#     refdir="/N/u/grthomas/Carbonate/bin/referee"
-#     omdir="/N/dc2/scratch/grthomas/qtip/owl-monkey"
-#     omref="/N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna"
-#     cd $omdir
+runCMD() {
+    refdir="/N/u/grthomas/Carbonate/bin/referee"
+    omdir="/N/dc2/scratch/grthomas/qtip/owl-monkey"
+    omref="/N/dcwan/projects/hahnlab-phi/owl-monkey/ref-genome/genbank/GCA_000952055.2_Anan_2.0_genomic.fna"
+    cd $omdir
 
-#     #angsd -GL 2 -i $omdir/split-bam-out/$1.bam -ref $omref -minQ 0 -doGlf 4 -out om-angsd/$1
-#     # Run ANGSD on all scaffolds
+    #angsd -GL 2 -i $omdir/split-bam-out/$1.bam -ref $omref -minQ 0 -doGlf 4 -out om-angsd/$1
+    # Run ANGSD on all scaffolds
 
      module load samtools/1.9
      samtools mpileup -d 999999999 -f $omref -Q 0 -B -s -o om-pileup/$1.pileup $omdir/split-bam-out/$1.bam
-#     # pileup command for no mapping quality and no baq recalculation (-B)
-# }
+    # pileup command for no mapping quality and no baq recalculation (-B)
+}
 
 # export -f runCMD
 # module load gnu-parallel/20170622
