@@ -1,6 +1,12 @@
 # These are the major changes and updates. For build specific changes (which are too numerous to document manually), check the commits on github.
 
-# Version 1.2: 
+# CURRENT:
+# Version Beta 1.2: November 4, 2018
+01) Added --bed option for output to BED files.
+02) Redesigned the website
+
+# PREVIOUS:
+# Version Beta 1.1: October 14, 2018
 01) Implemented in-house genotype likelihood calculations with --pileup input.
 02) Added the website.
 
