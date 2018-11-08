@@ -90,7 +90,7 @@ def startProg(globs):
 			os.makedirs(globs['beddir']);
 		# Specifiy and create the BED directory, if necessary.
 	else:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --fastq", pad) + 
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --bed", pad) + 
 					spacedOut("False", pad) + 
 					"Not writing output in BED format.");
 	# Reporting the fastq option.
