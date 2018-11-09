@@ -113,7 +113,7 @@
                                 used by samtools later on.</p>
                         </li>
 
-                        <li>We can also create the sequence dictionary with Picard. This is necessary if BWA doesn't creat a proper header in the SAM file:
+                        <li>We can also create the sequence dictionary with Picard. This is necessary if BWA doesn't create a proper header in the SAM file:
                             <pre><code>java -jar picard.jar CreateSequenceDictionary R=reference.fa O=reference.dict</code></pre>
                             
                             <p>This command will produce the file <strong>reference.dict</strong>.</p>
@@ -212,7 +212,7 @@
 
                     <p>A brief explanation of the options used in the above command:</p>
                     <table class="pure-table pure-table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
-                        <tr><td><code>-gl</code></td> <td>This is the input file for Referee. It is the output file from step 3, either the .glf.gz file 
+                        <tr><td><code>-gl</code></td> <td>This is the input file for Referee. It is the output file from step 4, either the .glf.gz file 
                             from ANGSD or the pileup file.</td></tr>
                         <tr><td><code>-ref</code></td> <td>The reference fasta file.</td></tr>
                         <tr><td><code>--pileup</code></td> <td>This flag indicates that the input specified with <code>-gl</code> is in pileup format. If 
@@ -231,7 +231,7 @@
                         <tr><td><strong>reference.fq</strong></td> <td>FASTQ formatted reference genome.</td></tr>
                     </table>
 
-                    <p>See the <a href="https://github.com/gwct/referee">README</a> for more information on these file formats.</p>
+                    <p>See the <a href="readme.html">README</a> for more information on these file formats.</p>
             </div>
 		</div>
 		<div class="pure-u-3-24" id="margin"></div>
