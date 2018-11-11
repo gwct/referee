@@ -127,10 +127,10 @@ def optParse(globs):
 			globs['beddir'] = os.path.join(globs['outdir'], "bed-files");
 		# Specifiy the BED directory, if necessary.			
 
-		if globs['stats']:
-			step_start_time  = RC.report_stats(globs, "Reading input", step_start=step_start_time);
-		else:
-			print("# Reading input file paths...");
+#		if globs['stats']:
+#			step_start_time  = RC.report_stats(globs, "Reading input", step_start=step_start_time);
+#		else:
+		print("# Reading input file paths...");
 		for line in open(args.input_list):
 			cur_gl_file = line.strip();
 			if not cur_gl_file:
