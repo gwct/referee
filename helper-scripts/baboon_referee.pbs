@@ -15,8 +15,19 @@ cd $babdir
 #time -p angsd -P 24 -GL 2 -i $bamfile -ref $reffile -minQ 0 -doGlf 4 -out bab-angsd
 # ANGSD command
 
-module load samtools/1.9
-samtools mpileup -d 999999999 -f $reffile -Q 0 -B -s -o bab.pileup $bamfile
+#module load samtools/1.9
+#samtools mpileup -d 999999999 -f $reffile -Q 0 -B -s -o bab.pileup $bamfile
 # pileup command with mapping quality (-s) and no baq recalculation (-B)
 
-#cd $refdir
+angsdin="/N/dc2/scratch/grthomas/qtip/baboon/bab-angsd.glf.gz"
+pilemqin="/N/dc2/scratch/grthomas/qtip/baboon/bab.pileup"
+outdir="/N/dc2/scratch/grthomas/qtip/baboon/time-tests"
+
+cd $refdir
+ps=(24 12 6 1)
+
+for i in ${ps[*]}; do 
+    time -p python referee.py -i $angsdin -ref $reffile --fastq --correct --bed -o $outdir/angsd-$i -p $i
+    time -p python referee.py -i $pilemqin -ref $reffile --fastq --correct --pileup --bed -o $outdir/pileup-$i -p $i
+    time -p python referee.py -i $pilemqin -ref $reffile --fastq --correct --pileup --mapq --bed -o $outdir/pileup-mq-$i -p $i
+done
