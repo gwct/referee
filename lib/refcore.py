@@ -360,7 +360,7 @@ def fastaGet(i_name, inds):
 
 def welcome():
 # Reads the ASCII art "Referee" text to be printed to the command line.
-	return open("lib/ref-welcome.txt", "r").read();
+	return open(os.path.join(os.path.dirname(__file__), "ref-welcome.txt"), "r").read();
 
 #############################################################################
 
