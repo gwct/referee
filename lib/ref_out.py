@@ -153,16 +153,26 @@ def outputTab(outdict, outfile, globs):
                 if outdict['gls'][gt] > max_gl:
                     max_gt = gt;
                     max_gl = outdict['gls'][gt];
+        else:
+            max_gt, max_gl = "NA", "NA"
         outline += [str(outdict['lr']), str(outdict['l_match']), str(outdict['l_mismatch']), str(outdict['ref']), max_gt, str(max_gl)];
     # Add the extra columns if --allcalcs.
+
+    if globs['raw-opt']:
+        outline += [str(outdict['raw'])];
 
     if globs['correct-opt']:
         try:
             cor_score = str(int(round(outdict['cor_score'])));
-            cor_base = outdict['cor_ref']
+            cor_base = outdict['cor_ref'];
+            if globs['raw-opt']:
+                cor_raw = outdict['cor_raw'];
         except:
-            cor_score, cor_base = "", "";
-        outline += [cor_base, cor_score]
+            cor_score, cor_base, cor_raw = "", "", "";
+        if globs['raw-opt']:
+            outline += [cor_base, cor_score, cor_raw];
+        else:
+            outline += [cor_base, cor_score];
     # See if this position has a corrected score if --correct is specified.
 
     outfile.write("\t".join(outline) + "\n");
@@ -280,8 +290,9 @@ def fillUnmapped(start, stop, scaff, seq, outfile, globs, fq_vars, bed_vars, fin
             # with the last scored base.
 
         outdict = { 'scaff' : scaff, 'pos' : start, 'ref' : seq[start-1], 
-                    'rq' : -2, 'lr' : "NA", 'l_match' : "NA", 'l_mismatch' : "NA", 
-                    'gls' : "NA", 'cor_ref' : "NA", 'cor_score' : "NA" };
+                    'rq' : -2, 'raw' : "NA", 'lr' : "NA", 'l_match' : "NA", 
+                    'l_mismatch' : "NA", 'gls' : "NA", 'cor_ref' : "NA", 
+                    'cor_score' : "NA", 'cor_raw' : "NA" };
         # Format the output info for an unmapped position.
         
         outputTab(outdict, outfile,  globs);

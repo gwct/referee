@@ -1,10 +1,12 @@
 # This file holds some global variables for some of the input options.
-# Global variables are exclusively read only -- they are not modified anywhere else in the code.
+# Global variables are exclusively read only -- they are not modified anywhere else in the code except when reading the input options.
 
 import timeit, refcore as RC
 
 def init():
     globs = {
+        'version' : 'Beta 1.2',
+        'releasedate' : 'November 4, 2018',
         'starttime' : timeit.default_timer(),
         'startdatetime' : RC.getOutTime(),
         'infile' : "",
@@ -19,6 +21,7 @@ def init():
         'bed' : False,
         'beddir' : False,
         'correct-opt' : False,
+        'raw-opt' : False,
         'log-v' : 1,
         'mapped' : False,
         'stats' : True,

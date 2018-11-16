@@ -46,7 +46,7 @@ def calcScore(ref, gls, method):
 # Sum of match genotypes = 0: -3 (this shouldn't happen ever)
 # No reads mapped: -2 (this is handled in the fullUnmapped function in ref_out)
     if ref.upper() in "NXB":
-        score, lr, l_match, l_mismatch = -1, "NA", "NA", "NA";
+        raw_score, score, lr, l_match, l_mismatch = "NA", -1, "NA", "NA", "NA";
     # If the called base at this position is undefined, score it as -1, otherwise do the calculation.
     else:
         l_match, l_mismatch = 0, 0;
@@ -58,9 +58,9 @@ def calcScore(ref, gls, method):
         # Sum the genotypes that match the called reference base and those that don't (mismatch).
 
         if l_match == 0:
-            score, lr = -3, "NA";
+            raw_score, score, lr = "-Inf", -3, "-Inf";
         elif l_mismatch == 0:
-            score, lr = 91, 0;
+            raw_score, score, lr = "Inf", 91, "Inf";
         # If the sum of the genotypes that don't match the called reference base is 0, assign maximum score.
         # This should scale with read depth somehow, though...
 
@@ -68,21 +68,23 @@ def calcScore(ref, gls, method):
         else:
             if method == 1:
                 lr = l_match / l_mismatch;
-                score = math.log(lr, 10);
+                raw_score = math.log(lr, 10);
             # Calculate the match : mismatch ratio and log transform.
             elif method == 2:
                 lr = "NA";
-                score = -1 * math.log(l_mismatch, 10);
+                raw_score = -1 * math.log(l_mismatch, 10);
             # Use the negative log of the sum of the mismatch likelihoods as the score.
-            if score > 90:
+            if raw_score > 90:
                 score = 90;
-            if score < 0:
+            elif raw_score < 0:
                 score = 0;
+            else:
+                score = raw_score;
             # Scale the scores so the max score is 91 and the all negative scores are 0.
-    return score, lr, l_match, l_mismatch;
+    return score, raw_score, lr, l_match, l_mismatch;
 #############################################################################
 
-def correctRef(max_score, ref, gls, method):
+def correctRef(max_raw, ref, gls, method):
 # If the score is negative, or the reference base is N, we can suggest a higher scoring
 # base. This loops through all alternative bases, calculates the quality score, and
 # returns the highest scoring one.
@@ -91,14 +93,14 @@ def correctRef(max_score, ref, gls, method):
     for base in bases:
         if base == max_base:
             continue;
-        score, lr, l_match, l_mismatch = calcScore(base, gls, method);
-        if score > max_score:
-            max_base, max_score = base, score;
+        score, raw_score, lr, l_match, l_mismatch = calcScore(base, gls, method);
+        if score > max_raw:
+            max_base, max_score, max_raw = base, score, raw_score;
 
     if max_base == ref:
         return "", "";
     else:
-        return max_base, max_score;
+        return max_base, max_score, max_raw;
 #############################################################################
 
 def glCalc(line, genotypes, log_probs, mapq):
@@ -162,7 +164,7 @@ def refCalc(file_item):
         for line in RC.getFileReader(file_info['in'])(file_info['in']):
             line = line.strip().split("\t");
             scaff, pos = line[0], int(line[1]);
-            cor_ref, cor_score = "NA", "NA";
+            cor_ref, cor_score, cor_raw = "NA", "NA", "NA";
 
             if globs['pileup']:
             # If the input type is pileup, we calculate the genotype likelihoods here.
@@ -190,16 +192,16 @@ def refCalc(file_item):
             if calc_rq_flag:
                 gls = { gt : math.exp(log_gls[gt]) for gt in log_gls };
 
-                rq, lr, l_match, l_mismatch = calcScore(ref, gls, globs['method']);
+                rq, raw_score, lr, l_match, l_mismatch = calcScore(ref, gls, globs['method']);
                 # Call the scoring function.
 
                 if globs['correct-opt'] and rq in [0,-1,-3]:
-                    cor_ref, cor_score = correctRef(rq, ref, gls, globs['method']);
+                    cor_ref, cor_score, cor_raw = correctRef(raw_score, ref, gls, globs['method']);
                 # With --correct, suggest a better/corrected reference base if the score is negative (0), the reference is undetermined (-1), or no reads support the matching base (-3)
 
-            outdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : ref, 'rq' : rq, 'lr' : lr,  
-                        'l_match' : l_match, 'l_mismatch' : l_mismatch, 'gls' : gls, 
-                        'cor_ref' : cor_ref, 'cor_score' : cor_score };
+            outdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : ref, 'rq' : rq, 'raw' : raw_score,
+                        'lr' : lr, 'l_match' : l_match, 'l_mismatch' : l_mismatch, 'gls' : gls, 
+                        'cor_ref' : cor_ref, 'cor_score' : cor_score, 'cor_raw' : cor_raw };
             # Store the info from the current site to be written once returned.
 
 

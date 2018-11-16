@@ -28,6 +28,8 @@ def startProg(globs):
 	print(welcome());
 	print("    Reference genome quality score calculator.\n")
 	printWrite(globs['logfilename'], 0, "# Welcome to Referee -- Reference genome quality score calculator.");
+	printWrite(globs['logfilename'], globs['log-v'], "# Version " + globs['version'] + " released on " + globs['releasedate']);
+	printWrite(globs['logfilename'], globs['log-v'], "# Referee was developed by Gregg Thomas and Matthew Hahn");
 	printWrite(globs['logfilename'], globs['log-v'], "# The date and time at the start is: " + getDateTime());
 	printWrite(globs['logfilename'], globs['log-v'], "# The program was called as: " + " ".join(sys.argv) + "\n#");
 
@@ -105,6 +107,16 @@ def startProg(globs):
 					"Calculating scores for every position in the reference genome.");
 	# Reporting the mapped option.
 
+	if globs['raw-opt']:
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --raw", pad) + 
+					spacedOut("True", pad) + 
+					"Printing raw Referee score in fourth column of tabbed output.");
+	else:
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --raw", pad) + 
+					spacedOut("False", pad) + 
+					"NOT printing raw Referee score in tabbed output.");
+	# Reporting the correct option.		
+
 	if globs['correct-opt']:
 		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --correct", pad) + 
 					spacedOut("True", pad) + 
@@ -120,7 +132,7 @@ def startProg(globs):
 					spacedOut("True", pad) + 
 					"No further information will be output while Referee is running.");
 	else:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --correct", pad) + 
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --quiet", pad) + 
 					spacedOut("False", pad) + 
 					"Time and memory (if psutil module is present) info will be output while Referee is running.");
 	# Reporting the correct option.

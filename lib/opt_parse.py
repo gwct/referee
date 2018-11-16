@@ -31,6 +31,7 @@ def optParse(globs):
 	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score 0.", action="store_true", default=False);
 	parser.add_argument("--mapped", dest="mapped_flag", help="Set this to calculate scores only for positions that have reads mapped to them.", action="store_true", default=False);
 	parser.add_argument("--mapq", dest="mapq_flag", help="Set with --pileup to indicate whether to consider mapping quality scores in the final score calculation. These should be in the seventh column of the pileup file.", action="store_true", default=False);
+	parser.add_argument("--raw", dest="raw_flag", help="Set this flag to output the raw score as the fourth column in the tabbed output.", action="store_true", default=False);
 	parser.add_argument("--quiet", dest="quiet_flag", help="Set this flag to prevent Referee from reporting detailed information about each step.", action="store_true", default=False);
 	# User options	
 	parser.add_argument("--allcalcs", dest="allcalc_opt", help=argparse.SUPPRESS, action="store_true", default=False);
@@ -91,6 +92,10 @@ def optParse(globs):
 	if args.correct_flag:
 		globs['correct-opt'] = True;
 	# Checking the correct option.
+
+	if args.raw_flag:
+		globs['raw-opt'] = True;
+	# Checking the raw score option.
 
 	if args.allcalc_opt:
 		globs['allcalc'] = True;

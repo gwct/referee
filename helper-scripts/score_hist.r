@@ -13,7 +13,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 #this.dir <- dirname(parent.frame(2)$ofile)
 #setwd(this.dir)
-#args = c("../bab-bed-test.txt", "..", "../data/baboon/chr1-pileup-snippet.txt.gz")
+#args = c("../test.txt", "..", "../data/baboon/chr1-pileup-snippet.txt.gz")
 # Manual entry of input files
 
 if(!length(args) %in% c(2,3) || "-h" %in% args){
@@ -49,13 +49,18 @@ print("Reading referee table...")
 in_data = read.table(infile, header=F, sep="\t")
 if(length(in_data[1,])==3){
   names(in_data) = c("scaff", "pos", "score")
+}else if(length(in_data[1,])==4){
+  names(in_data) = c("scaff", "pos", "score", "raw.score")
 }else if(length(in_data[1,])==5){
   names(in_data) = c("scaff", "pos", "score", "cor.base", "cor.score") 
-}else if(length(in_data[1,])==9){
-  names(in_data) = c("scaff", "pos", "score", "lr", "l.match", "l.mismatch", "ref", "max.gt", "max.gl")
-}else if(length(in_data[1,])==1){
-  names(in_data) = c("scaff", "pos", "score", "lr", "l.match", "l.mismatch", "ref", "max.gt", "max.gl", "core.base", "core.score")
-}
+}else if(length(in_data[1,])==7){
+  names(in_data) = c("scaff", "pos", "score", "raw.score", "cor.base", "cor.score", "cor.raw.score") 
+}  
+#}else if(length(in_data[1,])==9){
+#  names(in_data) = c("scaff", "pos", "score", "lr", "l.match", "l.mismatch", "ref", "max.gt", "max.gl")
+#}else if(length(in_data[1,])==1){
+#  names(in_data) = c("scaff", "pos", "score", "lr", "l.match", "l.mismatch", "ref", "max.gt", "max.gl", "core.base", "core.score")
+#}
 
 #print("Setting barplot option...")
 #if(length(args>=2)){
@@ -100,7 +105,7 @@ if(length(args)==3){
   
   print("Generating score-v-depth plot...")
   in_combo = merge(in_data, pileup_data, by=c("scaff", "pos"))
-  depth_p = ggplot(in_combo, aes(x=score, y=depth)) +
+  depth_p = ggplot(in_combo, aes(x=raw.score, y=depth)) +
     #geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
     #geom_point(color='#333333', size=0.5) +
     geom_bin2d(bins=100) +
