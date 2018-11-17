@@ -98,7 +98,7 @@ def correctRef(max_raw, ref, gls, method):
             max_base, max_score, max_raw = base, score, raw_score;
 
     if max_base == ref:
-        return "", "";
+        return "", "", "";
     else:
         return max_base, max_score, max_raw;
 #############################################################################
