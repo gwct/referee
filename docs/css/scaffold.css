@@ -17,6 +17,10 @@ h1 {
 }
 
 #nav_row {
+	z-index:10;
+	position: -webkit-sticky;
+	position:sticky;
+	top:0px;
 	color:#fff;
 	background-color:#000;
 }
