@@ -14,6 +14,6 @@ pilemqin="/N/dc2/scratch/grthomas/qtip/baboon/bab.pileup"
 outdir="/N/dc2/scratch/grthomas/qtip/baboon/bed-run"
 cd $refdir
 
-time -p python referee.py -gl $angsdin -ref $reffile --fastq --correct --bed -raw -o $outdir/angsd-$i -p 1
+time -p python referee.py -gl $angsdin -ref $reffile --fastq --correct --bed --raw -o $outdir/angsd-$i -p 1
 #time -p python referee.py -gl $pilemqin -ref $reffile --fastq --correct --pileup --bed -o $outdir/pileup-$i -p 1
 #time -p python referee.py -gl $pilemqin -ref $reffile --fastq --correct --pileup --mapq --bed -o $outdir/pileup-mq-$i -p 1
