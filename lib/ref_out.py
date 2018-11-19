@@ -166,7 +166,7 @@ def outputTab(outdict, outfile, globs):
             cor_score = str(int(round(outdict['cor_score'])));
             cor_base = outdict['cor_ref'];
             if globs['raw-opt']:
-                cor_raw = outdict['cor_raw'];
+                cor_raw = str(outdict['cor_raw']);
         except:
             cor_score, cor_base, cor_raw = "", "", "";
         if globs['raw-opt']:
