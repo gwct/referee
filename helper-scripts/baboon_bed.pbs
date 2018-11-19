@@ -1,0 +1,19 @@
+#!/bin/bash
+#PBS -k o
+#PBS -l nodes=1:ppn=1,walltime=24:00:00,vmem=100GB
+#PBS -M grthomas@indiana.edu
+#PBS -m abe
+#PBS -N baboon-bed
+#PBS -j oe
+
+refdir="/N/u/grthomas/Carbonate/bin/referee"
+babdir="/N/dc2/scratch/grthomas/qtip/baboon"
+reffile="/N/dc2/scratch/grthomas/qtip/baboon/assembly/baboon-chromes.fa"
+angsdin="/N/dc2/scratch/grthomas/qtip/baboon/bab-angsd.glf.gz"
+pilemqin="/N/dc2/scratch/grthomas/qtip/baboon/bab.pileup"
+outdir="/N/dc2/scratch/grthomas/qtip/baboon/bed-run"
+cd $refdir
+
+time -p python referee.py -gl $angsdin -ref $reffile --fastq --correct --bed -o $outdir/angsd-$i -p 1
+#time -p python referee.py -gl $pilemqin -ref $reffile --fastq --correct --pileup --bed -o $outdir/pileup-$i -p 1
+#time -p python referee.py -gl $pilemqin -ref $reffile --fastq --correct --pileup --mapq --bed -o $outdir/pileup-mq-$i -p 1
