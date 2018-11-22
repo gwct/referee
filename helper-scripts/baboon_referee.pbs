@@ -22,12 +22,12 @@ cd $babdir
 angsdin="/N/dc2/scratch/grthomas/qtip/baboon/bab-angsd.glf.gz"
 pilemqin="/N/dc2/scratch/grthomas/qtip/baboon/bab.pileup"
 outdir="/N/dc2/scratch/grthomas/qtip/baboon/time-tests"
+refpath="/N/u/grthomas/Carbonate/bin/referee/referee.py"
 
-cd $refdir
 ps=(24 12 6 1)
 
 for i in ${ps[*]}; do 
-    time -p python referee.py -gl $angsdin -ref $reffile --fastq --correct --bed -o $outdir/angsd-$i -p $i
-    time -p python referee.py -gl $pilemqin -ref $reffile --fastq --correct --pileup --bed -o $outdir/pileup-$i -p $i
-    time -p python referee.py -gl $pilemqin -ref $reffile --fastq --correct --pileup --mapq --bed -o $outdir/pileup-mq-$i -p $i
+    time -p python $refpath -gl $angsdin -ref $reffile --fastq --correct --bed -o $outdir/angsd-$i -p $i
+    time -p python $refpath -gl $pilemqin -ref $reffile --fastq --correct --pileup --bed -o $outdir/pileup-$i -p $i
+    time -p python $refpath -gl $pilemqin -ref $reffile --fastq --correct --pileup --mapq --bed -o $outdir/pileup-mq-$i -p $i
 done
