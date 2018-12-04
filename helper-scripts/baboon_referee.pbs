@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -k o
-#PBS -l nodes=1:ppn=6,walltime=72:00:00,vmem=100GB
+#PBS -l nodes=1:ppn=22,walltime=72:00:00,vmem=100GB
 #PBS -M grthomas@indiana.edu
 #PBS -m abe
 #PBS -N baboon-referee
@@ -19,12 +19,15 @@ cd $babdir
 #samtools mpileup -d 999999999 -f $reffile -Q 0 -B -s -o bab.pileup $bamfile
 # pileup command with mapping quality (-s) and no baq recalculation (-B)
 
-angsdin="/N/dc2/scratch/grthomas/qtip/baboon/bab-angsd.glf.gz"
-pilemqin="/N/dc2/scratch/grthomas/qtip/baboon/bab.pileup"
-outdir="/N/dc2/scratch/grthomas/qtip/baboon/time-tests"
+#angsdin="/N/dc2/scratch/grthomas/qtip/baboon/bab-angsd.glf.gz"
+#pilemqin="/N/dc2/scratch/grthomas/qtip/baboon/bab.pileup"
+pilemqin="/N/dc2/scratch/grthomas/qtip/baboon/bab-pileup.txt"
+angsdin="/N/dc2/scratch/grthomas/qtip/baboon/bab-angsd.txt"
+
+outdir="/N/dc2/scratch/grthomas/qtip/baboon/time-tests-3"
 refpath="/N/u/grthomas/Carbonate/bin/referee/referee.py"
 
-ps=(6 1)
+ps=(22 12 6 1)
 
 for i in ${ps[*]}; do 
     time -p python $refpath -gl $angsdin -ref $reffile --fastq --correct --bed --raw -o $outdir/angsd-$i -p $i
