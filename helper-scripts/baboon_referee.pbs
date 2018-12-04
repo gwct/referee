@@ -30,7 +30,7 @@ refpath="/N/u/grthomas/Carbonate/bin/referee/referee.py"
 ps=(22 12 6 1)
 
 for i in ${ps[*]}; do 
-    time -p python $refpath -gl $angsdin -ref $reffile --fastq --correct --bed --raw -o $outdir/angsd-$i -p $i
-    time -p python $refpath -gl $pilemqin -ref $reffile --fastq --correct --pileup --bed --raw -o $outdir/pileup-$i -p $i
-    time -p python $refpath -gl $pilemqin -ref $reffile --fastq --correct --pileup --mapq --bed --raw -o $outdir/pileup-mq-$i -p $i
+    time -p python $refpath -i $angsdin -ref $reffile --fastq --correct --bed --raw -o $outdir/angsd-$i -p $i
+    time -p python $refpath -i $pilemqin -ref $reffile --fastq --correct --pileup --bed --raw -o $outdir/pileup-$i -p $i
+    time -p python $refpath -i $pilemqin -ref $reffile --fastq --correct --pileup --mapq --bed --raw -o $outdir/pileup-mq-$i -p $i
 done
