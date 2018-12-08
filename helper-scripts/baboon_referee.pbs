@@ -27,7 +27,7 @@ angsdin="/N/dc2/scratch/grthomas/qtip/baboon/bab-angsd.txt"
 outdir="/N/dc2/scratch/grthomas/qtip/baboon/time-tests-3"
 refpath="/N/u/grthomas/Carbonate/bin/referee/referee.py"
 
-ps=(22 12 6 1)
+ps=(1)
 
 for i in ${ps[*]}; do 
     time -p python $refpath -i $angsdin -ref $reffile --fastq --correct --bed --raw -o $outdir/angsd-$i -p $i
