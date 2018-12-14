@@ -6,13 +6,19 @@
 #PBS -N jsin-referee
 #PBS -j oe
 
+# zcat jsin-angsd.glf.gz | while read p; do SUBSTRING=$(echo $p| cut -d ' ' -f 1); echo "$p" >> jsin-angsd/$SUBSTRING.angsd; done
+# Split the angsd output file.
+
 cd /N/u/grthomas/Carbonate/bin/referee/
 jsindir="/N/dc2/scratch/grthomas/qtip/jsinuosa"
 reffile="/N/dc2/scratch/grthomas/qtip/jsinuosa/assembly/Trinity.fasta"
-angsdin="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin-angsd.glf.gz"
-pilein="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin.pileup"
-pilemqin="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin-mq.pileup"
-outdir="/N/dc2/scratch/grthomas/qtip/jsinuosa/time-tests-2"
+angsdin="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin-angsd.txt"
+pilemqin="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin-pileup.txt"
+
+#angsdin="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin-angsd.glf.gz"
+#pilein="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin.pileup"
+#pilemqin="/N/dc2/scratch/grthomas/qtip/jsinuosa/jsin-mq.pileup"
+outdir="/N/dc2/scratch/grthomas/qtip/jsinuosa/time-tests-3"
 
 ps=(1 4 8 12 16 20 24)
 
