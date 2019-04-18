@@ -17,11 +17,12 @@
 #### Forthcoming
 
 ## Version History
-#### This is version Beta 1.2, released November 04, 2018
+#### This is version 1.0, released April 19, 2019
 
 Change log:
-* Added bed output option with `--bed`, redesigned website
+* No major changes, cleaned repository of old files.
 
+###### Version Beta 1.2 (November 04, 2018): Added bed output option with `--bed` and redesigned the website.
 ###### Version Beta 1.1 (October 14, 2018): Implemented in-house genotype likelihood calculations with `--pileup` input.
 ###### Version Beta 1.0 (October 6, 2018): First release and implementation of reference quality algorithm
 

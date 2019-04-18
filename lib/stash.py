@@ -1,4 +1,8 @@
 #############################################################################
+# Old or supplemental code that didn't end up being in the program
+
+
+#############################################################################
 # INITIAL ATTEMPT TO PARALLELIZE BY SPITTING FILES INTO CHUNKS
 # def multiPrep(files):
 # 	import math
