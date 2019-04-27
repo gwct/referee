@@ -14,7 +14,7 @@
 
 ## Citation
 
-#### Forthcoming
+#### Thomas GWC and Hahn MW. 2019. Refere: reference assembly quality scores. Genome Biology and Evolution. https://doi.org/10.1093/gbe/evz088. 
 
 ## Version History
 #### This is version 1.0, released April 19, 2019
