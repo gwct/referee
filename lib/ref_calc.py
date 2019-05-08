@@ -164,7 +164,7 @@ def refCalc(file_item):
         for line in RC.getFileReader(file_info['in'])(file_info['in']):
             line = line.strip().split("\t");
             scaff, pos = line[0], int(line[1]);
-            cor_ref, cor_score, cor_raw = "NA", "NA", "NA";
+            cor_ref, cor_score, cor_raw, raw_score, gls = "NA", "NA", "NA", "NA", "NA";
 
             if globs['pileup']:
             # If the input type is pileup, we calculate the genotype likelihoods here.
