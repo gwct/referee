@@ -30,6 +30,10 @@ def startProg(globs):
 	printWrite(globs['logfilename'], 0, "# Welcome to Referee -- Reference genome quality score calculator.");
 	printWrite(globs['logfilename'], globs['log-v'], "# Version " + globs['version'] + " released on " + globs['releasedate']);
 	printWrite(globs['logfilename'], globs['log-v'], "# Referee was developed by Gregg Thomas and Matthew Hahn");
+	printWrite(globs['logfilename'], globs['log-v'], "# Citation:      " + globs['doi']);
+	printWrite(globs['logfilename'], globs['log-v'], "# Website:       " + globs['http']);
+	printWrite(globs['logfilename'], globs['log-v'], "# Report issues: " + globs['github']);
+	printWrite(globs['logfilename'], globs['log-v'], "#");
 	printWrite(globs['logfilename'], globs['log-v'], "# The date and time at the start is: " + getDateTime());
 	printWrite(globs['logfilename'], globs['log-v'], "# The program was called as: " + " ".join(sys.argv) + "\n#");
 
@@ -129,12 +133,12 @@ def startProg(globs):
 
 	if globs['stats']:
 		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --quiet", pad) + 
-					spacedOut("True", pad) + 
-					"No further information will be output while Referee is running.");
-	else:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --quiet", pad) + 
 					spacedOut("False", pad) + 
 					"Time and memory (if psutil module is present) info will be output while Referee is running.");
+	else:
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --quiet", pad) + 
+					spacedOut("True", pad) + 
+					"No further information will be output while Referee is running.");
 	# Reporting the correct option.
 
 	printWrite(globs['logfilename'], globs['log-v'], spacedOut("# -p", pad) + 

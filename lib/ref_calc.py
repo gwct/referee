@@ -204,7 +204,6 @@ def refCalc(file_item):
                         'cor_ref' : cor_ref, 'cor_score' : cor_score, 'cor_raw' : cor_raw };
             # Store the info from the current site to be written once returned.
 
-
             if globs['debug']:
                 for gt in log_gls:
                    print(gt, log_gls[gt]);
