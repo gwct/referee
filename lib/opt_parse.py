@@ -1,4 +1,4 @@
-import sys, os, refcore as RC
+import sys, os, lib.refcore as RC
 #############################################################################
 
 def optParse(globs):

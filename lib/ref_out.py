@@ -1,4 +1,4 @@
-import os, math, refcore as RC
+import os, math, lib.refcore as RC
 #############################################################################
 
 def outputFastq(outdict, fq_vars, globs, final=False):

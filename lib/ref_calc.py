@@ -1,4 +1,4 @@
-import math, re, refcore as RC, ref_out as OUT, sys
+import math, re, lib.refcore as RC, lib.ref_out as OUT, sys
 #############################################################################
 
 def glInit(mapq):
@@ -207,8 +207,8 @@ def refCalc(file_item):
 
             if globs['debug']:
                 for gt in log_gls:
-                   print gt, log_gls[gt];
-                print rq, lr, l_match, l_mismatch;
+                   print(gt, log_gls[gt]);
+                print(rq, lr, l_match, l_mismatch);
             # Debug info
             
             OUT.outputTab(outdict, outfile, globs);

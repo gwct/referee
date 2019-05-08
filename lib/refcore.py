@@ -281,7 +281,7 @@ def getFileReader(i_name):
 
 def getRandStr(strlen=6):
 # This function generates a random string to add onto the end of tmp files to avoid possible overwrites.
-	return ''.join(random.choice(string.ascii_letters) for m in xrange(strlen));
+	return ''.join(random.choice(string.ascii_letters) for m in range(strlen));
 
 #############################################################################
 
