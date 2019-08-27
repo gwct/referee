@@ -23,10 +23,6 @@ def errorOut(errnum, errmsg, globs):
 
 def startProg(globs):
 # A nice way to start the program.
-	print("#");
-	printWrite(globs['logfilename'], globs['log-v'], "# =================================================");
-	print(welcome());
-	print("    Reference genome quality score calculator.\n")
 	printWrite(globs['logfilename'], 0, "# Welcome to Referee -- Reference genome quality score calculator.");
 	printWrite(globs['logfilename'], globs['log-v'], "# Version " + globs['version'] + " released on " + globs['releasedate']);
 	printWrite(globs['logfilename'], globs['log-v'], "# Referee was developed by Gregg Thomas and Matthew Hahn");

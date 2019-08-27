@@ -94,6 +94,10 @@ def referee(files, globs, step_start_time):
 if __name__ == '__main__':
 # Main is necessary for multiprocessing to work on Windows.
 	globs = GV.init();
+	print("#");
+	RC.printWrite(globs['logfilename'], globs['log-v'], "# =================================================");
+	print(RC.welcome());
+	print("    Reference genome quality score calculator.\n")
 	files, globs, step_start_time = OP.optParse(globs);
 	# Getting the input parameters from optParse.
 	referee(files, globs, step_start_time);
