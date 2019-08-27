@@ -33,9 +33,11 @@ def optParse(globs):
 	parser.add_argument("--mapq", dest="mapq_flag", help="Set with --pileup to indicate whether to consider mapping quality scores in the final score calculation. These should be in the seventh column of the pileup file.", action="store_true", default=False);
 	parser.add_argument("--raw", dest="raw_flag", help="Set this flag to output the raw score as the fourth column in the tabbed output.", action="store_true", default=False);
 	parser.add_argument("--quiet", dest="quiet_flag", help="Set this flag to prevent Referee from reporting detailed information about each step.", action="store_true", default=False);
+	parser.add_argument("--version", dest="version_flag", help="Simply print the version and exit. Can also be called as '-version', '-v', or '--v'", action="store_true", default=False);
 	# User options	
 	parser.add_argument("--allcalcs", dest="allcalc_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--debug", dest="debug_opt", help=argparse.SUPPRESS, action="store_true", default=False);
+	parser.add_argument("--nolog", dest="nolog_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("-s", dest="score_opt", help=argparse.SUPPRESS, type=int, default=1);
 	# Performance tests
 
@@ -51,6 +53,8 @@ def optParse(globs):
 		RC.errorOut(0, "Invalid score method opt.", globs);
 	if args.debug_opt:
 		globs['debug'] = True;
+	if args.nolog_opt:
+		globs['log-v'] = -1;
 	# Hidden test options
 
 	if not args.input_list and not args.gl_file:

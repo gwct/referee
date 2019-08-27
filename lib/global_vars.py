@@ -38,7 +38,8 @@ def init():
         'genotypes' : ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"],
         'psutil' : "",
         'probs' : "",
-        'debug' : False
+        'debug' : False,
+        'nolog' : False
     }
 
     globs['logfilename'] = "referee-" + globs['startdatetime'] + ".log";

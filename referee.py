@@ -100,7 +100,7 @@ if __name__ == '__main__':
 	# The version option to simply print the version and exit.
 
 	print("#");
-	RC.printWrite(globs['logfilename'], globs['log-v'], "# =================================================");
+	print("# =================================================");
 	print(RC.welcome());
 	print("    Reference genome quality score calculator.\n")
 	# A welcome banner.

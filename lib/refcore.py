@@ -23,6 +23,10 @@ def errorOut(errnum, errmsg, globs):
 
 def startProg(globs):
 # A nice way to start the program.
+	print("#");
+	printWrite(globs['logfilename'], globs['log-v'], "# =================================================");
+	print(welcome());
+	print("    Reference genome quality score calculator.\n")
 	printWrite(globs['logfilename'], 0, "# Welcome to Referee -- Reference genome quality score calculator.");
 	printWrite(globs['logfilename'], globs['log-v'], "# Version " + globs['version'] + " released on " + globs['releasedate']);
 	printWrite(globs['logfilename'], globs['log-v'], "# Referee was developed by Gregg Thomas and Matthew Hahn");
@@ -204,11 +208,12 @@ def printWrite(o_name, v, o_line1, o_line2="", pad=0):
 		outline = o_line1;
 	else:
 		outline = o_line1 + " "*(pad-len(o_line1)) + o_line2;
-	if v in [1,2]:
+	if v in [-1,1,2]:
 		print(outline);
-	f = open(o_name, "a");
-	f.write(outline + "\n");
-	f.close();
+	if v != -1:
+		f = open(o_name, "a");
+		f.write(outline + "\n");
+		f.close();
 
 #############################################################################
 	
