@@ -18,14 +18,14 @@ def optParse(globs):
 	parser = argparse.ArgumentParser(description="Referee: Reference genome quality scoring.");
 
 	parser.add_argument("-ref", dest="ref_file", help="The FASTA assembly to which you have mapped your reads.", default=False);
-	parser.add_argument("-gl", dest="gl_file", help="The file containing the genotype likelihood calculations.", default=False);
-	parser.add_argument("-i", dest="input_list", help="A file containing the paths to multiple input files containing genotype likelihoods and their reference FASTA files. Each line should contain one genotype likelihood file path and one FASTA file path separated by a tab.", default=False);
+	parser.add_argument("-gl", dest="gl_file", help="The file containing the genotype likelihood calculations or a pileup file (be sure to set --pileup!).", default=False);
+	parser.add_argument("-i", dest="input_list", help="A file containing the paths to multiple input files containing genotype likelihoods and their reference FASTA files. Each line should contain one genotype likelihood file path and one FASTA file path separated by a tab. If --pileup is set, this file should contain paths to pileup files.", default=False);
 	# Inputs
 	parser.add_argument("-o", dest="out_dest", help="A PREFIX name for the output files/directories. Default: referee-out-[date]-[time]", default=False);
 	# Output
 	parser.add_argument("-p", dest="processes", help="The number of processes Referee should use. Default: 1.", default=False);
 	# User params
-	parser.add_argument("--pileup", dest="pileup_flag", help=argparse.SUPPRESS, action="store_true", default=False);
+	parser.add_argument("--pileup", dest="pileup_flag", help="Set this option if your input file(s) are in pileup format and Referee will calculate genotype likelihoods for you.", action="store_true", default=False);
 	parser.add_argument("--fastq", dest="fastq_flag", help="Set this option to output in FASTQ format in addition to the default tab delimited format.", action="store_true", default=False);
 	parser.add_argument("--bed", dest="bed_flag", help="Set this option to output in BED format in addition to the default tab delimited format. BED files can be viewed as tracks in genome browsers.", action="store_true", default=False);
 	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score 0.", action="store_true", default=False);
@@ -38,7 +38,7 @@ def optParse(globs):
 	parser.add_argument("--allcalcs", dest="allcalc_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--debug", dest="debug_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--nolog", dest="nolog_opt", help=argparse.SUPPRESS, action="store_true", default=False);
-	parser.add_argument("-s", dest="score_opt", help=argparse.SUPPRESS, type=int, default=1);
+	parser.add_argument("--scoreopt", dest="score_opt", help=argparse.SUPPRESS, type=int, default=1);
 	# Performance tests
 
 	args = parser.parse_args();
@@ -69,7 +69,7 @@ def optParse(globs):
 		RC.errorOut(4, "Cannot find reference genome FASTA file: " + args.ref_file, globs);
 	else:
 		globs['reffile'] = args.ref_file;
-	# Check and read the reference genome file.
+	# Check reference genome fasta file path.
 
 	if args.processes and not args.processes.isdigit():
 		RC.errorOut(5, "-p must be an integer value greater than 1.", globs);
@@ -198,7 +198,6 @@ def optParse(globs):
 	# After all the essential options have been set, call the welcome function.
 	if globs['stats']:
 		if globs['psutil']:
-			import psutil
 			globs['pids'] = [psutil.Process(os.getpid())];	
 		globs['stats'] = True;
 		step_start_time = RC.report_stats(globs, stat_start=True);
