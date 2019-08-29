@@ -25,11 +25,11 @@ def glInit(mapq, haploid):
                 else:
                     # match_p = (0.5 * (1-bpe)) * (0.5 * (1-mpe));
                     # mismatch_p = (0.5 * (bpe/3.0)) * (0.5 * (mpe/3.0));
-                    # IS THIS RIGHT? (ORIGNAL/CURRENT)
+                    # Original (v1.0) calc (scores off by 1-2 due to order of ops)
 
                     match_p = (0.5 * (1 - (bpe * mpe)));
-                    mismatch_p = (0.5 * ((bpe * mpe)/ 3));
-                    # OR IS THIS RIGHT?
+                    mismatch_p = (0.5 * ((bpe * mpe) / 3));
+                    # Correct order of ops
 
                     log_probs[bq+mq][0] = math.log(match_p + match_p);
                     log_probs[bq+mq][1] = math.log(match_p + mismatch_p);
@@ -37,8 +37,6 @@ def glInit(mapq, haploid):
 
         else:
             log_probs[bq] = [0,0,0];
-
-
 
             if haploid:
                 match_p = (1-bpe);

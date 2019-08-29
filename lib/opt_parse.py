@@ -95,6 +95,9 @@ def optParse(globs):
 	# Checking the mapped option.
 
 	if args.haploid_flag:
+		if not args.pileup_flag:
+			RC.errorOut(7, "Please provide a --pileup file for internal genotype likelihood calculations when input data is --haploid.", globs);
+			# Raise error if haploid is set without pileup input.
 		globs['haploid'] = True;
 		globs['genotypes'] = globs['haploid-gt'];
 	# Checking the haploid option.
@@ -127,7 +130,7 @@ def optParse(globs):
 	if args.input_list:
 	# If the input method is -i
 		if not os.path.isfile(args.input_list):
-			RC.errorOut(7, "Cannot find file specified by -i.", globs);
+			RC.errorOut(8, "Cannot find file specified by -i.", globs);
 		globs['infile'] = args.input_list;
 		globs['intype'] = "List of files";
 		# Make sure we can find the input file.
@@ -153,7 +156,7 @@ def optParse(globs):
 			# Skip the line if its empty.
 
 			if not os.path.isfile(cur_gl_file):
-				RC.errorOut(8, "Invalid file path found in input file: " + cur_gl_file, globs);
+				RC.errorOut(9, "Invalid file path found in input file: " + cur_gl_file, globs);
 			basename = os.path.splitext(os.path.basename(cur_gl_file));
 			if basename[1] == '.gz':
 				basename = os.path.splitext(basename[0])[0];
@@ -171,7 +174,7 @@ def optParse(globs):
 	else:
 	# If the input method is -gl
 		if not os.path.isfile(args.gl_file):
-			RC.errorOut(9, "Cannot find genotype likelihood file specified by -gl.", globs);
+			RC.errorOut(10, "Cannot find genotype likelihood file specified by -gl.", globs);
 		globs['infile'] = args.gl_file;
 		globs['intype'] = "Single file";
 		# Check if the genotype likelihood file is a valid file.
@@ -198,7 +201,7 @@ def optParse(globs):
 	if globs['pileup'] and globs['mapq']:
 		for file_num in file_paths:
 			if not RC.mapQCheck(file_paths[file_num]['in']):
-				RC.errorOut(10, "--mapq is set, but couldn't find mapping qualities on the first line of a file: " + file_paths[file_num]['in'], globs);
+				RC.errorOut(11, "--mapq is set, but couldn't find mapping qualities on the first line of a file: " + file_paths[file_num]['in'], globs);
 
 	RC.startProg(globs);
 	# After all the essential options have been set, call the welcome function.

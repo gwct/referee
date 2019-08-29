@@ -24,9 +24,6 @@ def errorOut(errnum, errmsg, globs):
 def startProg(globs):
 # A nice way to start the program.
 	print("#");
-	printWrite(globs['logfilename'], globs['log-v'], "# =================================================");
-	print(welcome());
-	print("    Reference genome quality score calculator.\n")
 	printWrite(globs['logfilename'], 0, "# Welcome to Referee -- Reference genome quality score calculator.");
 	printWrite(globs['logfilename'], globs['log-v'], "# Version " + globs['version'] + " released on " + globs['releasedate']);
 	printWrite(globs['logfilename'], globs['log-v'], "# Referee was developed by Gregg Thomas and Matthew Hahn");
@@ -110,6 +107,16 @@ def startProg(globs):
 					spacedOut("False", pad) + 
 					"Calculating scores for every position in the reference genome.");
 	# Reporting the mapped option.
+
+	if globs['haploid']:
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --haploid", pad) + 
+					spacedOut("True", pad) + 
+					"Calculating genotype likelihoods and quality scores for HAPLOID data (4 genotypes).");
+	else:
+		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --haploid", pad) + 
+					spacedOut("False", pad) + 
+					"Calculating genotype likelihoods and quality scores for DIPLOID data (10 genotypes).");
+	# Reporting the haploid option.
 
 	if globs['raw-opt']:
 		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --raw", pad) + 
