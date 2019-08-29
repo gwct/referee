@@ -28,6 +28,7 @@ def optParse(globs):
 	parser.add_argument("--pileup", dest="pileup_flag", help="Set this option if your input file(s) are in pileup format and Referee will calculate genotype likelihoods for you.", action="store_true", default=False);
 	parser.add_argument("--fastq", dest="fastq_flag", help="Set this option to output in FASTQ format in addition to the default tab delimited format.", action="store_true", default=False);
 	parser.add_argument("--bed", dest="bed_flag", help="Set this option to output in BED format in addition to the default tab delimited format. BED files can be viewed as tracks in genome browsers.", action="store_true", default=False);
+	parser.add_argument("--haploid", dest="haploid_flag", help="Set this option if your input data are from a haploid species. Referee will limit its likelihood calculations to the four haploid genotypes. Can only be used with --pileup.", action="store_true", default=False);
 	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score 0.", action="store_true", default=False);
 	parser.add_argument("--mapped", dest="mapped_flag", help="Set this to calculate scores only for positions that have reads mapped to them.", action="store_true", default=False);
 	parser.add_argument("--mapq", dest="mapq_flag", help="Set with --pileup to indicate whether to consider mapping quality scores in the final score calculation. These should be in the seventh column of the pileup file.", action="store_true", default=False);
@@ -92,6 +93,11 @@ def optParse(globs):
 		else:
 			globs['mapped'] = True;
 	# Checking the mapped option.
+
+	if args.haploid_flag:
+		globs['haploid'] = True;
+		globs['genotypes'] = globs['haploid-gt'];
+	# Checking the haploid option.
 
 	if args.correct_flag:
 		globs['correct-opt'] = True;

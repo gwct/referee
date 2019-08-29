@@ -1,5 +1,10 @@
 # These are the major changes and updates. For build specific changes (which are too numerous to document manually), check the commits on github.
 
+# DEVELOPMENT:
+01) Fixed(?) the order of operations for the probability calcs with mapping quality.
+02) Updated unichr to chr for python 3.
+03) Testing haploid genotype likelihood calculations.
+
 # CURRENT:
 # Version 1.0: April 18, 2019
 01) First official release coincides with publication. No major changes, cleaned up repository.

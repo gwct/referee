@@ -1,36 +1,57 @@
 import math, re, lib.refcore as RC, lib.ref_out as OUT, sys
 #############################################################################
 
-def glInit(mapq):
+def glInit(mapq, haploid):
 # If the input is a pileup from which to calculate genotype likelihoods, this function
 # precalculates the probabilities for each quality score (or combination of quality scores
 # if mapping quality is provided).
     log_probs = {};
     for i in range(1,94):
-        bq = unichr(i+33);
+        bq = chr(i+33);
         bpe = 10.0 ** (-i/10.0);
 
         if mapq:
             for j in range(1,94):
-                mq = unichr(j+33);
+                mq = chr(j+33);
                 mpe = 10.00 ** (-j/10.0);
                 log_probs[bq+mq] = [0,0,0];
-                match_p = (0.5 * (1-bpe)) * (0.5 * (1-mpe));
-                mismatch_p = (0.5 * (bpe/3.0)) * (0.5 * (mpe/3.0));
 
-                log_probs[bq+mq][0] = math.log(match_p + match_p);
-                log_probs[bq+mq][1] = math.log(match_p + mismatch_p);
-                log_probs[bq+mq][2] = math.log(mismatch_p + mismatch_p);
+                if haploid:
+                    match_p = 1 - (bpe*mpe);
+                    mismatch_p = (bpe*mpe) / 3;
+                    log_probs[bq+mq][0] = math.log(match_p);
+                    log_probs[bq+mq][1] = math.log(mismatch_p);
+
+                else:
+                    # match_p = (0.5 * (1-bpe)) * (0.5 * (1-mpe));
+                    # mismatch_p = (0.5 * (bpe/3.0)) * (0.5 * (mpe/3.0));
+                    # IS THIS RIGHT? (ORIGNAL/CURRENT)
+
+                    match_p = (0.5 * (1 - (bpe * mpe)));
+                    mismatch_p = (0.5 * ((bpe * mpe)/ 3));
+                    # OR IS THIS RIGHT?
+
+                    log_probs[bq+mq][0] = math.log(match_p + match_p);
+                    log_probs[bq+mq][1] = math.log(match_p + mismatch_p);
+                    log_probs[bq+mq][2] = math.log(mismatch_p + mismatch_p);
 
         else:
             log_probs[bq] = [0,0,0];
 
-            match_p = (0.5 * (1-bpe));
-            mismatch_p = (0.5 * (bpe/3.0));
 
-            log_probs[bq][0] = math.log(match_p + match_p);
-            log_probs[bq][1] = math.log(match_p + mismatch_p);
-            log_probs[bq][2] = math.log(mismatch_p + mismatch_p);
+
+            if haploid:
+                match_p = (1-bpe);
+                mismatch_p = (bpe/3.0);
+                log_probs[bq][0] = math.log(match_p);
+                log_probs[bq][1] = math.log(mismatch_p);
+
+            else:
+                match_p = (0.5 * (1-bpe));
+                mismatch_p = (0.5 * (bpe/3.0));
+                log_probs[bq][0] = math.log(match_p + match_p);
+                log_probs[bq][1] = math.log(match_p + mismatch_p);
+                log_probs[bq][2] = math.log(mismatch_p + mismatch_p);
 
     return log_probs;
 
@@ -103,13 +124,13 @@ def correctRef(max_raw, ref, gls, method):
         return max_base, max_score, max_raw;
 #############################################################################
 
-def glCalc(line, genotypes, log_probs, mapq):
+def glCalc(line, genotypes, log_probs, mapq, haploid):
     if len(line) == 6:
         scaff, pos, ref, depth, reads, bqs = line;
     elif len(line) == 7:
         scaff, pos, ref, depth, reads, bqs, mqs = line;
     if not mapq:
-        mqs = [unichr(1+33) for char in bqs];
+        mqs = [chr(1+33) for char in bqs];
     # Read the pileup line. If there are mapping qualities, read them, but if mapq isn't set, 
     # just assign dummy values of 1 for mapping probs for every read.
 
@@ -141,12 +162,20 @@ def glCalc(line, genotypes, log_probs, mapq):
             if base == "*" or '!' in qual_key:
                 continue;
             # Skip the bad bases marked by pileup
-            if gt[0] == gt[1] and base == gt[0]:
-                log_gls[gt] += log_probs[qual_key][0];
-            elif gt[0] != gt[1] and (base == gt[0] or base == gt[1]):
-                log_gls[gt] += log_probs[qual_key][1];
+
+            if haploid:
+                if gt[0] == base:
+                    log_gls[gt] += log_probs[qual_key][0];
+                elif gt[0] != base:
+                    log_gls[gt] += log_probs[qual_key][1];
+
             else:
-                log_gls[gt] += log_probs[qual_key][2];
+                if gt[0] == gt[1] and base == gt[0]:
+                    log_gls[gt] += log_probs[qual_key][0];
+                elif gt[0] != gt[1] and (base == gt[0] or base == gt[1]):
+                    log_gls[gt] += log_probs[qual_key][1];
+                else:
+                    log_gls[gt] += log_probs[qual_key][2];
     # Calculate the genotype likelihood for every genotype given the current reads and probabilities.
 
     #log_gls_scaled = { gt : log_gls[gt] - max(log_gls.values()) for gt in log_gls };
@@ -173,7 +202,7 @@ def refCalc(file_item):
                     calc_rq_flag = False;
                 # If no reads have mapped to the site, assign score -2 and skip everything else.
                 else:
-                    ref, log_gls = glCalc(line, globs['genotypes'], globs['probs'], globs['mapq']);
+                    ref, log_gls = glCalc(line, globs['genotypes'], globs['probs'], globs['mapq'], globs['haploid']);
                 # Otherwise call the genotype likelihood function.
 
             else:

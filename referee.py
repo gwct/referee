@@ -25,7 +25,7 @@ def referee(files, globs, step_start_time):
 	if globs['pileup']:
 		if globs['stats']:
 			step_start_time = RC.report_stats(globs, "GL Init", step_start=step_start_time);
-		globs['probs'] = CALC.glInit(globs['mapq']);
+		globs['probs'] = CALC.glInit(globs['mapq'], globs['haploid']);
 
 	if globs['stats']:
 		file_start_time = RC.report_stats(globs, "Calcs", step_start=step_start_time);
