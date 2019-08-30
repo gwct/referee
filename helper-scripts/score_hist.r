@@ -8,12 +8,12 @@
 library(ggplot2)
 cat("----------\n")
 
-args = commandArgs(trailingOnly=TRUE)
+#args = commandArgs(trailingOnly=TRUE)
 # Command line entry of input files
 
-#this.dir <- dirname(parent.frame(2)$ofile)
-#setwd(this.dir)
-#args = c("../test.txt", "..", "../data/baboon/chr1-pileup-snippet.txt.gz")
+this.dir <- dirname(parent.frame(2)$ofile)
+setwd(this.dir)
+args = c("test.txt", ".", "test.pileup")
 # Manual entry of input files
 
 if(!length(args) %in% c(2,3) || "-h" %in% args){
@@ -55,7 +55,15 @@ if(length(in_data[1,])==3){
   names(in_data) = c("scaff", "pos", "score", "cor.base", "cor.score") 
 }else if(length(in_data[1,])==7){
   names(in_data) = c("scaff", "pos", "score", "raw.score", "cor.base", "cor.score", "cor.raw.score") 
-}  
+} else {
+  i_names = c("scaff", "pos", "score")
+  d_names = c()
+  for(i in 4:length(in_data[1,])){
+    print(i)
+    d_names = c(d_names, paste("C",i,sep=""))
+  }
+  names(in_data) = c(i_names, d_names)
+}
 #}else if(length(in_data[1,])==9){
 #  names(in_data) = c("scaff", "pos", "score", "lr", "l.match", "l.mismatch", "ref", "max.gt", "max.gl")
 #}else if(length(in_data[1,])==1){
@@ -101,11 +109,15 @@ ggsave(file=outfile, score_p, width=8, height=6, units="in")
 if(length(args)==3){
   print("Reading pileup...")
   pileup_data = read.table(pileupfile, header=F, sep="\t", quote="", comment="", colClasses=c("character", "integer", "character", "integer", "character", "character"))
-  names(pileup_data) = c("scaff", "pos", "base", "depth", "reads", "qual")
+  if(length(pileup_data[1,])==6){
+    names(pileup_data) = c("scaff", "pos", "base", "depth", "reads", "qual")
+  } else if(length(pileup_data[1,])==7){
+    names(pileup_data) = c("scaff", "pos", "base", "depth", "reads", "qual", "mqual")
+  }
   
   print("Generating score-v-depth plot...")
   in_combo = merge(in_data, pileup_data, by=c("scaff", "pos"))
-  depth_p = ggplot(in_combo, aes(x=raw.score, y=depth)) +
+  depth_p = ggplot(in_combo, aes(x=score, y=depth)) +
     #geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
     #geom_point(color='#333333', size=0.5) +
     geom_bin2d(bins=100) +
