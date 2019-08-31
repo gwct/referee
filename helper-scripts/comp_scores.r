@@ -13,13 +13,17 @@ cat("----------\n")
 refReader <- function(filehandle, file_num){
     in_data = read.table(filehandle, header=F, sep="\t")
     if(length(in_data[1,])==3){
-    labels = c("score")
+      labels = c("score")
     }else if(length(in_data[1,])==5){
-    labels = c("score", "cor.base", "cor.score") 
+      labels = c("score", "cor.base", "cor.score") 
     }else if(length(in_data[1,])==9){
-    labels = c("score", "lr", "l.match", "l.mismatch", "ref", "max.gt", "max.gl")
+      labels = c("score", "lr", "l.match", "l.mismatch", "ref", "max.gt", "max.gl")
     }else if(length(in_data[1,])==1){
-    labels = c("score", "lr", "l.match", "l.mismatch", "ref", "max.gt", "max.gl", "core.base", "core.score")
+      labels = c("score", "lr", "l.match", "l.mismatch", "ref", "max.gt", "max.gl", "core.base", "core.score")
+    } else {
+      labels = c("score")
+      for(i in 4:length(in_data[1,])){
+        labels = c(labels, paste("C",i,sep=""))
     }
     labels = c("scaff", "pos", paste(labels, file_num, sep=""))
     names(in_data) = labels
