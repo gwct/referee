@@ -24,6 +24,7 @@ refReader <- function(filehandle, file_num){
       labels = c("score")
       for(i in 4:length(in_data[1,])){
         labels = c(labels, paste("C",i,sep=""))
+      }
     }
     labels = c("scaff", "pos", paste(labels, file_num, sep=""))
     names(in_data) = labels
