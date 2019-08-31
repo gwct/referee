@@ -8,12 +8,12 @@
 library(ggplot2)
 cat("----------\n")
 
-#args = commandArgs(trailingOnly=TRUE)
+args = commandArgs(trailingOnly=TRUE)
 # Command line entry of input files
 
-this.dir <- dirname(parent.frame(2)$ofile)
-setwd(this.dir)
-args = c("test.txt", ".", "test.pileup")
+#this.dir <- dirname(parent.frame(2)$ofile)
+#setwd(this.dir)
+#args = c("test.txt", ".", "test.pileup")
 # Manual entry of input files
 
 if(!length(args) %in% c(2,3) || "-h" %in% args){
