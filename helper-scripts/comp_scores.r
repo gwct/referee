@@ -47,7 +47,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 #this.dir <- dirname(parent.frame(2)$ofile)
 #setwd(this.dir)
-#args = c("../test-s1.txt", "../test-s2.txt", "..", "test-prefix")
+#args = c("diploid1000.txt", "haploid1000.txt", ".", "test-prefix")
 # Manual entry of input files
 
 if(length(args) != 4 || "-h" %in% args){
@@ -88,6 +88,13 @@ scoreStats(data2)
  
 print("Generating score-v-score plot...")
 in_combo = merge(data1, data2, by=c("scaff", "pos"))
+
+in_combo = subset(in_combo, substr(C81,1,1)!=substr(C81,2,2))
+# Heterozygous sites only
+
+#in_combo = subset(in_combo, substr(C81,1,1)==substr(C81,2,2))
+# Homozygous sites only
+
 comp_p = ggplot(in_combo, aes(x=score1, y=score2)) +
     #geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
     #geom_point(color='#333333', size=1) +
