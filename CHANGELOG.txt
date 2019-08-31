@@ -1,15 +1,18 @@
 # These are the major changes and updates. For build specific changes (which are too numerous to document manually), check the commits on github.
 
 # DEVELOPMENT:
-01) Fixed(?) the order of operations for the probability calcs with mapping quality.
-02) Updated unichr to chr for python 3.
-03) Testing haploid genotype likelihood calculations.
+
 
 # CURRENT:
+# Version 1.1: August 31, 2019
+01) Implemented the --haploid option to score genomes from haploid species.
+02) Fixed the order of operations for the probability calcs with mapping quality.
+03) Updated unichr to chr for python 3.
+
+# PREVIOUS:
 # Version 1.0: April 18, 2019
 01) First official release coincides with publication. No major changes, cleaned up repository.
 
-# PREVIOUS:
 # Version Beta 1.2: November 4, 2018
 01) Added --bed option for output to BED files.
 02) Redesigned the website

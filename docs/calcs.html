@@ -30,7 +30,7 @@
                     <li class="pure-menu-item"><a href="#" class="nav_link" id="active">Calculations</a></li>
                     <li class="pure-menu-item"><a href="readme.html" class="nav_link">README</a></li>
 					<li class="pure-menu-item"><a href="walkthrough.html" class="nav_link">Walkthrough</a></li>
-					<li class="pure-menu-item"><a href="https://github.com/gwct/referee" target="_blank" class="nav_link">Download</a></li>
+					<li class="pure-menu-item"><a href="https://github.com/gwct/referee/releases/latest" target="_blank" class="nav_link">Download</a></li>
 					<!-- <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
 						<a href="#" id="menuLink1" class="pure-menu-link">Examples</a>
 							<ul class="pure-menu-children">
@@ -58,7 +58,7 @@
                             <li><a href="#" class="mobile_nav_link" id="active_drop">Calculations</a></li>
                             <li><a href="readme.html" class="mobile_nav_link">README</a></li>
 							<li><a href="walkthrough.html" class="mobile_nav_link">Walkthrough</a></li>	
-							<li><a href="https://github.com/gwct/referee" target="_blank" class="mobile_nav_link">Download</a></li>
+							<li><a href="https://github.com/gwct/referee/releases/latest" target="_blank" class="mobile_nav_link">Download</a></li>
 							<li><a href="links.html" class="mobile_nav_link">Other links</a></li>
 					</div>
 				</div>				
@@ -91,16 +91,24 @@
                 
                 <p>Given a set of reads <span class="math inline">\(R\)</span> at a site, we can calculate the likelihood of each genotype:</p>
 
-                <p><strong>Equation 1</strong></p>
+                <p><strong>Equation 1A &#8212; diploid likelihood calculation</strong></p>
                 
                 <p><span class="math display">\[ P(R\;|\;g = \{A_1,A_2\}) = \prod_{r}^{R} (\frac{1}{2}P(b_r|A_1) + \frac{1}{2}P(b_r|A_2) ) \]</span></p>
+
+                <p>We have also implemented a likelihood calculation for the most likely base in a set of reads from haploid data, in which the possible "genotypes" are:</p>
+
+                <p><span class="math display">\[ \mathbb{G} = \{\{A\}, \{T\}, \{C\}, \{G\}\} \]</span></p>
+
+                <p><strong>Equation 1B &#8212; haploid likelihood calculation</strong></p>
+                
+                <p><span class="math display">\[ P(R\;|\;g = \{A_1\}) = \prod_{r}^{R} (P(b_r|A_1)) \]</span></p>              
 
                 <p>To calculate the probability of the mapped base at the current read <span class="math inline">\(b_r\)</span> given each allele in the 
                     genotype <span class="math inline">\(A_i\)</span>, we can use the Phred scaled base quality score <span class="math inline">\(Q_b\)</span> 
                     and Phred scaled mapping quality score <span class="math inline">\(Q_m\)</span> for that base. First we convert the Phred scaled 
                     scores into probabilities of error:</p>
 
-                <p><strong>Equation 2</strong></p>
+                <p><strong>Equation 2 &#8212; Error probability from base quality</strong></p>
                 <p><span class="math display">\[ e = 10^{-\frac{Q}{10}} \]</span></p>
 
                 <p>Plugging in <span class="math inline">\(Q_b\)</span> and <span class="math inline">\(Q_m\)</span> gets 
@@ -109,7 +117,7 @@
 
                 <p>Then we can calculate the probability of the base given an allele <span class="math inline">\(P(b_r|A_i)\)</span> as follows:</p>
 
-                <p><strong>Equation 3</strong></p>
+                <p><strong>Equation 3 &#8212; The probability of a base given an allele</strong></p>
                 <span class="math display">\[\begin{equation}
                   P(b_r|A_i) =
                     \begin{cases}
@@ -121,10 +129,15 @@
                 <p>Practically, the multiplication of many small probabilities in <strong>Equation 1</strong> can lead to underflow errors. 
                     To resolve this, we simply take the log of the probabilities and add them instead:</p>
 
-                <p><strong>Equation 4</strong></p>
+                <p><strong>Equation 4A &#8212; Log likelihood calculation for diploid data</strong></p>
                 <p><span class="math display">\[ P_{log}(R\;|\;g = \{A_1,A_2\}) = \sum_{r}^{R} \log(\frac{1}{2}P(b_r|A_1) + \frac{1}{2}P(b_r|A_2)) \]</span></p>
+
+                Similarly, for haploid data:
+                <p><strong>Equation 4B &#8212; Log likelihood calculation for haploid data</strong></p>
+                <p><span class="math display">\[ P_{log}(R\;|\;g = \{A_1\}) = \sum_{r}^{R} \log(P(b_r|A_1)) \]</span></p>
+
                 <p>The log-likelihood of each genotype is obtained in this fashion. The log-likelihood for each of the 10 genotypes
-                    <span class="math inline">\(P_{log}(R;|\;g = \{A_1,A_2\})\)</span> is all we need for the purpose of calculating a reference 
+                    <span class="math inline">\(P_{log}(R;|\;g = \{A_1,A_2\})\)</span> (or 4 bases for haploid data) is all we need for the purpose of calculating a reference 
                     quality score. (Note: ANGSD does not consider mapping quality when calculating genotype likelihoods).</p>
 
                 <hr />

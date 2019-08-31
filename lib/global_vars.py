@@ -5,8 +5,8 @@ import timeit, lib.refcore as RC
 
 def init():
     globs = {
-        'version' : '1.0',
-        'releasedate' : 'April 19, 2019',
+        'version' : '1.1',
+        'releasedate' : 'August 31, 2019',
         'doi' : 'https://doi.org/10.1093/gbe/evz088',
         'http' : 'https://gwct.github.io/referee/',
         'github' : 'https://github.com/gwct/referee/issues',

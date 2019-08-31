@@ -30,7 +30,7 @@
                     <li class="pure-menu-item"><a href="calcs.html" class="nav_link">Calculations</a></li>
                     <li class="pure-menu-item"><a href="#" class="nav_link" id="active">README</a></li>
 					<li class="pure-menu-item"><a href="walkthrough.html" class="nav_link">Walkthrough</a></li>
-					<li class="pure-menu-item"><a href="https://github.com/gwct/referee" target="_blank" class="nav_link">Download</a></li>
+					<li class="pure-menu-item"><a href="https://github.com/gwct/referee/releases/latest" target="_blank" class="nav_link">Download</a></li>
 					<!-- <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
 						<a href="#" id="menuLink1" class="pure-menu-link">Examples</a>
 							<ul class="pure-menu-children">
@@ -58,7 +58,7 @@
                             <li><a href="calcs.html" class="mobile_nav_link">Calculations</a></li>
                             <li><a href="#" class="mobile_nav_link" id="active_drop">README</a></li>
 							<li><a href="walkthrough.html" class="mobile_nav_link">Walkthrough</a></li>
-							<li><a href="https://github.com/gwct/referee" target="_blank" class="mobile_nav_link">Download</a></li>
+							<li><a href="https://github.com/gwct/referee/releases/latest" target="_blank" class="mobile_nav_link">Download</a></li>
 							<li><a href="links.html" class="mobile_nav_link">Other links</a></li>
 					</div>
 				</div>				
@@ -261,6 +261,10 @@ GGTGTAGCCAGAGAGTAAANAATATGGTGAAGCCAGAGAG
                                     <td>Referee can output scores in binned BED format for visualizing tracks of scores in most genome browsers. One <code>.bed</code>
                                         file will be created for each scaffold scored and these will be placed in a directory ending with -bed-files. 
                                         Note: This option cannot be set with <code>--mapped</code>.</td></tr>
+
+                                <tr><td><code>--haploid</code></td>
+                                    <td>Set this option if your input sequencing data comes from a haploid species. Referee will limit it's likelihood calculations
+                                        to single base states. Note: This option can only be used with an input <code>--pileup</code> file.</td></tr>
 
                                 <tr><td><code>--correct</code></td>
                                     <td>With this option, sites where reads do not support the called reference base (score <= 0) will have a higher scoring base 
