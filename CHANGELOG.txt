@@ -1,5 +1,8 @@
 # These are the major changes and updates. For build specific changes (which are too numerous to document manually), check the commits on github.
 
+# TODO:
+1) Implement a check for headers in external genotype likelihood files such that if headers aren't present in the right order, the program exits and tell sthe user to add them.
+
 # DEVELOPMENT:
 
 

@@ -89,11 +89,11 @@ scoreStats(data2)
 print("Generating score-v-score plot...")
 in_combo = merge(data1, data2, by=c("scaff", "pos"))
 
-in_combo = subset(in_combo, substr(C81,1,1)!=substr(C81,2,2))
-# Heterozygous sites only
+#in_combo = subset(in_combo, substr(C81,1,1)!=substr(C81,2,2))
+# Heterozygous sites in data set 1 only
 
 #in_combo = subset(in_combo, substr(C81,1,1)==substr(C81,2,2))
-# Homozygous sites only
+# Homozygous sites in data set 1 only
 
 comp_p = ggplot(in_combo, aes(x=score1, y=score2)) +
     #geom_smooth(method='glm', color='#333333', fill="#d3d3d3", fullrange=T) +
