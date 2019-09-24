@@ -201,6 +201,7 @@ def refCalc(file_item):
                 # If no reads have mapped to the site, assign score -2 and skip everything else.
                 else:
                     ref, log_gls = glCalc(line, globs['genotypes'], globs['probs'], globs['mapq'], globs['haploid']);
+                    calc_rq_flag = True;
                 # Otherwise call the genotype likelihood function.
 
             else:
