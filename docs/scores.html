@@ -1,0 +1,120 @@
+<!doctype html>
+	<head>
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-98263199-2"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+
+			gtag('config', 'UA-98263199-2');
+        </script>
+        
+        <title>Scores</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">	
+		<link type="text/css" rel="stylesheet" href="css/pure.css"  media="screen,projection" />
+		<link type="text/css" rel="stylesheet" href="css/scaffold.css"  media="screen,projection" />
+		<link rel='shortcut icon' href='img/favicon.png' type='image/x-icon'/ >
+	</head>
+
+<body>
+	<div class="pure-g" id="desktop_nav">
+		<div class="pure-u-3-24" id="margin"></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="index.html"><img class="pure_img" id="logo_nav" src="img/ref-logo-2.png"></a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="index.html" class="nav_link">About</a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="calcs.html" class="nav_link">Calculations</a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="#" class="nav_link" id="active">Scores</a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="readme.html" class="nav_link">README</a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="walkthrough.html" class="nav_link">Walkthrough</a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="https://github.com/gwct/referee/releases/latest" target="_blank" class="nav_link">Download</a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="links.html" class="nav_link">Other links</a></div>
+		<div class="pure-u-5-24" id="margin"></div>
+	</div>
+
+	<div class="pure-g" id="mobile_nav">
+		<div class="pure-u-24-24 dropdown" id="nav_link_cell">
+			<a href="#" class="nav_link"><img class="pure_img" id="mobile_logo_nav" src="img/ref-logo-mobile.png"></a>
+			<div class="dropdown_container mobile_drop">
+				<ul class="pure-menu-list">
+					<li><a href="index.html" id="mobile_nav_link">About</a></li>
+					<li><a href="calcs.html" id="mobile_nav_link">Calculations</a></li>
+					<li><a href="#" id="mobile_nav_link">Scores</a></li>
+					<li><a href="readme.html" id="mobile_nav_link">README</a></li>
+					<li><a href="walkthrough.html" id="mobile_nav_link">Walkthrough</a></li>	
+					<li><a href="https://github.com/gwct/referee/releases/latest" target="_blank" id="mobile_nav_link">Download</a></li>
+					<li><a href="links.html" id="mobile_nav_link">Other links</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<!-- <div class="pure-g"><div class="pure-u-1" id="divider_row"></div></div> -->
+
+	<div class="pure-g" id="main_row">
+		<div class="pure-u-3-24" id="margin"></div>
+		<div class="pure-u-18-24" id="main_col">
+			<div id="main_content">
+				<h1>Referee's scores</h1>
+                    <p><strong>Referee's scores in output files will range from -2 to 91.</strong></p>
+
+                    <p>Since Referee's score is <a href="calcs.html">a ratio of probabilities</a>, theoretically any score from -infinity to +infinity 
+                        is possible. However, in practice scores tend to be limited to -300 to +300. Positive scores indicate support for the called 
+                        reference base while negative scores indicate more support for some other base.</p>
+
+                    <p>We cap Referee's scores from 0 to 90. This means that all sites that score negative are converted to a score of 0, and any sites
+                        that score higher than 90 simply get a score of 90. This scaling is practical because it makes scores easily interpratable and
+                        allows for the converstion to ASCII characters in the FASTQ output.</p>
+                        
+                    <p>However, here are several scenarios where the scoring calculation is impossible. We have reserved some scores for these situations.
+
+                        <center><table class="pure-table pure-table-striped">
+                            <thead><tr><th>Scenario</th><th>Score</th></tr></thead>
+                            <tbody>
+                                <tr><td>The sum of the genotype likelihoods that do not contain the reference base is 0</td> <td>91</td></tr>
+                                <tr><td>The reference base is called as N</td> <td>-1</td></tr>
+                                <tr><td>No reads mapped to this site</td> <td>-2</td></tr>
+                            </tbody>
+                        </table></center>
+                    </p>
+
+                    <p>For the case of the reference base being called as N, Referee can calculate the highest scoring base and report 
+                        it with the <code>--correct</code> option.</p>
+
+                    <h3>Referee's scores are not Phred-scaled error probabilities</h3>
+                    <p>Rather, they are a <a href="calcs.html">a ratio of probabilities</a>. While Referee's scores are said to be Phred-like
+                        because higher scores indicate more confidence in the called base, they do not represent a probability of error as traditional
+                        Phred scores do, and as such they are scaled differently. 
+                    </p>
+
+                    <p>Put succinctly:</p>
+                    <ul>A Phred score of 10 corresponds to a probability of error of 0.1.</ul>
+                    <ul>A Referee score of 10 means that the called base is <span class="math inline">\(10^{10}\)</span> more likely than another base.</ul>
+
+            </div>
+		</div>
+		<div class="pure-u-3-24" id="margin"></div>
+	</div>
+
+	<div class="pure-g"><div class="pure-u-1" id="divider_row"></div></div>
+	<div class="pure-g" id="footer">
+		<div class="pure-u-1">
+			<div id="footer_text">
+				<center>Site designed and maintained by <a href="https://gwct.github.io/index.html" target="_blank">Gregg Thomas</a> | Some of the CSS used to design
+					this site is from the <a href="https://purecss.io/" target="_blank">Pure CSS</a> project.</center>
+			</div>
+		</div>
+    </div>
+
+    <!-- dynamically load mathjax for compatibility with self-contained -->
+    <script>
+        (function () {
+          var script = document.createElement("script");
+          script.type = "text/javascript";
+          script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+          document.getElementsByTagName("head")[0].appendChild(script);
+        })();
+    </script>
+
+</body>
+</html>

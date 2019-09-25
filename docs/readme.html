@@ -19,55 +19,37 @@
 	</head>
 
 <body>
-	<div class="pure-g" id="nav_row">
+	<div class="pure-g" id="desktop_nav">
 		<div class="pure-u-3-24" id="margin"></div>
-		<div class="pure-u-18-24" id="nav_col">
-			<a href="#"><img class="pure_img" id="logo_nav" src="img/favicon.png"></a>
-			<a class="title" href="index.html">Referee</a>
-			<div class="pure-menu pure-menu-horizontal" id="nav_bar">
-				<ul class="pure-menu-list" id="nav_list">
-					<li class="pure-menu-item"><a href="index.html" class="nav_link">About</a></li>
-                    <li class="pure-menu-item"><a href="calcs.html" class="nav_link">Calculations</a></li>
-                    <li class="pure-menu-item"><a href="#" class="nav_link" id="active">README</a></li>
-					<li class="pure-menu-item"><a href="walkthrough.html" class="nav_link">Walkthrough</a></li>
-					<li class="pure-menu-item"><a href="https://github.com/gwct/referee/releases/latest" target="_blank" class="nav_link">Download</a></li>
-					<!-- <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-						<a href="#" id="menuLink1" class="pure-menu-link">Examples</a>
-							<ul class="pure-menu-children">
-								<li class="pure-menu-item"><a href="grampa/example1.html" class="pure-menu-link">Identify mode of polyploidy</a></li>
-								<li class="pure-menu-item"><a href="grampa/example2.html" class="pure-menu-link">Place WGD on phylogeny</a></li>
-								<li class="pure-menu-item"><a href="grampa/example3.html" class="pure-menu-link">Count duplications and losses</a></li>
-							</ul>
-					</li>
-					<li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-						<a href="#" id="menuLink1" class="pure-menu-link">Results</a>
-							<ul class="pure-menu-children">
-								<li class="pure-menu-item"><a href="grampa/results/yeast/yeast.html" class="pure-menu-link">Baker's Yeast</a></li>
-								<li class="pure-menu-item"><a href="grampa/results/wheat/wheat_all.html" class="pure-menu-link">Bread Wheat</a></li>
-								<li class="pure-menu-item"><a href="grampa/performance.html" class="pure-menu-link">Performance</a></li>
-							</ul>
-					</li> -->
-					<li class="pure-menu-item"><a href="links.html" class="nav_link">Other links</a></li>
-				</ul>
-
-				<div class="mobile_dropdown" id="mobile_nav">
-					<a href="#" id="nav_link_dropdown">Navigation</a>
-					<div class="mobile_dropdown_links">
-						<ul class="pure-menu-list">
-							<li><a href="index.html" class="mobile_nav_link">About</a></li>
-                            <li><a href="calcs.html" class="mobile_nav_link">Calculations</a></li>
-                            <li><a href="#" class="mobile_nav_link" id="active_drop">README</a></li>
-							<li><a href="walkthrough.html" class="mobile_nav_link">Walkthrough</a></li>
-							<li><a href="https://github.com/gwct/referee/releases/latest" target="_blank" class="mobile_nav_link">Download</a></li>
-							<li><a href="links.html" class="mobile_nav_link">Other links</a></li>
-					</div>
-				</div>				
-			</div>
-		</div>
-		<div class="pure-u-3-24" id="margin"></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="index.html"><img class="pure_img" id="logo_nav" src="img/ref-logo-2.png"></a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="index.html" class="nav_link">About</a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="calcs.html" class="nav_link">Calculations</a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="scores.html" class="nav_link">Scores</a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="#" class="nav_link" id="active">README</a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="walkthrough.html" class="nav_link">Walkthrough</a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="https://github.com/gwct/referee/releases/latest" target="_blank" class="nav_link">Download</a></div>
+		<div class="pure-u-2-24" id="nav_link_cell"><a href="links.html" class="nav_link">Other links</a></div>
+		<div class="pure-u-5-24" id="margin"></div>
 	</div>
 
-	<div class="pure-g"><div class="pure-u-1" id="divider_row"></div></div>
+	<div class="pure-g" id="mobile_nav">
+		<div class="pure-u-24-24 dropdown" id="nav_link_cell">
+			<a href="#" class="nav_link"><img class="pure_img" id="mobile_logo_nav" src="img/ref-logo-mobile.png"></a>
+			<div class="dropdown_container mobile_drop">
+				<ul class="pure-menu-list">
+					<li><a href="index.html" id="mobile_nav_link">About</a></li>
+					<li><a href="calcs.html" id="mobile_nav_link">Calculations</a></li>
+					<li><a href="scores.html" id="mobile_nav_link">Scores</a></li>
+					<li><a href="#" id="mobile_nav_link">README</a></li>
+					<li><a href="walkthrough.html" id="mobile_nav_link">Walkthrough</a></li>	
+					<li><a href="https://github.com/gwct/referee/releases/latest" target="_blank" id="mobile_nav_link">Download</a></li>
+					<li><a href="links.html" id="mobile_nav_link">Other links</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<!-- <div class="pure-g"><div class="pure-u-1" id="divider_row"></div></div> -->
 
 	<div class="pure-g" id="main_row">
 		<div class="pure-u-3-24" id="margin"></div>
@@ -283,32 +265,6 @@ GGTGTAGCCAGAGAGTAAANAATATGGTGAAGCCAGAGAG
                             </tbody>
                         </table>
 
-                    </br><div class="readme_divider"></div>
-                    <h2>Referee's scores</h2>
-                    <p><strong>Referee's scores in output files will range from -2 to 91.</strong></p>
-
-                    <p>Since Referee's score is <a href="calcs.html">a ratio of probabilities</a>, theoretically any score from -infinity to +infinity 
-                        is possible. However, in practice scores tend to be limited to -300 to +300. Positive scores indicate support for the called 
-                        reference base while negative scores indicate more support for some other base.</p>
-
-                    <p>We cap Referee's scores from 0 to 90. This means that all sites that score negative are converted to a score of 0, and any sites
-                        that score higher than 90 simply get a score of 90. This scaling is practical because it makes scores easily interpratable and
-                        allows for the converstion to ASCII characters in the FASTQ output.</p>
-                        
-                    <p>However, here are several scenarios where the scoring calculation is impossible. We have reserved some scores for these situations.
-
-                        <center><table class="pure-table pure-table-striped">
-                            <thead><tr><th>Scenario</th><th>Score</th></tr></thead>
-                            <tbody>
-                                <tr><td>The sum of the genotype likelihoods that do not contain the reference base is 0</td> <td>91</td></tr>
-                                <tr><td>The reference base is called as N</td> <td>-1</td></tr>
-                                <tr><td>No reads mapped to this site</td> <td>-2</td></tr>
-                            </tbody>
-                        </table></center>
-                    </p>
-
-                    <p>For the case of the reference base being called as N, Referee can calculate the highest scoring base and report 
-                        it with the <code>--correct</code> option.</p>
             </div>
 		</div>
 		<div class="pure-u-3-24" id="margin"></div>
