@@ -11,7 +11,7 @@
 # Version 1.1.2: September 27, 2019
 01) Added and error message when trying to read .gz compressed FASTA reference file.
 02) Added maxmimum input file size of 100GB to input -gl files to prevent users from duplicating large files and having intractable run times.
-03) Added the ref_split.sh helper script to aid users that need to split large BAM files by scaffold.
+03) Added the bam_split.sh and tab_split.sh helper scripts to aid users that need to split large BAM, pileup, or ANGSD files by scaffold.
 
 # PREVIOUS:
 # Version 1.1.1: September 24, 2019

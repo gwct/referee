@@ -10,7 +10,7 @@ display_usage() {
 # Usage message for -h
 	echo "Usage:"
     echo
-    echo "ref_split.sh -b <BAM file> -f <reference FASTA file> -r <1> -a -p -h"
+    echo "bam_split.sh -b <BAM file> -f <reference FASTA file> -r <1> -a -p -h"
     echo
     echo "Options:"
     echo "-b: (required) The full, sorted and indexed BAM file with reads mapped back to the assembly."
@@ -26,11 +26,11 @@ display_usage() {
     echo "03: ANGSD (required with -a; http://popgen.dk/angsd/index.php/Installation)"
     echo
     echo "This script will create the following directories and files:"
-    echo "01: refsplit-scaffold-list.txt -> A list of scaffolds in the input BAM file."
-    echo "02: refsplit-bam/ -> A directory to which the split BAM files will be written."
-    echo "03: refsplit-pileup/ -> If -p is specified, the split pileup files will be written here."
+    echo "01: bamsplit-scaffold-list.txt -> A list of scaffolds in the input BAM file."
+    echo "02: bamsplit-bam/ -> A directory to which the split BAM files will be written."
+    echo "03: bamsplit-pileup/ -> If -p is specified, the split pileup files will be written here."
     echo "04: referee-pileup-input.txt -> If -p is specified, this file will have the paths to the split pileup files for Referee's -i flag."
-    echo "05: refsplit-angsd/ -> If -a is specified, the ANGSD output files on the split BAMs will be written here."
+    echo "05: bamsplit-angsd/ -> If -a is specified, the ANGSD output files on the split BAMs will be written here."
     echo "06: referee-angsd-input.txt -> If -a is specified, this file will have the paths to the split ANGSD output files for Referee's -i flag."
     echo "================================================="
     exit 0
@@ -71,7 +71,7 @@ bamfile=false
 fasta=false
 pileup=false
 angsd=false
-scafffile="refsplit-scaffold-list.txt"
+scafffile="bamsplit-scaffold-list.txt"
 procs=1
 # Defaults
 
@@ -98,24 +98,24 @@ fi
 # fi
 # Check to make sure only ANGSD or pileup has been specified as a run mode.
 
-echo "STEP 01: GETTING LIST OF ALL SCAFFOLDS IN BAM FILE: refsplit-scaffold-list.txt"
-samtools idxstats $bamfile | cut -f 1 | tail -n10 | grep -v "*" > $scafffile
+echo "STEP 01: GETTING LIST OF ALL SCAFFOLDS IN BAM FILE: bamsplit-scaffold-list.txt"
+samtools idxstats $bamfile | cut -f 1 | grep -v "*" > $scafffile
 # Get a list of all scaffolds in the BAM file
 
 echo
 echo "STEP 02: SPLITTING BAM FILE BY SCAFFOLD"
-mkdir "refsplit-bam"
+mkdir "bamsplit-bam"
 if [ $procs == 1 ]; then
     while read scaff; do
         echo "SPLIT BAM: " $scaff
-        samtools view $bamfile -b -o refsplit-bam/$scaff.bam $scaff
+        samtools view $bamfile -b -o bamsplit-bam/$scaff.bam $scaff
     done < "$scafffile"
 # Serial
 else
     echo
     echo "SPLITTING BAM WITH GNU PARALLEL"
     echo
-    cat $scafffile | parallel --progress --eta -j $procs "samtools view $bamfile -b -o refsplit-bam/{.}.bam {.}"
+    cat $scafffile | parallel --progress --eta -j $procs "samtools view $bamfile -b -o bamsplit-bam/{.}.bam {.}"
 # Parallel
 fi
 # Split the BAM file by scaffold
@@ -124,24 +124,24 @@ fi
 if [ "$pileup" = true ]; then
     echo
     echo "STEP 3A: RUNNING PILEUP ON SPLIT BAMS"
-    mkdir "refsplit-pileup"
+    mkdir "bamsplit-pileup"
     if [ $procs == 1 ]; then
         while read scaff; do
             echo "PILEUP: " $scaff
-            samtools mpileup -d 999999999 -f $fasta -Q 0 -s -B -o refsplit-pileup/$scaff.pileup refsplit-bam/$scaff.bam
+            samtools mpileup -d 999999999 -f $fasta -Q 0 -s -B -o bamsplit-pileup/$scaff.pileup bamsplit-bam/$scaff.bam
         done < "$scafffile"   
     # Serial
     else
         echo
         echo "RUNNING PILEUP WITH GNU PARALLEL"
         echo
-        cat $scafffile | parallel --progress --eta -j $procs "samtools mpileup -d 999999999 -f $fasta -Q 0 -s -B -o refsplit-pileup/{.}.pileup refsplit-bam/{.}.bam"
+        cat $scafffile | parallel --progress --eta -j $procs "samtools mpileup -d 999999999 -f $fasta -Q 0 -s -B -o bamsplit-pileup/{.}.pileup bamsplit-bam/{.}.bam"
     fi
     # Parallel
     # Run pileup on the split BAMs
 
-    echo "-> GENERATIONG referee-pileup-input.txt"
-    ls -d -1 "$PWD/refsplit-pileup/"*.pileup > referee-pileup-input.txt
+    echo "-> GENERATING referee-pileup-input.txt"
+    ls -d -1 "$PWD/bamsplit-pileup/"*.pileup > referee-pileup-input.txt
     # Create the referee input file.
 fi
 # If pileup is specified to run
@@ -150,24 +150,24 @@ fi
 if [ "$angsd" = true ]; then
     echo
     echo "STEP 3B: RUNNING ANGSD ON SPLIT PILEUPS"
-    mkdir "refsplit-angsd"
+    mkdir "bamsplit-angsd"
     if [ $procs == 1 ]; then
         while read scaff; do
             echo "ANGSD " $scaff
-            angsd -GL 2 -i refsplit-bam/$scaff.bam -ref $fasta -minQ 0 -doGlf 4 -out refsplit-angsd/$scaff-angsd
+            angsd -GL 2 -i bamsplit-bam/$scaff.bam -ref $fasta -minQ 0 -doGlf 4 -out bamsplit-angsd/$scaff-angsd
         done < "$scafffile"   
     # Serial
     else
         echo
         echo "RUNNING ANGSD WITH GNU PARALLEL"
         echo
-        cat $scafffile | parallel --progress --eta -j $procs "angsd -GL 2 -i refsplit-bam/{.}.bam -ref $fasta -minQ 0 -doGlf 4 -out refsplit-angsd/{.}-angsd"
+        cat $scafffile | parallel --progress --eta -j $procs "angsd -GL 2 -i bamsplit-bam/{.}.bam -ref $fasta -minQ 0 -doGlf 4 -out bamsplit-angsd/{.}-angsd"
     fi
     # Parallel
     # Run ANGSD on the split BAM files
 
     echo "-> GENERATING referee-angsd-input.txt"
-    ls -d -1 "$PWD/refsplit-angsd/"*-angsd.glf.gz > referee-angsd-input.txt
+    ls -d -1 "$PWD/bamsplit-angsd/"*-angsd.glf.gz > referee-angsd-input.txt
     # Get the list of ANGSD output files with full paths
 fi
 # If ANGSD is specified to run
