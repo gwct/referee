@@ -1,18 +1,27 @@
 # These are the major changes and updates. For build specific changes (which are too numerous to document manually), check the commits on github.
 
 # TODO:
-1) Implement a check for headers in external genotype likelihood files such that if headers aren't present in the right order, the program exits and tell sthe user to add them.
+1) Implement a check for headers in external genotype likelihood files such that if headers aren't present in the right order, the program exits and tells the user to add them.
+2) Improve the multiprocessing procedure such that 1) the input file is read through only once and 2) duplicates of the input file are not created.
 
 # DEVELOPMENT:
 
 
 # CURRENT:
+# Version 1.1.2: September 27, 2019
+01) Added and error message when trying to read .gz compressed FASTA reference file.
+02) Added maxmimum input file size of 100GB to input -gl files to prevent users from duplicating large files and having intractable run times.
+03) Added the ref_split.sh helper script to aid users that need to split large BAM files by scaffold.
+
+# PREVIOUS:
+# Version 1.1.1: September 24, 2019
+01) Fixed a bug where all scores output would be -2 after encountering a site with no reads mapped in a pileup file. Thanks to @reedacartwright.
+
 # Version 1.1: August 31, 2019
 01) Implemented the --haploid option to score genomes from haploid species.
 02) Fixed the order of operations for the probability calcs with mapping quality.
 03) Updated unichr to chr for python 3.
 
-# PREVIOUS:
 # Version 1.0: April 18, 2019
 01) First official release coincides with publication. No major changes, cleaned up repository.
 

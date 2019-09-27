@@ -186,10 +186,17 @@ def refCalc(file_item):
     file_num, file_info, globs = file_item;
     calc_rq_flag = True;
 
+    reader = RC.getFileReader(file_info['in']);
+    if reader == open:
+        lread = lambda l : l.strip().split("\t");
+    else:
+        lread = lambda l : l.decode().strip().split("\t");
+
     last_scaff = "";
     with open(file_info['out'], "w") as outfile:
-        for line in RC.getFileReader(file_info['in'])(file_info['in']):
-            line = line.strip().split("\t");
+        for line in reader(file_info['in']):
+            line = lread(line);
+
             scaff, pos = line[0], int(line[1]);
             cor_ref, cor_score, cor_raw, raw_score, gls = "NA", "NA", "NA", "NA", "NA";
 

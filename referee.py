@@ -19,7 +19,7 @@ def referee(files, globs, step_start_time):
 		step_start_time = RC.report_stats(globs, "Index ref fasta", step_start=step_start_time);
 	# Initialize the stats output if --stats is set
 
-	globs['ref'] = RC.fastaReadInd(globs['reffile']);
+	globs['ref'] = RC.fastaReadInd(globs['reffile'], globs);
 	# Index the reference FASTA file.
 
 	if globs['pileup']:

@@ -19,7 +19,7 @@ def optParse(globs):
 
 	parser.add_argument("-ref", dest="ref_file", help="The FASTA assembly to which you have mapped your reads.", default=False);
 	parser.add_argument("-gl", dest="gl_file", help="The file containing the genotype likelihood calculations or a pileup file (be sure to set --pileup!).", default=False);
-	parser.add_argument("-i", dest="input_list", help="A file containing the paths to multiple input files containing genotype likelihoods and their reference FASTA files. Each line should contain one genotype likelihood file path and one FASTA file path separated by a tab. If --pileup is set, this file should contain paths to pileup files.", default=False);
+	parser.add_argument("-i", dest="input_list", help="A file containing the paths to multiple input files containing genotype likelihoods and their reference FASTA files. Each line should contain one genotype likelihood file path or one pileup file path.", default=False);
 	# Inputs
 	parser.add_argument("-o", dest="out_dest", help="A PREFIX name for the output files/directories. Default: referee-out-[date]-[time]", default=False);
 	# Output
@@ -174,7 +174,10 @@ def optParse(globs):
 	else:
 	# If the input method is -gl
 		if not os.path.isfile(args.gl_file):
-			RC.errorOut(10, "Cannot find genotype likelihood file specified by -gl.", globs);
+			RC.errorOut(10, "Cannot find input file specified by -gl.", globs);
+		if os.path.getsize(args.gl_file) > globs['maxsize']:
+			RC.errorOut("TMP1", "Single file input size limit is 100GB. Please split the input file by scaffold to avoid intractable run times. See helper-scripts/ref_split.sh for help!", globs)
+
 		globs['infile'] = args.gl_file;
 		globs['intype'] = "Single file";
 		# Check if the genotype likelihood file is a valid file.

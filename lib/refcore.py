@@ -185,6 +185,8 @@ def endProg(globs):
 	printWrite(globs['logfilename'], globs['log-v'], "#\n# Done!");
 	printWrite(globs['logfilename'], globs['log-v'], "# The date and time at the end is: " + getDateTime());
 	printWrite(globs['logfilename'], globs['log-v'], "# Total execution time: " + str(round(totaltime,3)) + " seconds.");
+	printWrite(globs['logfilename'], globs['log-v'], "# Output directory for this run: " + globs['outdir']);
+	printWrite(globs['logfilename'], globs['log-v'], "# Log file for this run: " + globs['logfilename']);
 	printWrite(globs['logfilename'], globs['log-v'], "# =================================================");
 	print("#");
 	sys.exit();
@@ -307,21 +309,32 @@ def mapQCheck(infile):
 
 #############################################################################
 
-def fastaReadInd(i_name):
+def fastaReadInd(i_name, globs):
 # fastaGetFileInd reads a FASTA file and returns a dictionary containing file indexes for each title
 # and sequence with the key:value format as [title start index]:[sequence start index]
 
-	try:
-		gzip_check = gzip.open(i_name).read(1);
-		reader = gzip.open;
-	except:
-		reader = open;
-	# Check if the genotype likelihood file is gzipped, and if so set gzip as the file reader. Otherwise, read as a normal text file.
-	# MAKE SURE THIS WORKS WITH GZIPPED FILES!!
+	reader = getFileReader(i_name);
+	if reader != open:
+		errorOut(12, "FASTA indexing requires the reference FASTA (-ref) to be uncompressed. Please gunzip the file and try again.", globs)
 
-	with reader(i_name, "rb") as infile:
+	# if reader == open:
+	# 	freadline = lambda f : f.readline();
+	# else:
+	#	freadline = lambda f : f.readline().decode();
+
+	# try:
+	# 	gzip_check = gzip.open(i_name).read(1);
+	# 	reader = gzip.open;
+    #     #lread = lambda l : l.decode().rstrip();                
+	# except:
+	# 	reader = open;
+		#lread = lambda l : l.rstrip();
+	# Check if the fasta file is gzipped, and if so set gzip as the file reader. Otherwise, read as a normal text file.
+	# Can't get the FASTA indexing to work on .gz files... just going to throw an error if -ref is .gz for now.
+
+	with reader(i_name, "r") as infile:
 		fasta, first, curlist = {}, False, [];
-		line = "derp";
+		line = "blah";
 		while line != '':
 			line = infile.readline();
 			if line[:1] == '>':
@@ -356,7 +369,7 @@ def fastaGet(i_name, inds):
 
 	titlestart, titleend, seqstart, seqend = inds;
 
-	with open(i_name, "rb") as infile:
+	with open(i_name, "r") as infile:
 		infile.seek(titlestart);
 		title = infile.read(titleend - titlestart);
 
