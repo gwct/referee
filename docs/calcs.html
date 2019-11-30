@@ -87,8 +87,15 @@
 
                 <p>To calculate the probability of the mapped base at the current read <span class="math inline">\(b_r\)</span> given each allele in the 
                     genotype <span class="math inline">\(A_i\)</span>, we can use the Phred scaled base quality score <span class="math inline">\(Q_b\)</span> 
-                    and Phred scaled mapping quality score <span class="math inline">\(Q_m\)</span> for that base. First we convert the Phred scaled 
-                    scores into probabilities of error:</p>
+                    and Phred scaled mapping quality score <span class="math inline">\(Q_m\)</span> for that base.</p> 
+                    
+                <h3>An important note: base and mapping quality scores must be Phred-scaled probabilities of error. Be sure to confirm your software produces such scores.
+                    For example, the TopHat and TopHat2 read mapping software 
+                    <a href="http://www.acgt.me/blog/2015/3/17/more-madness-with-mapq-scores-aka-why-bioinformaticians-hate-poor-and-incomplete-software-documentation" target="_blank">
+                        do not produce mapping quality scores that are probabilities of error</a>.
+                    As such, mapping quality from these programs should not be used in conjunction with Referee.</h3>
+                    
+                <p>First we convert the Phred scaled scores into probabilities of error:</p>
 
                 <p><strong>Equation 2 &#8212; Error probability from base quality</strong></p>
                 <p><span class="math display">\[ e = 10^{-\frac{Q}{10}} \]</span></p>
