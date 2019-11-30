@@ -195,7 +195,7 @@ html_template = """
 ######################
 pagefile = "walkthrough.html";
 print("Generating " + pagefile + "...");
-title = "Referee"
+title = "Referee walkthrough"
 
 head = RC.readHead(title);
 nav = RC.readNav(pagefile);

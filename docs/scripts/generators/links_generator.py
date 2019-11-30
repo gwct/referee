@@ -59,7 +59,7 @@ html_template = """
 ######################
 pagefile = "links.html";
 print("Generating " + pagefile + "...");
-title = "Referee"
+title = "Referee links"
 
 head = RC.readHead(title);
 nav = RC.readNav(pagefile);

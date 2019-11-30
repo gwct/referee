@@ -246,7 +246,7 @@ GGTGTAGCCAGAGAGTAAANAATATGGTGAAGCCAGAGAG
 ######################
 pagefile = "readme.html";
 print("Generating " + pagefile + "...");
-title = "Referee"
+title = "Referee README"
 
 head = RC.readHead(title);
 nav = RC.readNav(pagefile);
