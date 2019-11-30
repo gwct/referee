@@ -1,54 +1,22 @@
+############################################################
+# For Referee docs, 11.19
+# This generates the file "walkthrough.html"
+############################################################
 
+import sys, os
+sys.path.append('..')
+import lib.read_chunks as RC
+
+######################
+# HTML template
+######################
+
+html_template = """
 <!doctype html>
-    <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-98263199-2"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'UA-98263199-2');
-    </script>
-
-    <title>Referee</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">	
-    <link type="text/css" rel="stylesheet" href="css/pure.css"  media="screen,projection" />
-    <link type="text/css" rel="stylesheet" href="css/scaffold.css"  media="screen,projection" />
-    <link rel='shortcut icon' href='img/favicon.png' type='image/x-icon'/ >
-</head>
+    {head}
 
 <body>
-    <div class="pure-g" id="desktop_nav">
-    <div class="pure-u-3-24" id="margin"></div>
-    <div class="pure-u-2-24" id="nav_link_cell"><a href="index.html"><img class="pure_img" id="logo_nav" src="img/ref-logo-2.png"></a></div>
-    <div class="pure-u-2-24" id="nav_link_cell"><a href="index.html" class="nav_link">About</a></div>
-    <div class="pure-u-2-24" id="nav_link_cell"><a href="calcs.html" class="nav_link">Calculations</a></div>
-    <div class="pure-u-2-24" id="nav_link_cell"><a href="scores.html" class="nav_link">Scores</a></div>
-    <div class="pure-u-2-24" id="nav_link_cell"><a href="readme.html" class="nav_link">README</a></div>
-    <div class="pure-u-2-24" id="nav_link_cell"><a href="#" class="nav_link" id="active">Walkthrough</a></div>
-    <div class="pure-u-2-24" id="nav_link_cell"><a href="https://github.com/gwct/referee/releases/latest" target="_blank" class="nav_link">Download</a></div>
-    <div class="pure-u-2-24" id="nav_link_cell"><a href="links.html" class="nav_link">Other links</a></div>
-    <div class="pure-u-5-24" id="margin"></div>
-</div>
-
-<div class="pure-g" id="mobile_nav">
-    <div class="pure-u-24-24 dropdown" id="nav_link_cell">
-        <a href="#" class="nav_link"><img class="pure_img" id="mobile_logo_nav" src="img/ref-logo-mobile.png"></a>
-        <div class="dropdown_container mobile_drop">
-            <ul class="pure-menu-list">
-                <li><a href="index.html" id="mobile_nav_link">About</a></li>
-                <li><a href="calcs.html" id="mobile_nav_link">Calculations</a></li>
-                <li><a href="scores.html" id="mobile_nav_link">Scores</a></li>
-                <li><a href="readme.html" id="mobile_nav_link">README</a></li>
-                <li><a href="#" id="mobile_nav_link">Walkthrough</a></li>	
-                <li><a href="https://github.com/gwct/referee/releases/latest" target="_blank" id="mobile_nav_link">Download</a></li>
-                <li><a href="links.html" id="mobile_nav_link">Other links</a></li>
-            </ul>
-        </div>
-    </div>
-</div>
+    {nav}
 
     <div class="pure-g" id="main_row">
 		<div class="pure-u-3-24" id="margin"></div>
@@ -218,13 +186,22 @@
 		<div class="pure-u-3-24" id="margin"></div>
 	</div>
 
-    <div class="pure-g"><div class="pure-u-1" id="divider_row"></div></div>
-<div class="pure-g" id="footer">
-    <div class="pure-u-1">
-        <div id="footer_text">
-            <center>Site designed and maintained by <a href="https://gwct.github.io/index.html" target="_blank">Gregg Thomas</a> | <a href="https://purecss.io/" target="_blank">Pure CSS</a> |
-                Page built: 11/29/2019 21:13:24 MST</center>
-        </div>
-    </div>
-</div>
+    {footer}
 </body>
+"""
+
+######################
+# Main block
+######################
+pagefile = "walkthrough.html";
+print("Generating " + pagefile + "...");
+title = "Referee"
+
+head = RC.readHead(title);
+nav = RC.readNav(pagefile);
+footer = RC.readFooter();
+
+outfilename = "../../" + pagefile;
+
+with open(outfilename, "w") as outfile:
+    outfile.write(html_template.format(head=head, nav=nav, footer=footer));
