@@ -11,8 +11,6 @@ def readNav(active_url):
     navfile = "../html-chunks/nav.html";
     navlines = open(navfile, "r").readlines()
     for x in range(len(navlines)):
-        if "TMPTITLE" in navlines[x]:
-            navlines[x] = navlines[x].replace("TMPTITLE", title);
         if active_url in navlines[x]:
             navlines[x] = navlines[x].replace(active_url, "#");
             if 'class="nav_link"' in navlines[x]:
