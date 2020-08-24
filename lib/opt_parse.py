@@ -16,14 +16,16 @@ def optParse(globs):
 	# Check if psutil is installed for memory usage stats.
 
 	parser = argparse.ArgumentParser(description="Referee: Reference genome quality scoring.");
-
 	parser.add_argument("-ref", dest="ref_file", help="The FASTA assembly to which you have mapped your reads.", default=False);
 	parser.add_argument("-gl", dest="gl_file", help="The file containing the genotype likelihood calculations or a pileup file (be sure to set --pileup!).", default=False);
-	parser.add_argument("-i", dest="input_list", help="A file containing the paths to multiple input files containing genotype likelihoods and their reference FASTA files. Each line should contain one genotype likelihood file path or one pileup file path.", default=False);
+	#parser.add_argument("-i", dest="input_list", help="A file containing the paths to multiple input files containing genotype likelihoods and their reference FASTA files. Each line should contain one genotype likelihood file path or one pileup file path.", default=False);
 	# Inputs
-	parser.add_argument("-o", dest="out_dest", help="A PREFIX name for the output files/directories. Default: referee-out-[date]-[time]", default=False);
+	parser.add_argument("-d", dest="outdir", help="An output directory for all files associated with this run. Will be created if it doesn't exist. Default: referee-[date]-[time]", default=False);
+	parser.add_argument("-prefix", dest="prefix", help="A prefix for all files associated with this run. Default: referee-[date]-[time]", default=False);
+	parser.add_argument("--overwrite", dest="overwrite", help="Set this option to explicitly overwrite files within a previous output directory.", action="store_true", default=False);
 	# Output
 	parser.add_argument("-p", dest="processes", help="The number of processes Referee should use. Default: 1.", default=False);
+	parser.add_argument("-l", dest="lines_per_proc", help="The number of lines to be read per process. Decreasing may reduce memory usage at the cost of slightly higher run times. Default: 100000.", default=False);
 	# User params
 	parser.add_argument("--pileup", dest="pileup_flag", help="Set this option if your input file(s) are in pileup format and Referee will calculate genotype likelihoods for you.", action="store_true", default=False);
 	parser.add_argument("--fastq", dest="fastq_flag", help="Set this option to output in FASTQ format in addition to the default tab delimited format.", action="store_true", default=False);
@@ -35,7 +37,8 @@ def optParse(globs):
 	parser.add_argument("--raw", dest="raw_flag", help="Set this flag to output the raw score as the fourth column in the tabbed output.", action="store_true", default=False);
 	parser.add_argument("--quiet", dest="quiet_flag", help="Set this flag to prevent Referee from reporting detailed information about each step.", action="store_true", default=False);
 	parser.add_argument("--version", dest="version_flag", help="Simply print the version and exit. Can also be called as '-version', '-v', or '--v'", action="store_true", default=False);
-	# User options	
+	# User options
+	parser.add_argument("--norun", dest="norun", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--allcalcs", dest="allcalc_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--debug", dest="debug_opt", help=argparse.SUPPRESS, action="store_true", default=False);
 	parser.add_argument("--nolog", dest="nolog_opt", help=argparse.SUPPRESS, action="store_true", default=False);
@@ -45,9 +48,6 @@ def optParse(globs):
 	args = parser.parse_args();
 	# The input options and help messages
 
-	if args.out_dest:
-		globs['logfilename'] = args.out_dest + ".log";
-
 	if args.score_opt in [1,2]:
 		globs['method'] = args.score_opt;
 	else:
@@ -56,49 +56,53 @@ def optParse(globs):
 		globs['debug'] = True;
 	if args.nolog_opt:
 		globs['log-v'] = -1;
+	if args.norun:
+		globs['norun'] = True;
 	# Hidden test options
 
-	if not args.input_list and not args.gl_file:
-		RC.errorOut(1, "No input method specified. Make sure one input method (either just -i or -gl) is specified.", globs);
-	if args.input_list and args.gl_file:
-		RC.errorOut(2, "Only one input method (-i or -gl) should be specified.", globs);
-	# Make sure at least one and only one input method has been specified (either -i or -gl).
+	if not args.gl_file or not os.path.isfile(args.gl_file):
+		RC.errorOut("OP1", "Cannot find input file! A genotype likelihood or pileup file is required (-i).", globs);
+	globs['in-file'] = args.gl_file
+	# Check input file.
 
-	if not args.ref_file:
-		RC.errorOut(3, "A reference genome in FASTA format must be provided with -ref", globs);
-	elif not os.path.isfile(args.ref_file):
-		RC.errorOut(4, "Cannot find reference genome FASTA file: " + args.ref_file, globs);
-	else:
-		globs['reffile'] = args.ref_file;
-	# Check reference genome fasta file path.
+	if not args.ref_file or not os.path.isfile(args.ref_file):
+		RC.errorOut("OP2", "Cannot find reference file! A genome file in FASTA format is required (-r).", globs);
+	globs['ref-file'] = args.ref_file;
+	# Check reference genome fasta file.
 
-	if args.processes and not args.processes.isdigit():
-		RC.errorOut(5, "-p must be an integer value greater than 1.", globs);
-	elif args.processes:
-		globs['num-procs'] = int(args.processes);
+	globs['num-procs'] = RC.isPosInt(args.processes);
+	if not globs['num-procs']:
+		RC.errorOut("OP3", "-p must be an integer value greater than 1.", globs);
 	# Checking the number of processors option.
 
+	if args.lines_per_proc:
+		globs['lines-per-proc'] = RC.isPosInt(args.lines_per_proc);
+		if not globs['lines-per-proc']:
+			RC.errorOut("OP4", "-l must be an integer value greater than 1.", globs);
+	globs['chunk-size'] = globs['num-procs'] * globs['lines-per-proc'];
+	# Checking the lines per proc option and then setting the chunk size based on that and the number of procs.
+
 	if args.fastq_flag:
-		globs['fastq'] = True;
+		globs['fastq-opt'] = True;
 	# Checking the fastq option.
 
 	if args.bed_flag:
-		globs['bed'] = True;
+		globs['bed-opt'] = True;
 	# Checking the BED option.
 
 	if args.mapped_flag:
 		if args.fastq_flag or args.bed_flag:
-			RC.errorOut(6, "Cannot output to --fastq or --bed when only doing --mapped positions. Pick one.", globs);
+			RC.errorOut("OP5", "Cannot output to --fastq or --bed when only doing --mapped positions. Pick one.", globs);
 			# Raise error if both --fastq or --bed and --mapped are selected. FASTQ output without all positions would be confusing.
 		else:
-			globs['mapped'] = True;
+			globs['mapped-only-opt'] = True;
 	# Checking the mapped option.
 
 	if args.haploid_flag:
 		if not args.pileup_flag:
-			RC.errorOut(7, "Please provide a --pileup file for internal genotype likelihood calculations when input data is --haploid.", globs);
+			RC.errorOut("OP6", "Please provide a --pileup file for internal genotype likelihood calculations when input data is --haploid.", globs);
 			# Raise error if haploid is set without pileup input.
-		globs['haploid'] = True;
+		globs['haploid-opt'] = True;
 		globs['genotypes'] = globs['haploid-gt'];
 	# Checking the haploid option.
 
@@ -111,175 +115,228 @@ def optParse(globs):
 	# Checking the raw score option.
 
 	if args.allcalc_opt:
-		globs['allcalc'] = True;
-		globs['fastq'] = False;
+		globs['allcalc-opt'] = True;
+		#globs['fastq-opt'] = False;
 	# Allcalc option (hidden)
 
 	if args.pileup_flag:
-		globs['pileup'] = True;
+		globs['pileup-opt'] = True;
 		if args.mapq_flag:
-			globs['mapq'] = True;
+			globs['mapq-opt'] = True;
 	# Pileup option
 
-	if args.quiet_flag:
-		globs['stats'] = False;
-		step_start_time = "";
-
-	file_paths, file_num = {}, 1;
-	# Variables to store the file info.
-	if args.input_list:
-	# If the input method is -i
-		if not os.path.isfile(args.input_list):
-			RC.errorOut(8, "Cannot find file specified by -i.", globs);
-		globs['infile'] = args.input_list;
-		globs['intype'] = "List of files";
-		# Make sure we can find the input file.
-
-		if not args.out_dest:
-			globs['outdir'] = "referee-out-" + globs['startdatetime'] + RC.getRandStr();
-		else:
-			globs['outdir'] = args.out_dest;
-		# Specifiy the output directory, if necessary.
-
-		if globs['bed']:
-			globs['beddir'] = os.path.join(globs['outdir'], "bed-files");
-		# Specifiy the BED directory, if necessary.			
-
-#		if globs['stats']:
-#			step_start_time  = RC.report_stats(globs, "Reading input", step_start=step_start_time);
-#		else:
-		print("# Reading input file paths...");
-		for line in open(args.input_list):
-			cur_gl_file = line.strip();
-			if not cur_gl_file:
-				continue;
-			# Skip the line if its empty.
-
-			if not os.path.isfile(cur_gl_file):
-				RC.errorOut(9, "Invalid file path found in input file: " + cur_gl_file, globs);
-			basename = os.path.splitext(os.path.basename(cur_gl_file));
-			if basename[1] == '.gz':
-				basename = os.path.splitext(basename[0])[0];
-			else:
-				basename = basename[0];
-
-			cur_outfiletab = os.path.join(globs['outdir'], basename + "-out.txt");
-			cur_outfiletmp = os.path.join(globs['outdir'], basename + "-" + globs['startdatetime'] + "-" + RC.getRandStr() + ".tmp");
-			cur_outfilefq = os.path.join(globs['outdir'], basename + ".fq");
-
-			file_paths[file_num] = { 'in' : cur_gl_file, 'out' : cur_outfiletab, 'tmpfile' : cur_outfiletmp, 'outfq' : cur_outfilefq };
-			file_num += 1;
-		# Read the input file and get all the file paths. Also specify output file paths.
-
+	if not args.prefix:
+		globs['out-prefix'] = "referee-" + globs['startdatetime'];
 	else:
-	# If the input method is -gl
-		if not os.path.isfile(args.gl_file):
-			RC.errorOut(10, "Cannot find input file specified by -gl.", globs);
-		if os.path.getsize(args.gl_file) > globs['maxsize']:
-			RC.errorOut("TMP1", "Single file input size limit is 100GB. Please split the input file by scaffold to avoid intractable run times. See helper-scripts/ref_split.sh for help!", globs)
+		globs['out-prefix'] = args.prefix;
+	# Get the output prefix
+	
+	if not args.outdir:
+		args.outdir = globs['out-prefix'];
 
-		globs['infile'] = args.gl_file;
-		globs['intype'] = "Single file";
-		# Check if the genotype likelihood file is a valid file.
+	if not os.path.isdir(args.outdir):
+		os.system("mkdir " + args.outdir);
+	elif os.path.isdir(args.outdir) and not args.overwrite:
+		RC.errorOut("OP7", "Output directory already exists. Please specify --overwrite if you wish to overwrite the previous referee files within.", globs);
+	globs['out-dir'] = args.outdir;
+	# Output directory
 
-		if not args.out_dest:
-			outfiletab = "referee-out-" + globs['startdatetime'] + RC.getRandStr() + ".txt";
-			outfiletmp = "referee-tmp-" + globs['startdatetime'] + RC.getRandStr() + ".tmp";
-			outfilefq = "referee-out-" + globs['startdatetime'] + RC.getRandStr() + ".fq";
-			if globs['bed']:
-				globs['beddir'] = "referee-bed-files-" + globs['startdatetime'] + RC.getRandStr()
-			globs['out'] = "referee-out-[start datetime]-[random string]";
-		else:
-			outfiletab = args.out_dest + ".txt";
-			outfiletmp = args.out_dest + "-tmp-" + globs['startdatetime'] + "-" + RC.getRandStr() + ".tmp";
-			outfilefq = args.out_dest + ".fq";
-			if globs['bed']:
-				globs['beddir'] = args.out_dest + "-bed-files";
-			globs['out'] = args.out_dest;
-		# Specify the output files.
+	globs['out-tab'] = os.path.join(globs['out-dir'], globs['out-prefix'] + ".txt");
+	if globs['fastq-opt']:
+		globs['out-fq']  = os.path.join(globs['out-dir'], globs['out-prefix'] + ".fq");
+	if globs['bed-opt']:
+		globs['bed-dir'] = os.path.join(globs['out-dir'], globs['out-prefix'] + "-bed");
+		if not os.path.isdir(globs['bed-dir']):
+			os.system("mkdir " + globs['bed-dir']);
+	#globs['out'] = "referee-out-[start datetime]-[random string]";
+	# Output files
 
-		file_paths[file_num] = { 'in' : args.gl_file, 'out' : outfiletab, 'tmpfile' : outfiletmp, 'outfq' : outfilefq };
-	# Get the file paths for the current files.
+	globs['logfilename'] = os.path.join(globs['out-dir'], globs['out-prefix'] + ".log");
+	globs['endprog'] = True;
+	# Log file
 
-	if globs['pileup'] and globs['mapq']:
-		for file_num in file_paths:
-			if not RC.mapQCheck(file_paths[file_num]['in']):
-				RC.errorOut(11, "--mapq is set, but couldn't find mapping qualities on the first line of a file: " + file_paths[file_num]['in'], globs);
+	ref_index = args.ref_file + ".fai"
+	if os.path.isfile(ref_index):
+		globs['ref-index'] = ref_index;
+	# Check if there is an index for the reference FASTA file, which makes getting the scaffold lengths much quicker in some cases.
 
-	RC.startProg(globs);
+	if args.quiet_flag:
+		globs['quiet'] = True;
+		globs['log-v'] = 3;
+	# Set the verbosity if the --quiet option is specified.
+
+	if globs['pileup-opt'] and globs['mapq-opt']:
+		if not RC.mapQCheck(globs['in-file']):
+			RC.errorOut("OP8", "--mapq is set, but couldn't find mapping qualities on the first line of the input file: " + globs['infile'], globs);
+	# Make sure the pileup file input has a mapping quality column if --mapq is specified as well.
+
+	if globs['psutil']:
+		globs['pids'] = [psutil.Process(os.getpid())];
+	# Get the starting process ids to calculat memory usage throughout.
+
+	startProg(globs);
 	# After all the essential options have been set, call the welcome function.
-	if globs['stats']:
-		if globs['psutil']:
-			globs['pids'] = [psutil.Process(os.getpid())];	
-		globs['stats'] = True;
-		step_start_time = RC.report_stats(globs, stat_start=True);
-	# Initializing the stats options if --quiet is not set.
 
-	return file_paths, globs, step_start_time;
+	return globs;
 
 #############################################################################
 
-def multiSplit(files, globs):
-# Given a file and a number of splits (in this case, the number of processors), this function splits
-# the file into files with equal numbers of lines.
-	import math
 
-	file_info = files[1];
-	#infilename, reffilename, outfilename, scaffs, globs = files[1];
-	RC.printWrite(globs['logfilename'], globs['log-v'],"+ Making tmp directory: " + globs['tmpdir']);
-	os.makedirs(globs['tmpdir']);
-	# Make the temporary directory to store the split files and split outputs.
+def startProg(globs):
+# A nice way to start the program.
+	start_v = 1;
 
-	new_files = {};
-	# The dictionary for the new temporary files.
+	print("#");
+	RC.printWrite(globs['logfilename'], 0, "# Welcome to Referee -- Reference genome quality score calculator.");
+	RC.printWrite(globs['logfilename'], start_v, "# Version " + globs['version'] + " released on " + globs['releasedate']);
+	RC.printWrite(globs['logfilename'], start_v, "# Referee was developed by Gregg Thomas and Matthew Hahn");
+	RC.printWrite(globs['logfilename'], start_v, "# Citation:      " + globs['doi']);
+	RC.printWrite(globs['logfilename'], start_v, "# Website:       " + globs['http']);
+	RC.printWrite(globs['logfilename'], start_v, "# Report issues: " + globs['github']);
+	RC.printWrite(globs['logfilename'], start_v, "#");
+	RC.printWrite(globs['logfilename'], start_v, "# The date and time at the start is: " + RC.getDateTime());
+	RC.printWrite(globs['logfilename'], start_v, "# Using Python version:              " + globs['pyver'] + "\n#");
+	RC.printWrite(globs['logfilename'], start_v, "# The program was called as: " + " ".join(sys.argv) + "\n#");
 
-	tmpfiles = [os.path.join(globs['tmpdir'], str(i) + "-chunk.txt") for i in range(globs['num-procs'])];
-	# Generate the names of the tmp input files.
+	pad = 20;
+	RC.printWrite(globs['logfilename'], start_v, "# " + "-" * 125);
+	RC.printWrite(globs['logfilename'], start_v, "# INPUT/OUTPUT INFO");
+	RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# Input file:", pad) + globs['in-file']);
+	RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# Reference file:", pad) + globs['ref-file']);
+	RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# Output directory:", pad) + globs['out-dir']);
+	RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# Output prefix:", pad) + globs['out-prefix']);
 
-	num_lines = RC.getFileLen(file_info['in']);
-	linespersplit = int(math.ceil(num_lines / float(globs['num-procs'])));
-	# Count the number of lines in the input file and get the number of lines per split.
+	RC.printWrite(globs['logfilename'], start_v, "# " + "-" * 125);
+	RC.printWrite(globs['logfilename'], start_v, "# OPTIONS INFO");	
+	RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# Option", pad) + RC.spacedOut("Current setting", pad) + "Current action");
+	RC.printWrite(globs['logfilename'], start_v, "# " + "-" * 125);
 
-	with RC.getFileReader(file_info['in'])(file_info['in'], "r") as infile:
-		file_lines, file_num = 0, 0;
-		tmpfile = open(tmpfiles[file_num], "w");
-		for line in infile:
-			tmpfile.write(line);
-			file_lines += 1;
-			if file_lines == linespersplit:
-				tmpfile.close();
-				newoutfile = os.path.join(globs['tmpdir'], str(file_num) + "-chunk-out.txt");
-				new_files[file_num] = { 'in' : tmpfiles[file_num], 'out' : newoutfile };
-				file_lines = 0;
-				file_num += 1;
-				if file_num != len(tmpfiles):
-					tmpfile = open(tmpfiles[file_num], "w");
-	# Read through every line in the input file and write it to one of the sub-files, updating the
-	# subfile if we've reached the number of lines per split in that file.
+	if globs['pileup-opt']:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --pileup", pad) + 
+					RC.spacedOut("True", pad) + 
+					"Input type set to pileup. Referee will calculate genotype likelihoods.");
+		if globs['mapq-opt']:
+			RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --mapq", pad) + 
+						RC.spacedOut("True", pad) + 
+						"Incorporating mapping qualities (7th column of pileup file) into quality score calculations if they are present.");
+		else:
+			RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --mapq", pad) + 
+						RC.spacedOut("False", pad) + 
+						"Ignoring mapping qualities in pileup file if they are present.");
+	else:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --pileup", pad) + 
+					RC.spacedOut("False", pad) + 
+					"Input is pre-calculated genotype log likelihoods.");
+		if globs['mapq-opt']:
+			RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --mapq", pad) + 
+						RC.spacedOut("True", pad) +  
+						"--pileup not set. Ignoring --mapq option.");
+	# Reporting the pileup option.
 
-	if len(new_files) != len(tmpfiles):
-		tmpfile.close();
-		newoutfile = os.path.join(globs['tmpdir'], str(file_num) + "-out.txt");
-		new_files[file_num] = { 'in' : tmpfiles[file_num], 'out' : newoutfile };
-	# If the last file has fewer lines than the rest it won't get added in the loop so we add it here.
+	if globs['fastq-opt']:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --fastq", pad) + 
+					RC.spacedOut("True", pad) + 
+					"Writing output in FASTQ format in addition to tab delimited: " + globs['out-fq']);
+	else:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --fastq", pad) + 
+					RC.spacedOut("False", pad) + 
+					"Not writing output in FASTQ format.");
+	# Reporting the fastq option.
 
-	return new_files;
+	if globs['bed-opt']:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --bed", pad) + 
+					RC.spacedOut("True", pad) + 
+					"Writing output in BED format in addition to tab delimited: " + globs['bed-dir']);
+		# Specifiy and create the BED directory, if necessary.
+	else:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --bed", pad) + 
+					RC.spacedOut("False", pad) + 
+					"Not writing output in BED format.");
+	# Reporting the fastq option.
+
+	if globs['mapped-only-opt']:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --mapped", pad) + 
+					RC.spacedOut("True", pad) + 
+					"Only calculating scores for positions with reads mapped to them.");
+	else:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --mapped", pad) + 
+					RC.spacedOut("False", pad) + 
+					"Calculating scores for every position in the reference genome.");
+	# Reporting the mapped option.
+
+	if globs['haploid-opt']:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --haploid", pad) + 
+					RC.spacedOut("True", pad) + 
+					"Calculating genotype likelihoods and quality scores for HAPLOID data (4 genotypes).");
+	else:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --haploid", pad) + 
+					RC.spacedOut("False", pad) + 
+					"Calculating genotype likelihoods and quality scores for DIPLOID data (10 genotypes).");
+	# Reporting the haploid option.
+
+	if globs['raw-opt']:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --raw", pad) + 
+					RC.spacedOut("True", pad) + 
+					"Printing raw Referee score in fourth column of tabbed output.");
+	else:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --raw", pad) + 
+					RC.spacedOut("False", pad) + 
+					"NOT printing raw Referee score in tabbed output.");
+	# Reporting the correct option.		
+
+	if globs['correct-opt']:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --correct", pad) + 
+					RC.spacedOut("True", pad) + 
+					"Suggesting higher scoring alternative base when reference score is negative or reference base is N.");
+	else:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --correct", pad) + 
+					RC.spacedOut("False", pad) + 
+					"Not suggesting higher scoring alternative base when reference score is negative or reference base is N.");
+	# Reporting the correct option.
+
+	if not globs['quiet']:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --quiet", pad) + 
+					RC.spacedOut("False", pad) + 
+					"Step info will be output while Referee is running.");
+	else:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --quiet", pad) + 
+					RC.spacedOut("True", pad) + 
+					"No further information will be output while Referee is running.");
+	# Reporting the correct option.
+
+	RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# -p", pad) + 
+				RC.spacedOut(str(globs['num-procs']), pad) + 
+				"Referee will use this many processes to run.");
+	# Reporting the number of processes specified.
+
+	RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# -l", pad) + 
+			RC.spacedOut(str(globs['lines-per-proc']), pad) + 
+			"This many lines will be read per process to be calculated at one time in parallel");
+	# Reporting the lines per proc option.
+
+	if globs['allcalc-opt']:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --allcalcs", pad) + 
+					RC.spacedOut("True", pad) + 
+					"Using tab delimited output and reporting extra columns.");
+	# Reporting the allcalc option.
+
+	if globs['debug']:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --debug", pad) + 
+					RC.spacedOut("True", pad) + 
+					"Printing out a bit of debug info.");
+	# Reporting the allcalc option.
+
+	if not globs['pileup-opt']:
+		RC.printWrite(globs['logfilename'], start_v, "#\n# " + "-" * 40);
+		RC.printWrite(globs['logfilename'], start_v, "## IMPORTANT!");
+		RC.printWrite(globs['logfilename'], start_v, "## Input columns: Scaffold\tPosition\tAA\tAC\tAG\tAT\tCC\tCG\tCT\tGG\tGT\tTT");
+		RC.printWrite(globs['logfilename'], start_v, "## Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order without headers.");
+		RC.printWrite(globs['logfilename'], start_v, "## Failure to do so will result in inaccurate calculations!!");
+		RC.printWrite(globs['logfilename'], start_v, "# " + "-" * 40 + "\n#");
+	
+	if globs['quiet']:
+		RC.printWrite(globs['logfilename'], start_v, "# " + "-" * 125);
+		RC.printWrite(globs['logfilename'], start_v, "# Running...");
 
 #############################################################################
 
-def mergeFiles(outfile, files, globs):
-# This function merges the tmp output files back into the main output file.
-	import shutil
-	with open(outfile, "w") as out:
-		for file_num in sorted(files.keys()):
-			with open(files[file_num]['out']) as infile:
-				for line in infile:
-					out.write(line);
-	try:
-		RC.printWrite(globs['logfilename'], globs['log-v'],"+ Removing tmp directory and files: " + globs['tmpdir']);
-		shutil.rmtree(globs['tmpdir']);
-	except:
-		RC.printWrite(globs['logfilename'], globs['log-v'],"+ Could not remove tmp directory and files. User can remove manually: " + globs['tmpdir']);
-	# Try to remove the tmp directory and files.
-
-#############################################################################

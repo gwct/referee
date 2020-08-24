@@ -644,3 +644,20 @@
 # #topScores(result_list, 40)
 # #topScores(result_list, 1)
 # ```
+
+
+
+
+
+
+
+		# with mp.Pool(processes=globs['num-procs']) as pool:
+		# 	scaffs = [];
+		# 	for scaff in globs['ref']:
+		# 		scaffs.append(scaff);
+		# 		if len(scaffs) == globs['num-procs']:
+		# 			for result in pool.starmap(RC.getScaffLens, ((scaff, globs) for scaff in scaffs)):
+		# 				#print(result);
+		# 				globs['scaffs'][result[0]] = result[1];
+		# 			scaffs = [];
+		# This is slower for some reason

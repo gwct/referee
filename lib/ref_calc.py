@@ -78,12 +78,11 @@ def calcScore(ref, gls, method):
 
         if l_match == 0:
             raw_score, score, lr = "-Inf", -3, "-Inf";
+        # If the sum of the genotyps that match the called reference base is 0, assign a score of -3. This should never happen.
         elif l_mismatch == 0:
             raw_score, score, lr = "Inf", 91, "Inf";
         # If the sum of the genotypes that don't match the called reference base is 0, assign maximum score.
         # This should scale with read depth somehow, though...
-
-        # If the sum of the genotyps that match the called reference base is 0, assign a score of -3. This should never happen.
         else:
             if method == 1:
                 lr = l_match / l_mismatch;
@@ -103,18 +102,39 @@ def calcScore(ref, gls, method):
     return score, raw_score, lr, l_match, l_mismatch;
 #############################################################################
 
-def correctRef(max_raw, ref, gls, method):
+def correctRef(max_raw, ref, gls, method, s):
 # If the score is negative, or the reference base is N, we can suggest a higher scoring
 # base. This loops through all alternative bases, calculates the quality score, and
 # returns the highest scoring one.
+    #print(max_raw, ref, gls, method)
     max_base = ref;
-    bases = "ATCG";
+    #bases = "ATCG";
+    bases = [ base for base in "ATCG" if base != max_base ];
     for base in bases:
-        if base == max_base:
-            continue;
         score, raw_score, lr, l_match, l_mismatch = calcScore(base, gls, method);
-        if score > max_raw:
+        # if type(score) == str or type(max_raw) == str:
+        #     print(s);
+        #     print(score, type(score));
+        #     print(max_raw, type(max_raw));
+        #     print(gls);
+        # if type(raw_score) == str or type(score) == str:
+        #     print(raw_score, score);
+
+        if raw_score in ["Inf", "-Inf"] or score > max_raw:
+            if raw_score == "Inf":
+                raw_score = 9999999999;
+            if raw_score == "-Inf":
+                raw_score = -9999999999;
             max_base, max_score, max_raw = base, score, raw_score;
+            # if s == "NODE_1017_length_2712_cov_27.225427:607":
+            #     print(ref);
+            #     print(base);
+            #     print(score, type(score));
+            #     print(raw_score);
+            #     print(max_raw, type(max_raw));
+            #     print(gls);
+            #     print("-----")
+
 
     if max_base == ref:
         return "", "", "";
@@ -148,6 +168,11 @@ def glCalc(line, genotypes, log_probs, mapq, haploid):
     # If it is the beginning of the read, we must also removing the following quality score symbol -- \w!\"#$%&'()*+,./:;<=>?@-
     # In regex, . matches ANY CHARACTER but \n
     # Then convert the . and , symbols to the actual base stored in ref
+    # print(line);
+    # print(reads);
+    # print(bqs);
+    # print(mqs);
+
 
     log_gls = {};
     for gt in genotypes:
@@ -167,86 +192,108 @@ def glCalc(line, genotypes, log_probs, mapq, haploid):
                 elif gt[0] != base:
                     log_gls[gt] += log_probs[qual_key][1];
 
+           
             else:
+                
                 if gt[0] == gt[1] and base == gt[0]:
                     log_gls[gt] += log_probs[qual_key][0];
                 elif gt[0] != gt[1] and (base == gt[0] or base == gt[1]):
                     log_gls[gt] += log_probs[qual_key][1];
                 else:
                     log_gls[gt] += log_probs[qual_key][2];
+
+                # print(gt, qual_key, log_gls[gt]);
     # Calculate the genotype likelihood for every genotype given the current reads and probabilities.
 
     #log_gls_scaled = { gt : log_gls[gt] - max(log_gls.values()) for gt in log_gls };
-
     return ref, log_gls;#_scaled;
 #############################################################################
 
-def refCalc(file_item):
+def refCalc(line_chunk, globs):
 # Reads through a genotype likelihood file and calculates a quality scores for each line.
-    file_num, file_info, globs = file_item;
     calc_rq_flag = True;
 
-    reader = RC.getFileReader(file_info['in']);
-    if reader == open:
-        lread = lambda l : l.strip().split("\t");
-    else:
-        lread = lambda l : l.decode().strip().split("\t");
+    # reader = RC.getFileReader(file_info['in']);
+    # if reader == open:
+    #     lread = lambda l : l.strip().split("\t");
+    # else:
+    #     lread = lambda l : l.decode().strip().split("\t");
+
+    #outdicts = {};
+    outdicts = [];
 
     last_scaff = "";
-    with open(file_info['out'], "w") as outfile:
-        for line in reader(file_info['in']):
-            line = lread(line);
+    for line in line_chunk:
+        line = globs['lread'](line);
 
-            scaff, pos = line[0], int(line[1]);
-            cor_ref, cor_score, cor_raw, raw_score, gls = "NA", "NA", "NA", "NA", "NA";
+        scaff, pos = line[0], int(line[1]);
+        site = scaff + ":" + line[1];
+        cor_ref, cor_score, cor_raw, raw_score, gls = "NA", "NA", "NA", "NA", "NA";
 
-            if globs['pileup']:
-            # If the input type is pileup, we calculate the genotype likelihoods here.
-                if line[3] == "0":
-                    ref, rq, lr, l_match, l_mismatch, log_gls = line[3].upper(), -2, "NA", "NA", "NA", "NA";
-                    calc_rq_flag = False;
-                # If no reads have mapped to the site, assign score -2 and skip everything else.
-                else:
-                    ref, log_gls = glCalc(line, globs['genotypes'], globs['probs'], globs['mapq'], globs['haploid']);
-                    calc_rq_flag = True;
-                # Otherwise call the genotype likelihood function.
-
+        if globs['pileup-opt']:
+        # If the input type is pileup, we calculate the genotype likelihoods here.
+            if line[3] == "0":
+                ref, rq, lr, l_match, l_mismatch, log_gls = line[3].upper(), -2, "NA", "NA", "NA", "NA";
+                calc_rq_flag = False;
+            # If no reads have mapped to the site, assign score -2 and skip everything else.
             else:
-            # If the input type is pre-calculated genotype likelihoods, just parse the line and pass it to calcScore.
-                scaff, pos, gl_list = line[0], int(line[1]), line[2:];
-                #gls = { globs['genotypes'][x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
-                log_gls = { globs['genotypes'][x] : float(gl_list[x]) for x in range(len(gl_list)) };
-                # Parse the info from the current line -- scaffold, position, genotype likelihoods.
+                ref, log_gls = glCalc(line, globs['genotypes'], globs['probs'], globs['mapq-opt'], globs['haploid-opt']);
+                calc_rq_flag = True;
+                # print(ref, log_gls);
+            # Otherwise call the genotype likelihood function.
 
-                if last_scaff != scaff:
-                    seq = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1];
-                    last_scaff = scaff;
-                ref = seq[pos-1].upper();
-                # Gets the called reference base at the current position.
+        else:
+        # If the input type is pre-calculated genotype likelihoods, just parse the line and pass it to calcScore.
+            scaff, pos, gl_list = line[0], int(line[1]), line[2:];
+            #gls = { globs['genotypes'][x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
+            log_gls = { globs['genotypes'][x] : float(gl_list[x]) for x in range(len(gl_list)) };
+            # Parse the info from the current line -- scaffold, position, genotype likelihoods.
 
-            if calc_rq_flag:
-                gls = { gt : math.exp(log_gls[gt]) for gt in log_gls };
+            if last_scaff != scaff:
+                seq = RC.fastaGet(globs['ref-file'], globs['ref'][scaff])[1];
+                last_scaff = scaff;
+            ref = seq[pos-1].upper();
+            # Gets the called reference base at the current position.
 
-                rq, raw_score, lr, l_match, l_mismatch = calcScore(ref, gls, globs['method']);
-                # Call the scoring function.
+        if calc_rq_flag:
+            gls = { gt : math.exp(log_gls[gt]) for gt in log_gls };
+            # print(ref, gls);
 
-                if globs['correct-opt'] and rq in [0,-1,-3]:
-                    cor_ref, cor_score, cor_raw = correctRef(raw_score, ref, gls, globs['method']);
-                # With --correct, suggest a better/corrected reference base if the score is negative (0), the reference is undetermined (-1), or no reads support the matching base (-3)
 
-            outdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : ref, 'rq' : rq, 'raw' : raw_score,
-                        'lr' : lr, 'l_match' : l_match, 'l_mismatch' : l_mismatch, 'gls' : gls, 
-                        'cor_ref' : cor_ref, 'cor_score' : cor_score, 'cor_raw' : cor_raw };
-            # Store the info from the current site to be written once returned.
+            rq, raw_score, lr, l_match, l_mismatch = calcScore(ref, gls, globs['method']);
+            # print(rq, raw_score, lr, l_match, l_mismatch);
+            # sys.exit();
+            # Call the scoring function.
 
-            if globs['debug']:
-                for gt in log_gls:
-                   print(gt, log_gls[gt]);
-                print(rq, lr, l_match, l_mismatch);
-            # Debug info
-            
-            OUT.outputTab(outdict, outfile, globs);
-            # Writes the output to the current output file.
+            if globs['correct-opt'] and ref != "N" and rq in [0,-1]:
+                if type(raw_score) == str:
+                    print(site);
+                    print(line);
+                    print(gls);
+                cor_ref, cor_score, cor_raw = correctRef(raw_score, ref, gls, globs['method'], site);
+            # With --correct, suggest a better/corrected reference base if the score is negative (0), the reference is undetermined (-1), or no reads support the matching base (-3)
 
-    return file_num;
+        
+        outdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : ref, 'rq' : rq, 'raw' : raw_score,
+                    'lr' : lr, 'l_match' : l_match, 'l_mismatch' : l_mismatch, 'gls' : gls, 
+                    'cor_ref' : cor_ref, 'cor_score' : cor_score, 'cor_raw' : cor_raw };
+
+        #outdicts[site] = outdict;
+        outdicts.append(outdict);
+        # print(site);
+        # print(outdict);
+        # print(outdicts[site]);
+        # sys.exit();
+        # Store the info from the current site to be written once returned.
+
+        if globs['debug']:
+            for gt in log_gls:
+                print(gt, log_gls[gt]);
+            print(rq, lr, l_match, l_mismatch);
+        # Debug info
+        
+        #OUT.outputTab(outdict, outfile, globs);
+        # Writes the output to the current output file.
+
+    return outdicts;
 #############################################################################

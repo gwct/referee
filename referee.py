@@ -5,88 +5,138 @@
 #
 # Gregg Thomas
 # Fall 2018
+# Summer 2020 update: fixed multiprocessing to read chunks of input at a time
+# rather than split files.
 #############################################################################
 
-import sys, os, multiprocessing as mp, shutil, lib.refcore as RC, lib.ref_calc as CALC, \
+import sys, os, multiprocessing as mp, shutil, gzip, lib.refcore as RC, lib.ref_calc as CALC, \
 	lib.opt_parse as OP, lib.ref_out as OUT, lib.global_vars as GV
 
 #############################################################################
 
-def referee(files, globs, step_start_time):
-	if globs['stats']:
-		if globs['psutil']:
-			import psutil
-		step_start_time = RC.report_stats(globs, "Index ref fasta", step_start=step_start_time);
-	# Initialize the stats output if --stats is set
+def referee(globs):
+	step_start_time = RC.report_step(globs, "", "", "", start=True);
+	# Initialize the step headers
 
-	globs['ref'] = RC.fastaReadInd(globs['reffile'], globs);
+	step = "Detecting compression"
+	step_start_time = RC.report_step(globs, step, False, "In progress...");
+	globs['reader'] = RC.getFileReader(globs['in-file']);
+	if globs['reader'] != open:
+		globs['lread'] = RC.readGzipLine
+		globs['read-mode'] = "rb";
+	step_start_time = RC.report_step(globs, step, step_start_time, "Success!");
+	#print("\n", globs['reader'], globs['lread'], globs['read-mode']);
+	# Detect whether the input file is gzip compressed or not and save the appropriate functions.
+
+	step = "Indexing reference FASTA"
+	step_start_time = RC.report_step(globs, step, False, "In progress...");
+	globs['ref'] = RC.fastaReadInd(globs['ref-file'], globs);
+	step_start_time = RC.report_step(globs, step, step_start_time, "Success!");
 	# Index the reference FASTA file.
 
-	if globs['pileup']:
-		if globs['stats']:
-			step_start_time = RC.report_stats(globs, "GL Init", step_start=step_start_time);
-		globs['probs'] = CALC.glInit(globs['mapq'], globs['haploid']);
-
-	if globs['stats']:
-		file_start_time = RC.report_stats(globs, "Calcs", step_start=step_start_time);
-	# --stats update.
-
-	if globs['num-procs'] == 1:
-		for file_num in files:
-			result = CALC.refCalc((file_num, files[file_num], globs));
-			if globs['stats']:
-				step_start_time = RC.report_stats(globs, "File " + str(result) + " calcs done", file_start_time);
-	# The serial version.
+	if globs['ref-index']:
+		step = "Getting scaffold lengths from index"
+		step_start_time = RC.report_step(globs, step, False, "In progress...");
+		for line in open(globs['ref-index']):
+			line = line.split("\t");
+			globs['scaff-lens'][line[0]] = int(line[1]);
 	else:
-		if len(files) == 1:
-			if globs['stats']:
-				step_start_time = RC.report_stats(globs, "Split files", step_start=step_start_time);
-			new_files = OP.multiSplit(files, globs);
+		RC.printWrite(globs['logfilename'], globs['log-v'], "# WARNING 1: Cannot find reference index file (" + globs['ref-file'] + ".fai)");
+		RC.printWrite(globs['logfilename'], globs['log-v'], "# WARNING 1: Will read reference scaffold lengths manually, which can take a few minutes.");		
+		step = "Getting scaffold lengths manually"
+		step_start_time = RC.report_step(globs, step, False, "In progress...");
+		for scaff in globs['ref']:
+			seq = RC.fastaGet(globs['ref-file'], globs['ref'][scaff])[1];
+			globs['scaff-lens'][scaff] = len(seq);
+	step_start_time = RC.report_step(globs, step, step_start_time, "Success! Read " + str(len(globs['scaff-lens'])) + " scaffolds");
+	# Getting scaffold lengths
+
+	if globs['pileup-opt']:
+		step = "Computing likelihood look-up table"
+		step_start_time = RC.report_step(globs, step, False, "In progress...");
+		globs['probs'] = CALC.glInit(globs['mapq-opt'], globs['haploid-opt']);
+		step_start_time = RC.report_step(globs, step, step_start_time, "Success!");
+	# Pre-compute the likelihoods for every base-quality (+ mapping quality if set) so they can
+	# just be looked up for each position.
+
+	with open(globs['out-tab'], "w") as outfile, mp.Pool(processes=globs['num-procs']) as pool:
+		if globs['fastq-opt']:
+			fastqfile = open(globs['out-fq'], "w");
 		else:
-			new_files = files;
-		# If multiple processors are available for 1 file, we split the file into chunks.
+			fastqfile = "";
+		# Open the FASTQ file if --fastq is specified. Otherwise just set an empty string instead of the stream.
 
-		pool = mp.Pool(processes = globs['num-procs']);
-		if globs['stats'] and globs['psutil']:
-			for result in pool.imap(RC.getSubPID, range(globs['num-procs'])):
-				globs['pids'].append(result);
-		for result in pool.imap(CALC.refCalc, ((file_num, new_files[file_num], globs) for file_num in new_files)):
-			if globs['stats']:
-				step_start_time = RC.report_stats(globs, "File " + str(result) + " calcs done", file_start_time);
-		# Creates the pool of processes and passes each file to one process to calculate scores on.
+		if globs['bed-opt']:
+			for line in globs['reader'](globs['in-file'], globs['read-mode']):
+				first_scaff = globs['lread'](line)[0];
+				break;
+			globs['cur-bed'] = OUT.initializeBed(first_scaff, globs);
+		# Initialize first scaffold for BED output.
 
-		if len(files) == 1:
-			if globs['stats']:
-				step_start_time = RC.report_stats(globs, "Merge files", step_start=step_start_time);
-			OP.mergeFiles(files[1]['out'], new_files, globs);
-		# Merges the split tmp files back into a single output file.
-	# The parallel verison.
+		cur_lines, outdicts = [], [];
+		i, i_start = 0, 1;
+		prev_scaff, prev_pos = "", 1;
+		for line in globs['reader'](globs['in-file'], globs['read-mode']):
+			i += 1;
+			cur_lines.append(line);
+			if len(cur_lines) == globs['chunk-size']:
+				step = "Processing lines " + str(i_start) + "-" + str(i);
+				step_start_time = RC.report_step(globs, step, False, "In progress...");
 
-	if globs['stats']:
-		file_start_time = RC.report_stats(globs, "Adding unmapped ", step_start=step_start_time);
-	if not globs['mapped']:
-		if globs['num-procs'] == 1 or len(files) == 1:
-			for file_num in files:
-				result = OUT.addUnmapped((file_num, files[file_num], globs));
-				if globs['stats']:
-					step_start_time = RC.report_stats(globs, "File " + str(result) + " unmapped done", step_start=file_start_time);
-					RC.printWrite(globs['logfilename'], globs['log-v'], "+ Renaming tmp file to output file: " + files[result]['tmpfile'] + " -> " + files[result]['out']);
-				shutil.move(files[result]['tmpfile'], files[result]['out']);
-		# Serial version to add unmapped sites.
-		else:
-			for result in pool.imap(OUT.addUnmapped, ((file_num, files[file_num], globs) for file_num in new_files)):
-				if globs['stats']:
-					step_start_time = RC.report_stats(globs, "File " + str(result) + " unmapped done", step_start=file_start_time);
-				RC.printWrite(globs['logfilename'], globs['log-v'], "+ Renaming tmp file to output file: " + files[result]['tmpfile'] + " -> " + files[result]['out']);
-				shutil.move(files[result]['tmpfile'], files[result]['out']);
+				i_start = i + 1;
+				line_chunks = list(RC.chunks(cur_lines, globs['lines-per-proc']));
+				for result in pool.starmap(CALC.refCalc, ((line_chunk, globs) for line_chunk in line_chunks)):
+					outdicts += result;
+					#for site in result:
+						#print(site);
+						#print(result[site]);
+						#prev_scaff, prev_pos = OUT.outputDistributor(result[site], prev_scaff, prev_pos, outfile, fastqfile, globs);
+				for outdict in outdicts:
+					prev_scaff, prev_pos = OUT.outputDistributor(outdict, prev_scaff, prev_pos, outfile, fastqfile, globs);
+				cur_lines, outdicts = [], [];
+				step_start_time = RC.report_step(globs, step, step_start_time, "Success!");
+		# Read the input file line by line. Once a certain number of lines have been read, pass them to siteParse in parallel.
 
-		# Parallel version to add unmapped sites.
-		
-	# If all positions are to be assigned a score, this fills in the unmapped positions. Requires one pass through of the output file.
+		if cur_lines != []:
+			step = "Processing lines "  + str(i_start) + "-" + str(i);
+			step_start_time = RC.report_step(globs, step, False, "In progress...");
 
-	if globs['stats']:
-		step_start_time = RC.report_stats(globs, "End program", step_start=step_start_time, stat_end=True);
-	# A step update for --stats.
+			line_chunks = list(RC.chunks(cur_lines, globs['lines-per-proc']));
+			for result in pool.starmap(CALC.refCalc, ((line_chunk, globs) for line_chunk in line_chunks)):
+				outdicts += result;
+				# for site in result:
+					#print(site);
+					#print(result[site]);
+					#prev_scaff, prev_pos = OUT.outputDistributor(result[site], prev_scaff, prev_pos, outfile, fastqfile, globs);
+			for outdict in outdicts:
+				prev_scaff, prev_pos = OUT.outputDistributor(outdict, prev_scaff, prev_pos, outfile, fastqfile, globs);	
+			step_start_time = RC.report_step(globs, step, step_start_time, "Success!");
+		# Read the input file line by line. Once a certain number of lines hav
+		# Count the last chunk of lines if necessary.
+
+		if prev_pos != globs['scaff-lens'][prev_scaff]:
+			step = "Filling final unmapped positions"
+			step_start_time = RC.report_step(globs, step, False, "In progress...");
+			seq = RC.fastaGet(globs['ref-file'], globs['ref'][prev_scaff])[1];
+			outdict = { 'scaff' : prev_scaff, 'pos' : globs['scaff-lens'][prev_scaff], 'ref' : seq[prev_pos-1], 
+                        'rq' : -2, 'raw' : "NA", 'lr' : "NA", 'l_match' : "NA", 
+                        'l_mismatch' : "NA", 'gls' : "NA", 'cor_ref' : "NA", 
+                        'cor_score' : "NA", 'cor_raw' : "NA" };
+			prev_scaff, prev_pos = OUT.outputDistributor(outdict, prev_scaff, prev_pos, outfile, fastqfile, globs)
+			step_start_time = RC.report_step(globs, step, step_start_time, "Success!");
+		# If the last positions are unmapped they won't have been filled in. Do that here using the last position (length) of the
+		# previous scaffold as the outdict.
+
+		if globs['fastq-opt']:
+			fastqfile.close();
+		# Close the FASTQ file if --fastq was set.
+
+		if globs['bed-opt']:
+			step = "Writing final bed file"
+			step_start_time = RC.report_step(globs, step, False, "In progress...");
+			OUT.outputBed(globs['cur-bed']);
+			step_start_time = RC.report_step(globs, step, step_start_time, "Success!");
+		# Write out the last bed file.
 
 	return;
 #############################################################################
@@ -102,12 +152,19 @@ if __name__ == '__main__':
 	print("#");
 	print("# =================================================");
 	print(RC.welcome());
-	print("    Reference genome quality score calculator.\n")
+	print("    Reference genome quality score calculator.\n");
+	if "-h" not in sys.argv:
+		print("       Pseudo assembly by iterative mapping.\n");
 	# A welcome banner.
 
-	files, globs, step_start_time = OP.optParse(globs);
+	globs = OP.optParse(globs);
 	# Getting the input parameters from optParse.
-	referee(files, globs, step_start_time);
+
+	if globs['norun']:
+		sys.exit("# --norun SET. EXITING AFTER PRINTING OPTIONS INFO...\n#");
+
+	referee(globs);
 	RC.endProg(globs);
 
 #############################################################################
+

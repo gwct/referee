@@ -16,165 +16,13 @@ def errorOut(errnum, errmsg, globs):
 	fullmsg = "|**Error " + str(errnum) + ": " + errmsg + " |";
 	border = " " + "-" * (len(fullmsg)-2);
 	fullstr = "\n" + border + "\n" + fullmsg + "\n" + border + "\n"
-	printWrite(globs['logfilename'], globs['log-v'], "\n" + border + "\n" + fullmsg + "\n" + border + "\n")
-	endProg(globs);
-
-#############################################################################
-
-def startProg(globs):
-# A nice way to start the program.
-	print("#");
-	printWrite(globs['logfilename'], 0, "# Welcome to Referee -- Reference genome quality score calculator.");
-	printWrite(globs['logfilename'], globs['log-v'], "# Version " + globs['version'] + " released on " + globs['releasedate']);
-	printWrite(globs['logfilename'], globs['log-v'], "# Referee was developed by Gregg Thomas and Matthew Hahn");
-	printWrite(globs['logfilename'], globs['log-v'], "# Citation:      " + globs['doi']);
-	printWrite(globs['logfilename'], globs['log-v'], "# Website:       " + globs['http']);
-	printWrite(globs['logfilename'], globs['log-v'], "# Report issues: " + globs['github']);
-	printWrite(globs['logfilename'], globs['log-v'], "#");
-	printWrite(globs['logfilename'], globs['log-v'], "# The date and time at the start is: " + getDateTime());
-	printWrite(globs['logfilename'], globs['log-v'], "# The program was called as: " + " ".join(sys.argv) + "\n#");
-
-	pad = 20;
-	printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 40);
-	printWrite(globs['logfilename'], globs['log-v'], "# Input/output info");
-	printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Input file:", pad) + globs['infile']);
-	printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Input type:", pad) + globs['intype']);
-	if globs['intype'] == "List of files":
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Output directory:", pad) + globs['outdir']);
-		if not os.path.isdir(globs['outdir']):
-			printWrite(globs['logfilename'], globs['log-v'], "+ Making output directory: " + globs['outdir']);
-			os.makedirs(globs['outdir']);
+	printWrite(globs['logfilename'], globs['log-v'], "\n" + border + "\n" + fullmsg + "\n" + border + "\n");
+	if globs['endprog']:
+		globs['exit-code'] = 1;
+		endProg(globs);
 	else:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Output prefix:", pad) + globs['out']);
-
-	printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 40);
-	printWrite(globs['logfilename'], globs['log-v'], "# Options info");	
-	printWrite(globs['logfilename'], globs['log-v'], spacedOut("# Option", pad) + spacedOut("Current setting", pad) + "Current action");
-	printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 125);
-
-	if globs['pileup']:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --pileup", pad) + 
-					spacedOut("True", pad) + 
-					"Input type set to pileup. Referee will calculate genotype likelihoods.");
-		if globs['mapq']:
-			printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --mapq", pad) + 
-						spacedOut("True", pad) + 
-						"Incorporating mapping qualities (7th column of pileup file) into quality score calculations if they are present.");
-		else:
-			printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --mapq", pad) + 
-						spacedOut("False", pad) + 
-						"Ignoring mapping qualities in pileup file if they are present.");
-	else:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --pileup", pad) + 
-					spacedOut("False", pad) + 
-					"Input is pre-calculated genotype log likelihoods.");
-		if globs['mapq']:
-			printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --mapq", pad) + 
-						spacedOut("True", pad) +  
-						"--pileup not set. Ignoring --mapq option.");
-	# Reporting the pileup option.
-
-	if globs['fastq']:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --fastq", pad) + 
-					spacedOut("True", pad) + 
-					"Writing output in FASTQ format in addition to tab delimited.");
-	else:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --fastq", pad) + 
-					spacedOut("False", pad) + 
-					"Not writing output in FASTQ format.");
-	# Reporting the fastq option.
-
-	if globs['bed']:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --bed", pad) + 
-					spacedOut("True", pad) + 
-					"Writing output in BED format in addition to tab delimited.");
-		printWrite(globs['logfilename'], globs['log-v'], "+ Making BED directory: " + globs['beddir']);
-		if globs['beddir'] and not os.path.isdir(globs['beddir']):
-			os.makedirs(globs['beddir']);
-		# Specifiy and create the BED directory, if necessary.
-	else:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --bed", pad) + 
-					spacedOut("False", pad) + 
-					"Not writing output in BED format.");
-	# Reporting the fastq option.
-
-	if globs['mapped']:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --mapped", pad) + 
-					spacedOut("True", pad) + 
-					"Only calculating scores for positions with reads mapped to them.");
-	else:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --mapped", pad) + 
-					spacedOut("False", pad) + 
-					"Calculating scores for every position in the reference genome.");
-	# Reporting the mapped option.
-
-	if globs['haploid']:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --haploid", pad) + 
-					spacedOut("True", pad) + 
-					"Calculating genotype likelihoods and quality scores for HAPLOID data (4 genotypes).");
-	else:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --haploid", pad) + 
-					spacedOut("False", pad) + 
-					"Calculating genotype likelihoods and quality scores for DIPLOID data (10 genotypes).");
-	# Reporting the haploid option.
-
-	if globs['raw-opt']:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --raw", pad) + 
-					spacedOut("True", pad) + 
-					"Printing raw Referee score in fourth column of tabbed output.");
-	else:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --raw", pad) + 
-					spacedOut("False", pad) + 
-					"NOT printing raw Referee score in tabbed output.");
-	# Reporting the correct option.		
-
-	if globs['correct-opt']:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --correct", pad) + 
-					spacedOut("True", pad) + 
-					"Suggesting higher scoring alternative base when reference score is negative or reference base is N.");
-	else:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --correct", pad) + 
-					spacedOut("False", pad) + 
-					"Not suggesting higher scoring alternative base when reference score is negative or reference base is N.");
-	# Reporting the correct option.
-
-	if globs['stats']:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --quiet", pad) + 
-					spacedOut("False", pad) + 
-					"Time and memory (if psutil module is present) info will be output while Referee is running.");
-	else:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --quiet", pad) + 
-					spacedOut("True", pad) + 
-					"No further information will be output while Referee is running.");
-	# Reporting the correct option.
-
-	printWrite(globs['logfilename'], globs['log-v'], spacedOut("# -p", pad) + 
-				spacedOut(str(globs['num-procs']), pad) + 
-				"Referee will use this many processes to run.");
-
-	if globs['allcalc']:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --allcalcs", pad) + 
-					spacedOut("True", pad) + 
-					"Using tab delimited output and reporting extra columns.");
-	# Reporting the allcalc option.
-
-	if globs['debug']:
-		printWrite(globs['logfilename'], globs['log-v'], spacedOut("# --debug", pad) + 
-					spacedOut("True", pad) + 
-					"Printing out a bit of debug info.");
-	# Reporting the allcalc option.
-
-	if not globs['pileup']:
-		printWrite(globs['logfilename'], globs['log-v'], "#\n# " + "-" * 40);
-		printWrite(globs['logfilename'], globs['log-v'], "## IMPORTANT!");
-		printWrite(globs['logfilename'], globs['log-v'], "## Input columns: Scaffold\tPosition\tAA\tAC\tAG\tAT\tCC\tCG\tCT\tGG\tGT\tTT");
-		printWrite(globs['logfilename'], globs['log-v'], "## Please ensure that your input genotype likelihood files are tab delimited with columns in this exact order without headers.");
-		printWrite(globs['logfilename'], globs['log-v'], "## Failure to do so will result in inaccurate calculations!!");
-		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 40 + "\n#");
-	
-	if not globs['stats']:
-		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * 125);
-		printWrite(globs['logfilename'], globs['log-v'], "# Running...");
+		printWrite(globs['logfilename'], globs['log-v'], "\nScript call: " + " ".join(sys.argv));
+		sys.exit(1);
 
 #############################################################################
 
@@ -184,18 +32,24 @@ def endProg(globs):
 	totaltime = endtime - globs['starttime'];
 	printWrite(globs['logfilename'], globs['log-v'], "#\n# Done!");
 	printWrite(globs['logfilename'], globs['log-v'], "# The date and time at the end is: " + getDateTime());
-	printWrite(globs['logfilename'], globs['log-v'], "# Total execution time: " + str(round(totaltime,3)) + " seconds.");
-	printWrite(globs['logfilename'], globs['log-v'], "# Output directory for this run: " + globs['outdir']);
-	printWrite(globs['logfilename'], globs['log-v'], "# Log file for this run: " + globs['logfilename']);
+	printWrite(globs['logfilename'], globs['log-v'], "# Total execution time:            " + str(round(totaltime,3)) + " seconds.");
+	printWrite(globs['logfilename'], globs['log-v'], "# Output directory for this run:   " + globs['out-dir']);
+	printWrite(globs['logfilename'], globs['log-v'], "# Log file for this run:           " + globs['logfilename']);
 	printWrite(globs['logfilename'], globs['log-v'], "# =================================================");
 	print("#");
-	sys.exit();
+	sys.exit(globs['exit-code']);
 
 #############################################################################
 
-def getLogTime():
+def getDate():
 # Function to get the date and time in a certain format.
-	return datetime.datetime.now().strftime("%I.%M.%S");
+	return datetime.datetime.now().strftime("%m.%d.%Y");
+
+#############################################################################
+
+def getTime():
+# Function to get the date and time in a certain format.
+	return datetime.datetime.now().strftime("%H:%M:%S");
 
 #############################################################################
 
@@ -211,12 +65,8 @@ def getOutTime():
 
 #############################################################################
 
-def printWrite(o_name, v, o_line1, o_line2="", pad=0):
+def printWrite(o_name, v, outline):
 # Function to print a string AND write it to the file.
-	if o_line2 == "":
-		outline = o_line1;
-	else:
-		outline = o_line1 + " "*(pad-len(o_line1)) + o_line2;
 	if v in [-1,1,2]:
 		print(outline);
 	if v != -1:
@@ -233,69 +83,81 @@ def spacedOut(string, totlen):
 
 #############################################################################
 
-def report_stats(globs, msg="", step_start=0, stat_start=False, stat_end=False):
+def report_step(globs, step, step_start_time, step_status, start=False):
 # Uses psutil to gather memory and time info between steps and print them to the screen.
-	import timeit
+	#log = logger(globs['logfilename']);
+
+	dashes = 150
 	if globs['psutil']:
 		import psutil;
-		dashes = 125;
-	else:
-		dashes = 75;
+		dashes = 175;
+
 	cur_time = timeit.default_timer();
-	if stat_start:
-	# The first time through just print the headers.
-		globs['progstarttime'] = cur_time;
-		#printWrite(globs['logfilename'], globs['log-v'], "# --stats : Reporting Referee time and memory usage.");
-		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * dashes);
+	col_widths = [ 14, 10, 40, 30, 20, 16 ];
+	if globs['psutil']:
+		col_widths += [25, 20];
+	if start:
+		headers = [ "# Date", "Time", "Current step", "Status", "Elapsed time (s)", "Step time (s)" ];
 		if globs['psutil']:
-			printWrite(globs['logfilename'], globs['log-v'], "# Step" + " " * 20 + "Time since prev (sec)" + " " * 6 + "Elapsed time (sec)" + " " * 4 + "Current mem usage (MB)" + " " * 4 + "Virtual mem usage (MB)");
-		else:
-			printWrite(globs['logfilename'], globs['log-v'], "# Step" + " " * 20 + "Time since prev (sec)" + " " * 6 + "Elapsed time (sec)");
+			headers += ["Current mem usage (MB)", "Virtual mem usage (MB)"]
+
+		headers = "".join([ spacedOut(str(headers[i]), col_widths[i]) for i in range(len(headers)) ]);
+
 		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * dashes);
+		printWrite(globs['logfilename'], globs['log-v'], headers);
+		printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * dashes);
+
 	else:
-		prog_elapsed = cur_time - globs['progstarttime'];
-		step_elapsed = cur_time - step_start;
-		if globs['psutil']:
-			mem = sum([p.memory_info()[0] for p in globs['pids']]) / float(2 ** 20);
-			vmem = sum([p.memory_info()[1] for p in globs['pids']]) / float(2 ** 20);
-			printWrite(globs['logfilename'], globs['log-v'], "# " + msg + " " * (24-len(msg)) + str(step_elapsed) + " " * (27-len(str(step_elapsed))) + str(prog_elapsed) + " " * (22-len(str(prog_elapsed))) + str(mem) + " " * (26-len(str(mem))) + str(vmem));
+		prog_elapsed = str(round(cur_time - globs['starttime'], 5));
+		if not step_start_time:
+			out_line = [ "# " + getDate(), getTime(), step, step_status ];
+			term_col_widths = col_widths[:4];
+			out_line = [ spacedOut(str(out_line[i]), term_col_widths[i]) for i in range(len(out_line)) ];
+			sys.stdout.write("".join(out_line));
+			sys.stdout.flush();
+
+
 		else:
-			printWrite(globs['logfilename'], globs['log-v'], "# " + msg + " " * (24-len(msg)) + str(step_elapsed) + " " * (27-len(str(step_elapsed))) + str(prog_elapsed) + " " * (22-len(str(prog_elapsed))));
-		if stat_end:
-			printWrite(globs['logfilename'], globs['log-v'], "# " + "-" * dashes);
+			step_elapsed = str(round(cur_time - step_start_time, 5));
+			out_line = [ step_status, prog_elapsed, step_elapsed ];
+			if globs['psutil']:
+				mem = round(sum([p.memory_info()[0] for p in globs['pids']]) / float(2 ** 20), 5);
+				vmem = round(sum([p.memory_info()[1] for p in globs['pids']]) / float(2 ** 20), 5);
+				out_line += [str(mem), str(vmem)];
+			term_col_widths = col_widths[3:];
+			file_line = [ "# " + getDate(), getTime(), step ] + out_line;
+			file_col_widths = col_widths[:3] + [30] + col_widths[4:];
+			
+			out_line = [ spacedOut(str(out_line[i]), term_col_widths[i]) for i in range(len(out_line)) ];
+			sys.stdout.write("\b" * 30);
+			sys.stdout.write("".join(out_line) + "\n");
+			sys.stdout.flush();
+			#print(file_col_widths);
+			file_line = [ spacedOut(str(file_line[i]), file_col_widths[i]) for i in range(len(file_line)) ];
+			printWrite(globs['logfilename'], 3, "".join(file_line));
 	return cur_time;
-
-#############################################################################
-
-def getSubPID(n):
-# Gets the process ids for the --stats option.
-	import psutil
-	return psutil.Process(os.getpid());
-
-#############################################################################
-
-def getFileLen(i_name):
-# Gets the numebr of lines in a file.
-	num_lines = 0;
-	for line in getFileReader(i_name)(i_name): num_lines += 1;
-	return float(num_lines);
 
 #############################################################################
 
 def getFileReader(i_name):
 # Check if a file is gzipped, and if so set gzip as the file reader. Otherwise, read as a normal text file.
 	try:
-		gzip_check = gzip.open(i_name).read(1);
+		gzip_check = gzip.open(i_name, "r").read(1);
+		# print("HI")
+		# print(gzip_check.decode());
 		reader = gzip.open;
+		#sys.exit();
 	except:
 		reader = open;
 	return reader;
 
 #############################################################################
+# The two line reader functions based on whether the input file is gzipped or not
+def readLine(line):
+	return line.strip().split("\t");
 
-def getRandStr(strlen=6):
-# This function generates a random string to add onto the end of tmp files to avoid possible overwrites.
-	return ''.join(random.choice(string.ascii_letters) for m in range(strlen));
+def readGzipLine(line):
+	return line.decode().strip().split("\t");
 
 #############################################################################
 
@@ -315,7 +177,7 @@ def fastaReadInd(i_name, globs):
 
 	reader = getFileReader(i_name);
 	if reader != open:
-		errorOut(12, "FASTA indexing requires the reference FASTA (-ref) to be uncompressed. Please gunzip the file and try again.", globs)
+		errorOut("CORE1", "FASTA indexing requires the reference FASTA (-ref) to be uncompressed. Please gunzip the file and try again.", globs)
 
 	# if reader == open:
 	# 	freadline = lambda f : f.readline();
@@ -383,22 +245,38 @@ def fastaGet(i_name, inds):
 
 #############################################################################
 
+def getScaffLens(scaff, globs):
+# Gets the lengths of each scaffold in the input file after indexing
+	seq = fastaGet(globs['ref-file'], globs['ref'][scaff])[1];
+	return len(seq);
+
+#############################################################################
+
+def chunks(l, n):
+# Splits a list l into even chunks of size n.
+    n = max(1, n);
+    return (l[i:i+n] for i in range(0, len(l), n));
+
+#############################################################################
+
+def isPosInt(numstr):
+# Check if a string is a positive integer
+	try:
+		num = int(numstr);
+	except:
+		return False;
+
+	if num > 0:
+		return num;
+	else:
+		return False;
+#############################################################################
+
 def welcome():
 # Reads the ASCII art "Referee" text to be printed to the command line.
 	return open(os.path.join(os.path.dirname(__file__), "ref-welcome.txt"), "r").read();
 
 #############################################################################
-
-
-
-
-
-
-
-
-
-
-
 
 
 

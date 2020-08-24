@@ -1,152 +1,126 @@
-import os, math, lib.refcore as RC
+import os, math, copy, lib.refcore as RC
 #############################################################################
 
-def outputFastq(outdict, fq_vars, globs, final=False):
-# For output to FASTQ format.
-    if not final:
-        fq_vars["fq_seq"] += outdict['ref'];
-        score = str(unichr(int(round(outdict['rq'])+35)));
-        fq_vars["fq_scores"] += score;
-    # Adds the current base and ascii score to the corresponding lists.
+def outputDistributor(outdict, prev_scaff, prev_pos, outfile, fastqfile, globs):
+# This function reads an output dictionary for a site and distributes it to the proper output functions.
+# If the site being output is preceded by unmapped sites this also fills in those sites in all specified
+# outputs with scores of -2.
 
-    if len(fq_vars["fq_seq"]) == globs['fastq-len'] or final:
-        cur_title = "@" + outdict['scaff'] + " " + str(outdict["pos"]-int(len(fq_vars["fq_seq"]))+1) + ":" + str(outdict["pos"]) + " length=" + str(len(fq_vars["fq_seq"]));
-        # Set the current FASTQ title.
+    cur_scaff, cur_pos = outdict['scaff'], outdict['pos'];
+    # Get the scaffold and position for the current site.
 
-        fq_vars["fqoutfile"].write(cur_title + "\n");
-        fq_vars["fqoutfile"].write(fq_vars["fq_seq"] + "\n");
-        fq_vars["fqoutfile"].write("+\n");
-        fq_vars["fqoutfile"].write(fq_vars["fq_scores"] + "\n");
-        # Write the title, sequence, and scores.
+    if prev_scaff != "" and cur_scaff != prev_scaff and prev_pos != globs['scaff-lens'][prev_scaff]:
+    # If we're not on the first scaffold (prev_scaff != "") and
+    # if the current scaffold is not the same as the previous scaffold and
+    # the previous position is not the last position of the previous scaffold.
 
-        fq_vars['fq_seq'], fq_vars['fq_scores'] = "", "";
-        # Reset the sequence and score strings.
-    # This writes the sequence and scores if the length of the sequence matches the max fastq line length (global) or if its the final line.
+        seq = RC.fastaGet(globs['ref-file'], globs['ref'][prev_scaff])[1];
+        # Read the sequence for the previous scaffold.
 
-    return fq_vars;
-#############################################################################
+        while prev_pos <= globs['scaff-lens'][prev_scaff]:
+        # Under the conditions outlined above, we want to fill in positions from the previous position to the
+        # end of that scaffold.
 
-def outputBed(bed_vars):
-# For output to bed format.
-    bed = bed_vars['cur-bed'];
-    with open(bed_vars['bedout'], "w") as bedfile:
-    # Open the bed output file.    
-        bedfile.write("browser position " + bed['scaff'] + "\n");
-        bedfile.write("browser hide all\n");
-        bedfile.write("track name=\"" + bed['scaff'] + " Referee\" description=\"Referee quality scores\" visibility=2 itemRgb=\"On\"\n");
-        # These are the bed header lines.
+            unmapped_outdict = { 'scaff' : prev_scaff, 'pos' : prev_pos, 'ref' : seq[prev_pos-1], 
+                        'rq' : -2, 'raw' : "NA", 'lr' : "NA", 'l_match' : "NA", 
+                        'l_mismatch' : "NA", 'gls' : "NA", 'cor_ref' : "NA", 
+                        'cor_score' : "NA", 'cor_raw' : "NA" };
+            # Format the output info for an unmapped position.
 
-        for b in bed['bins']:
-            #bed['bins'][b]['chunk-starts'] = [ str(int(s) - bed['bins'][b]['first-pos']) for s in bed['bins'][b]['chunk-starts'] ];
-            # This line subtracts the first position from each bin. Not sure why I had this, first position is always 0 now.
+            outputTab(unmapped_outdict, outfile, globs);
+            # Output to tabbed file
 
-            outline = "\t".join([bed['scaff'], 
-                str(bed['bins'][b]['first-pos']), 
-                str(bed['bins'][b]['last-pos']), 
-                bed['bins'][b]['name'], 
-                str(bed['bins'][b]['shade']),  
-                ".", 
-                str(bed['bins'][b]['first-pos']), 
-                str(bed['bins'][b]['last-pos']), 
-                bed['bins'][b]['rgb']]
-                );
-            outline += "\t" + str(bed['bins'][b]['num-chunks']);
-            outline += "\t" + ",".join(bed['bins'][b]['chunk-sizes']);
-            outline += "\t" + ",".join(bed['bins'][b]['chunk-starts']);
-            # The bed output info for each bin.
-            bedfile.write(outline + "\n");
+            if globs['fastq-opt']:
+                outputFastq(unmapped_outdict, fastqfile, globs);
+            # Output to FASTQ file if --fastq was specified.
 
-#############################################################################
+            if globs['bed-opt']:
+                globs['cur-bed'] = getBedBin(unmapped_outdict['rq'], globs['cur-bed']);
+                if globs['cur-bed']['cur-bin'] != globs['cur-bed']['last-bin']:
+                    globs['cur-bed'] = finishBedBin(globs['cur-bed'], prev_pos);      
+                # Get score/bin
+            # Handle bed binning if --bed was specified.
 
-def bedInit(scaff, seqlen, globs, score):
-# Referee scores range from -2 to 91. This gives us 10 bins of scores, and this function
-# prepares a dictionary of information for each bin.
+            prev_pos += 1;
+            # Iterate the position until it catches up to the end of the scaffold
 
-    cur_bed = {
-            'scaff' : scaff, 'scaff-start' : 0, 'scaff-end' : seqlen-1, 
-            'bins' : 
-            {
-                1 : { 'name' : '<=0', 'rgb' : "165,0,38", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'shade' : 1000 },
-                2 : { 'name' : '1-10', 'rgb' : "221,61,45", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'shade' : 900  },
-                3 : { 'name' : '11-20', 'rgb' : "246,126,75", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'shade' : 800  },
-                4 : { 'name' : '21-30', 'rgb' : "253,179,102", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'shade' : 700  },
-                5 : { 'name' : '31-40', 'rgb' : "254,218,139", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'shade' : 600  },
-                6 : { 'name' : '41-50', 'rgb' : "194,228,239", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'shade' : 500  },
-                7 : { 'name' : '51-60', 'rgb' : "152,202,225", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'shade' : 400  },
-                8 : { 'name' : '61-70', 'rgb' : "110,166,205", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'shade' : 300  },
-                9 : { 'name' : '71-80', 'rgb' : "74,123,183", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'shade' : 200  },
-                10 : { 'name' : '81+', 'rgb' : "54,75,154", 'num-chunks' : 1, 'chunk-sizes' : ["0"], 'chunk-starts' : ["0"], 'last-pos' : 0, 'first-pos' : 0, 'shade' : 100  }
-            }
-        };
-    bed_vars = { 'bedout' : os.path.join(globs['beddir'], scaff + ".bed"),
-                 'chunk-start' : 0, 'last-bin' : getBedBin(score), 'cur-bin' : getBedBin(score),
-                 'added' : False, 'cur-bed' : cur_bed };
-    # These are general bed variables that get passed between functions.
+        if globs['bed-opt']:
+            outputBed(globs['cur-bed']);
+            globs['cur-bed'] = initializeBed(cur_scaff, globs);
+        # Write the bed file for the previous scaffold and and initialize the bed dictionary for the current scaffold.
 
-    return bed_vars;
+        prev_scaff, prev_pos = cur_scaff, 1;
+        # Set the previous scaffold and position to the start of the new scaffold in case there are positions at
+        # the beginning of the current scaffold that need to be filled in too.
+    # Fill in sites at the end of the previous scaffold that are unmapped.
 
-#############################################################################
+    if (cur_scaff == prev_scaff or prev_scaff == "") and cur_pos != (prev_pos + 1):
+    # If the current scaffold is the same as the previous scaffold or this is the first scaffold and
+    # The current position is not directly after the last position
 
-def getBedBin(score):
-# Given a Referee score, this function returns the bin that score is in.
-    if score <= 0:
-        b = 1;
-    elif score >= 81:
-        b = 10;
-    else:
-        upper = int(math.ceil(score / 10.0)) * 10;
-        if upper == 10:
-            b = 2;
-        elif upper == 20:
-            b = 3
-        elif upper == 30:
-            b = 4
-        elif upper == 40:
-            b = 5
-        elif upper == 50:
-            b = 6
-        elif upper == 60:
-            b = 7
-        elif upper == 70:
-            b = 8
-        elif upper == 80:
-            b = 9
-    return b;
+        seq = RC.fastaGet(globs['ref-file'], globs['ref'][cur_scaff])[1];
+        # Read the sequence for the current scaffold
 
-#############################################################################
+        while prev_pos < cur_pos:
+        # Under the conditions outlined above, we want to fill in scores until we catch up to the current
+        # position.
 
-def finishBedBin(bed_vars, pos, seqlen=""):
-# After a given stretch of scores in the same bin, the info for that chunk is written to the bin dictionary here.
+            unmapped_outdict = { 'scaff' : cur_scaff, 'pos' : prev_pos, 'ref' : seq[prev_pos-1], 
+                        'rq' : -2, 'raw' : "NA", 'lr' : "NA", 'l_match' : "NA", 
+                        'l_mismatch' : "NA", 'gls' : "NA", 'cor_ref' : "NA", 
+                        'cor_score' : "NA", 'cor_raw' : "NA" };
+            # Format the output info for an unmapped position.
 
-    bed_vars['cur-bed']['bins'][bed_vars['last-bin']]['num-chunks'] += 1;
-    # Iterate the number of chunks.    
+            outputTab(unmapped_outdict, outfile, globs);
+            # Output to tabbed file
 
-    bed_vars['cur-bed']['bins'][bed_vars['last-bin']]['last-pos'] = pos - 1;
-    # Update the current last position. If its the last bin it will be the correct last position for the file.
+            if globs['fastq-opt']:
+                outputFastq(unmapped_outdict, fastqfile, globs);
+            # Output to FASTQ file if --fastq was specified.
 
-    cur_size = (pos - bed_vars['chunk-start']) - 1;
-    bed_vars['cur-bed']['bins'][bed_vars['last-bin']]['chunk-sizes'].append(str(cur_size));
-    # Calculate the size of the current chunk.
+            if globs['bed-opt']:
+                globs['cur-bed'] = getBedBin(unmapped_outdict['rq'], globs['cur-bed']);
+                if globs['cur-bed']['cur-bin'] != globs['cur-bed']['last-bin']:
+                    globs['cur-bed'] = finishBedBin(globs['cur-bed'], prev_pos); 
+                # Get score/bin
+            # Handle bed binning if --bed was specified.
 
-    bed_vars['cur-bed']['bins'][bed_vars['last-bin']]['chunk-starts'].append(str(bed_vars['chunk-start']));
-    # Add in the chunk start.
+            prev_pos += 1;
+            # Iterate the previous position until it catches up to the current position.
+    # Fill in sites on current scaffold that precede the current position and are unmapped.
 
-    bed_vars['chunk-start'] = pos-1;
-    # Update the chunk start for the next bin.
+    outputTab(outdict, outfile, globs);
+    # Output to tabbed file
 
-    bed_vars['last-bin'] = bed_vars['cur-bin'];
-    # Update the bin.
+    if globs['fastq-opt']:
+        outputFastq(outdict, fastqfile, globs);
+    # Output to FASTQ file if --fastq was specified.
 
-    return bed_vars;
+    if globs['bed-opt']:
+        if cur_scaff != prev_scaff:
+            outputBed(globs['cur-bed']);
+            globs['cur-bed'] = initializeBed(cur_scaff, globs);
+        # Write the bed file for the previous scaffold and and initialize the bed dictionary for the current scaffold.
+
+        globs['cur-bed'] = getBedBin(outdict['rq'], globs['cur-bed']);
+        if globs['cur-bed']['cur-bin'] != globs['cur-bed']['last-bin']:
+            globs['cur-bed'] = finishBedBin(globs['cur-bed'], prev_pos);   
+            # Get score/bin
+        # Handle bed binning if --bed was specified.
+    # Handle bed output for current site if --bed was specified.
+    # Output the score for the current site
+
+    return cur_scaff, cur_pos;
 
 #############################################################################
 
 def outputTab(outdict, outfile, globs):
 # For output to tab delimited format.
+
     outline = [outdict['scaff'], str(outdict['pos']), str(int(round(outdict['rq'])))];
     # Set-up the basic output: scaffold, position, and score.
 
-    if globs['allcalc']:
+    if globs['allcalc-opt']:
         if outdict['rq'] != -2:
             max_gt, max_gl = "", -9999;
             for gt in outdict['gls']:
@@ -160,6 +134,7 @@ def outputTab(outdict, outfile, globs):
 
     if globs['raw-opt']:
         outline += [str(outdict['raw'])];
+    # Add the extra column for the --raw option.
 
     if globs['correct-opt']:
         try:
@@ -177,137 +152,136 @@ def outputTab(outdict, outfile, globs):
 
     outfile.write("\t".join(outline) + "\n");
     # Write the line.
-#############################################################################
-
-def addUnmapped(file_item):
-# Since we need to have a score for every position in the reference genome and some of those positions are unmapped,
-# this function goes through the positions in the output file and adds the unmapped positions.
-
-    file_num, file_info, globs = file_item;
-    scaff_pos, last_scaff, first = 1, "", True;
-    # scaff_pos keeps track of the last position we've filled in. Comparing it to the current position in the output file
-    # or the length of the current scaffold allows us to fill in the missing sites.
-
-    with open(file_info['tmpfile'], "w") as tmpoutfile:
-        fq_vars = {};
-        if globs['fastq']:
-            fqoutfile = open(file_info['outfq'], "w");
-            fq_vars = { "fqoutfile" : fqoutfile, "fq_seq" : "", "fq_scores" : "", "filled" : False }
-        # Variables for FASTQ output.
-
-        bed_vars = { 'last-bin' : "", 'cur-bin' : 0 };
-        # A dummy bed_vars to pass to functions when --bed isn't called.
-
-        for line in open(file_info['out']):
-            linelist = line.strip().split("\t");
-            scaff, pos, score = linelist[0], int(linelist[1]), int(linelist[2]);
-
-            if scaff != last_scaff:
-                if first:
-                    first = False
-                else:
-                    scaff_pos, fq_vars, bed_vars = fillUnmapped(scaff_pos, seqlen, last_scaff, seq, tmpoutfile, globs, fq_vars, bed_vars);
-                    if globs['bed']:
-                        bed_vars = finishBedBin(bed_vars, seqlen, seqlen);
-                        outputBed(bed_vars);
-                # If this is not the first scaffold, fill in all positions from the last position on the last scaffold.
-                # until the end of that scaffold. Also output the bed file for the last scaffold
-
-                seq = RC.fastaGet(globs['reffile'], globs['ref'][scaff])[1];
-                seqlen = len(seq);
-                scaff_pos = 1;
-                last_scaff = scaff;
-                # When the scaffold changes, get the new seq, seqlen, last_scaff, and reset scaff_pos to 1.
-
-                if globs['bed']:
-                    bed_vars = bedInit(scaff, seqlen, globs, score);
-                # Initialize the BED structures for this scaffold.
-
-            scaff_pos, fq_vars, bed_vars = fillUnmapped(scaff_pos, pos-1, scaff, seq, tmpoutfile, globs, fq_vars, bed_vars);
-            # If the current scaff_pos is below the pos in the output file, we need to fill in the unmapped positions
-            # up to that position.
-
-            if globs['fastq']:
-                if globs['correct-opt'] and len(linelist) == 5:
-                    fqoutdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : linelist[3].lower(), 'rq' : int(linelist[4]) };
-                else:
-                    fqoutdict = { 'scaff' : scaff, 'pos' : pos, 'ref' : seq[pos-1], 'rq' : int(linelist[2]) };
-                fq_vars = outputFastq(fqoutdict, fq_vars, globs);
-            # Output the current position to FASTQ.
-
-            if globs['bed']:
-                bed_vars['cur-bin'] = getBedBin(score);
-                if bed_vars['cur-bin'] != bed_vars['last-bin']:
-                    bed_vars = finishBedBin(bed_vars, pos);
-            # If the bin of the current score is different from the bin of the last score,
-            # finish the bed bin.
-
-            tmpoutfile.write(line);
-            scaff_pos += 2; 
-            # Simply re-write the line to the tmp file and iterate the scaff_pos.
-            # Since the pass to fillUnmapped passed the INDEX (pos-1), I need to add one to get it back into POSITION. Then I need to
-            # add one more to go to the next position... hence += 2.
-
-        scaff_pos, fq_vars, bed_vars = fillUnmapped(scaff_pos, seqlen, last_scaff, seq, tmpoutfile, globs, fq_vars, bed_vars, final=True);
-        # After the last line of the output file, fill in the rest of the positions for that scaffold.
-       
-        if globs['fastq']:
-            if not fq_vars['filled'] and fq_vars['fq_seq'] != "":
-                fq_vars = outputFastq(fqoutdict, fq_vars, globs, final=True);
-            fqoutfile.close();
-        # Write the final FASTQ line if the last position was mapped and had a score and close the FASTQ output file.
-
-        if globs['bed']:
-            bed_vars = finishBedBin(bed_vars, seqlen, seqlen);
-            outputBed(bed_vars);
-        # Write the last scaffold to the bed file.
-
-        return file_num;
 
 #############################################################################
 
-def fillUnmapped(start, stop, scaff, seq, outfile, globs, fq_vars, bed_vars, final=False, first=True):
-# Given a start and stop position, this function fills in the scores for unmapped positions
-# up to the stop position. The score for unmapped positions is -2.
-    filled = False;
-    while start <= stop:
-        if first:
-            filled, first = True, False;
-            # If its the first position to fill in, flag it.
+def outputFastq(outdict, fastqfile, globs):
+# For output to FASTQ format.
 
-            if globs['bed'] and bed_vars['cur-bin'] != 1:
-                if start != 1:
-                    bed_vars = finishBedBin(bed_vars, start);
-                bed_vars['last-bin'] = 1;
-                bed_vars['cur-bin'] = 1;
-            # If the current bin when entering the function wasn't 1, then we need to finish that bin
-            # and start a new one in the 1 bin.
+    scaff, pos = outdict['scaff'], outdict['pos'];
+    globs['cur-fastq-seq'] += outdict['ref'];
+    score = str(chr(int(round(outdict['rq'])+35)));
+    globs['cur-fastq-scores'] += score;
+    globs['cur-fastq-len'] += 1;
+    # Adds the current base and ascii score to the corresponding lists.
 
-            if final:
-                fq_vars['filled'] = True;
-            # If its the last call, we need to know if the last position is unmapped for FASTQ output.
-            # If it is, then we call the final FASTQ output here. If not, then we call it back in addUnmapped
-            # with the last scored base.
+    if globs['cur-fastq-len'] == globs['fastq-line-len'] or pos == globs['scaff-lens'][scaff]:      
+        cur_title = "@" + outdict['scaff'] + " " + str(outdict["pos"]-int(len(globs["cur-fastq-seq"]))+1) + ":" + str(outdict["pos"]) + " length=" + str(len(globs["cur-fastq-seq"]));
+        # Set the current FASTQ title.
 
-        outdict = { 'scaff' : scaff, 'pos' : start, 'ref' : seq[start-1], 
-                    'rq' : -2, 'raw' : "NA", 'lr' : "NA", 'l_match' : "NA", 
-                    'l_mismatch' : "NA", 'gls' : "NA", 'cor_ref' : "NA", 
-                    'cor_score' : "NA", 'cor_raw' : "NA" };
-        # Format the output info for an unmapped position.
-        
-        outputTab(outdict, outfile,  globs);
-        # Output to tab file.
+        fastqfile.write(cur_title + "\n");
+        fastqfile.write(globs["cur-fastq-seq"] + "\n");
+        fastqfile.write("+\n");
+        fastqfile.write(globs["cur-fastq-scores"] + "\n");
+        # Write the title, sequence, and scores.
 
-        if globs['fastq']:
-            fq_vars = outputFastq(outdict, fq_vars, globs);
-        # Output to Fastq file.
+        globs['cur-fastq-seq'], globs['cur-fastq-scores'], globs['cur-fastq-len']  = "", "", 0;
+        # Reset the sequence and score strings.
+    # This writes the sequence and scores if the length of the sequence matches the max fastq line length (global) or if its the final position of the scaffold.
 
-        start += 1;
+#############################################################################
 
-    if globs['fastq'] and final and fq_vars['filled'] and fq_vars['fq_seq'] != "":
-        fq_vars = outputFastq(outdict, fq_vars, globs, final=True);
-    # If this is the final call and the last position was unmapped, we call the final FASTQ output here.
+def initializeBed(scaff, globs):
+# When a new scaffold is encountered, initialize the bed dictionary.
+    cur_bed = copy.deepcopy(globs['bed-template']);
+    cur_bed['scaff'] = scaff;
+    cur_bed['out'] = os.path.join(globs['bed-dir'], scaff + ".bed");
+    cur_bed['scaff-len'] = globs['scaff-lens'][scaff];
+    return cur_bed;
 
-    return stop, fq_vars, bed_vars;
+#############################################################################
+
+def getBedBin(score, cur_bed):
+# Given a Referee score, this function returns the bin that score is in.
+    if score <= 0:
+        b = 1;
+    elif score > 80:
+        b = 10;
+    else:
+        upper = int(math.ceil(score / 10.0)) * 10;
+        b = (upper / 10) + 1;
+        # if upper == 10:
+        #     b = 2;
+        # elif upper == 20:
+        #     b = 3
+        # elif upper == 30:
+        #     b = 4
+        # elif upper == 40:
+        #     b = 5
+        # elif upper == 50:
+        #     b = 6
+        # elif upper == 60:
+        #     b = 7
+        # elif upper == 70:
+        #     b = 8
+        # elif upper == 80:
+        #     b = 9
+
+    cur_bed['cur-bin'] = b;
+    # Set the current bin.
+
+    if not cur_bed['last-bin']:
+        cur_bed['last-bin'] = b;
+    # If this is the first scaffold, set the last bin to be the same as the current bin.
+    
+    return cur_bed;
+
+#############################################################################
+
+def finishBedBin(cur_bed, pos, seqlen=""):
+# After a given stretch of scores in the same bin, the info for that chunk is saved to the bin dictionary here.
+# Am I off by 1?
+
+    prev_bin, next_bin = cur_bed['last-bin'], cur_bed['cur-bin'];
+    # Unpack the bins from the current bed dict.
+
+    cur_bed['bins'][prev_bin]['num-chunks'] += 1;
+    # Iterate the number of chunks.    
+
+    cur_bed['bins'][prev_bin]['last-pos'] = pos;
+    # Update the current last position. If its the last bin it will be the correct last position for the file.
+
+    cur_size = (pos - cur_bed['chunk-start']);
+    cur_bed['bins'][prev_bin]['chunk-sizes'].append(str(cur_size));
+    # Calculate the size of the current chunk.
+
+    cur_bed['bins'][prev_bin]['chunk-starts'].append(str(cur_bed['chunk-start']));
+    # Add in the chunk start.
+
+    cur_bed['chunk-start'] = pos;
+    # Update the chunk start for the next bin.
+
+    cur_bed['last-bin'] = cur_bed['cur-bin'];
+    # Update the bin.
+
+    return cur_bed
+
+#############################################################################
+
+def outputBed(cur_bed):
+# For output to bed format.
+    with open(cur_bed['out'], "w") as bedfile:
+    # Open the bed output file.    
+        bedfile.write("browser position " + cur_bed['scaff'] + "\n");
+        bedfile.write("browser hide all\n");
+        bedfile.write("track name=\"" + cur_bed['scaff'] + " Referee\" description=\"Referee quality scores\" visibility=2 itemRgb=\"On\"\n");
+        # These are the bed header lines.
+
+        for b in cur_bed['bins']:
+            outline = "\t".join([cur_bed['scaff'], 
+                str(cur_bed['bins'][b]['first-pos']), 
+                str(cur_bed['bins'][b]['last-pos']), 
+                cur_bed['bins'][b]['name'], 
+                str(cur_bed['bins'][b]['shade']),  
+                ".", 
+                str(cur_bed['bins'][b]['first-pos']), 
+                str(cur_bed['bins'][b]['last-pos']), 
+                cur_bed['bins'][b]['rgb']]
+                );
+            outline += "\t" + str(cur_bed['bins'][b]['num-chunks']);
+            outline += "\t" + ",".join(cur_bed['bins'][b]['chunk-sizes']);
+            outline += "\t" + ",".join(cur_bed['bins'][b]['chunk-starts']);
+            # The bed output info for each bin.
+            bedfile.write(outline + "\n");
 
 #############################################################################
