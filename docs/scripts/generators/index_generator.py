@@ -35,9 +35,9 @@ html_template = """
 						<a class="button-secondary pure-button" id="install_btn" href="https://github.com/gwct/referee/releases/latest" target="_blank">Download &raquo;</a>
 				</div>
 
-				<h3>Update: v1.1 &#8212; 08.31.2019</h3>
-				<p>Referee now supports input data from haploid genomes with the <code>--haploid</code> option! Check out the <a href="calcs.html">calculations</a> 
-					page to see how we modified the likelihood to accomodate these data.</p>
+				<h3>Update: v1.2 &#8212; 08.25.2020</h3>
+				<p>Referee now implements a more streamlined multi-processing scheme that does not require duplications of large input files or multiple read-throughs
+					of input files!</p>
 
 				<h3>About</h3>
 				<p>Modern genome sequencing technologies provide a succinct measure of quality at each position in every read, however all of 
@@ -46,7 +46,8 @@ html_template = """
 
 				<p>We accomplish this by first calculating genotype likelihoods for every site. For a given site in a diploid genome, there 
 					are 10 possible genotypes (AA, AC, AG, AT, CC, CG, CT, GG, GT, TT). Referee takes as input the genotype likelihoods 
-					calculated for all 10 genotypes given the called reference base at each position.</p>
+					calculated for all 10 genotypes given the called reference base at each position. For haploid genomes, the likelihood
+					calculations are limited to the four bases with the <code>--haploid</code> option.</p>
 
 				<p>To obtain these likelihoods, one must first map the reads used to make the assembly back onto the finished assembly. 
 					Then these reads can be used to calculate genotype likelihoods using any method/program. <a href="calcs.html">Referee can calculate</a> 
