@@ -28,7 +28,7 @@ html_template = """
                 <div class="readme_divider"></div>
 				<h2>Installation</h2>
                     <p>Clone or download the github repo: <a href="https://github.com/gwct/referee" target="_blank">Referee github</a></p>
-                    <p>The only dependency is Python 2.7 or higher. You may want to add the Referee folder to your $PATH variable for ease of use!</p>
+                    <p>The only dependency is Python 3 or higher. You may want to add the Referee folder to your $PATH variable for ease of use!</p>
                 
                 <div class="readme_divider"></div>
                 <h2>Usage</h2>
@@ -41,9 +41,9 @@ html_template = """
                             for this).</p></li>
                         <li><p>Score your genome with one of the following Referee commands:</p>
                             <pre><code>python referee.py -gl [genotype likelihood file] -ref [reference genome FASTA file] --pileup</code></pre>
-                            <p>Alternatively, if you have multiple genotype likelihood files you wish to score with the same reference genome, you 
+                            <!--<p>Alternatively, if you have multiple genotype likelihood files you wish to score with the same reference genome, you 
                                 could put the paths to each file in a text file with one file path per line for Referee to score them all:</p>
-                            <pre><code>python referee.py -i [text file with paths to genotype likelihood files] -ref [reference genome FASTA file] --pileup</code></pre>
+                            <pre><code>python referee.py -i [text file with paths to genotype likelihood files] -ref [reference genome FASTA file] --pileup</code></pre>-->
                             <p>If you have pre-calculated genotype likelihoods as input, exclude the <code>--pileup</code> flag.</p>
                         </li>
                     </ol>
@@ -52,7 +52,7 @@ html_template = """
                     <h3>Input</h3>
                         <p>There are two main inputs for the program:</p>
                         <ol>
-                            <li><p>A genotype log-likelihood file (<code class="cb">-gl</code>) or files (<code class="cb">-i</code>). File(s) can be either 
+                            <li><p>A genotype log-likelihood file (<code class="cb">-gl</code>) or files <!--(<code class="cb">-i</code>)-->. File(s) can be either 
                                 pre-calculated genotype log-likelihoods in a certain format (see below), or a pileups from which Referee will calculate 
                                 genotype likelihoods. See the <a href="walkthrough.html">walkthrough</a> for more info.</p>
                                 
@@ -77,7 +77,7 @@ scaffold_0	10	-8.689986	0.000000	-10.076280	-10.076280	-29.821151	-30.514277	-30
                                 Note that ANGSD also scales the log likelihoods by subtracting the highest likelihood from each likelihood. 
                                 This has no effect on Referee's scoring.</p>
 
-                                <p>If you have multiple genotype log-likelihood files from the same genome, you can put the paths to those files in a text file and
+                                <!--<p>If you have multiple genotype log-likelihood files from the same genome, you can put the paths to those files in a text file and
                                         give that to Referee as input through <code class="cb">-i</code> <strong>instead of</strong> <code class="cb">-gl</code></p>
             
                                     <p>Example <code>-i</code> input:
@@ -85,13 +85,13 @@ scaffold_0	10	-8.689986	0.000000	-10.076280	-10.076280	-29.821151	-30.514277	-30
 /path/to/gl/file2.txt
 /path/to/gl/file3.txt
 /path/to/gl/file4.txt</code></pre>
-                                    </p>
+                                    </p>-->
                                 
                             </li>
 
                             <li>A reference FASTA file containing the sequences used to calculate genotype log-likelihoods (<code class="cb">-ref</code>).
                                 <strong>The FASTA headers in this file must match those in the first column of the ANGSD or pileup file(s) specified with 
-                                <code class="cb">-i</code> or <code class="cb">-gl</code></strong>. By default, Referee will trim the FASTA headers at
+                                <!--<code class="cb">-i</code> or--> <code class="cb">-gl</code></strong>. By default, Referee will trim the FASTA headers at
                                 the first occurrence of a space character, so be sure to account for this. I admit this is a shaky workaround, but given
                                 the non-standard nature of FASTA files its what I came up with. Please contact me if you would like some other header
                                 format implemented.</li>
@@ -175,26 +175,31 @@ GGTGTAGCCAGAGAGTAAANAATATGGTGAAGCCAGAGAG
                                 <tr><td><code>-gl</code></td>
                                     <td>A single pileup file or a single file containing log genotype likelihoods for every site in your genome with reads 
                                         mapped to it. Can be gzip compressed or not. If using pre-calculated log likelihoods, see the important information 
-                                        below regarding the order of the columns in the file. Note: Only one of <code>-gl</code> or <code>-i</code> can be 
-                                        specified.</td></tr>
+                                        below regarding the order of the columns in the file.</td></tr>
 
-                                <tr><td><code>-i</code></td>
+                                <!--<tr><td><code>-i</code></td>
                                     <td>A file containing paths to multiple pileup files or multiple genotype log likelihood files. One file path per line. 
-                                        Note: Only one of <code>-gl</code> or <code>-i</code> can be specified.</td></tr>
+                                        Note: Only one of <code>-gl</code> or <code>-i</code> can be specified.</td></tr>-->
+
+                                <tr><td><code>--pileup</code></td>
+                                    <td>If this option is set, Referee will read the input file(s) in pileup format and use this info to calculate genotype 
+                                        likelihoods prior to the reference quality score.</td></tr> 
 
                                 <tr><td><code>-ref</code></td>
                                     <td>A FASTA formatted file containing the genome you wish to score. Can be gzip compressed or not. FASTA headers must 
                                         match the sequence IDs in column one of the pileup or genotype log likelihood file.</td></tr>
 
                                 <tr><td><code>-o</code></td>
+                                    <td>The desired output directory. Default: <code>referee-[date]-[time]</code>.</td></tr>
+
+                                <tr><td><code>-prefix</code></td>
                                     <td>Referee will create at least 2 output files: a tab delimited score file and a log file. Use this option to specify 
-                                        a prefix for these file names. Otherwise, they will default to <code>referee-out-[date]-[time]-[random string]</code>. 
-                                        If <code>-i</code> is specified, this will be the name of the output directory.</td></tr>
+                                        a prefix for these file names. Otherwise, they will default to <code>referee-[date]-[time]</code>.</td></tr>
+
+                                <tr><td><code>--overwrite</code></td>
+                                    <td>By default, if the specified output directory already exists, Referee will exit with a warning. 
+                                        Set this option to bypass this warning and allow Referee to overwrite the files in this directory.</td></tr>
                                         
-                                <tr><td><code>--pileup</code></td>
-                                    <td>If this option is set, Referee will read the input file(s) in pileup format and use this info to calculate genotype 
-                                        likelihoods prior to the reference quality score.</td></tr> 
-                                            
                                 <tr><td><code>--mapq</code></td>
                                     <td>If pileup file(s) are given as input, set this to incorporate mapping quality into Referee's quality score calculation.
                                         Mapping quality can be output by samtools mpileup with the <code>-s</code> option, and will appear in the 7th column of the file. 
@@ -229,6 +234,9 @@ GGTGTAGCCAGAGAGTAAANAATATGGTGAAGCCAGAGAG
 
                                 <tr><td><code>-p</code></td>
                                     <td>The number of processes Referee can use.</td></tr>      
+                            
+                                <tr><td><code>-l</code></td>
+                                    <td>The number of input lines read per process. Default: 100000. Decreasing this number may improve memory usage at the cost of slightly higher run times.</td></tr>   
                             </tbody>
                         </table>
 

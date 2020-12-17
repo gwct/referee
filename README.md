@@ -24,11 +24,12 @@
 #### Thomas GWC and Hahn MW. 2019. Referee: reference assembly quality scores. Genome Biology and Evolution. https://doi.org/10.1093/gbe/evz088. 
 
 ## Version History
-#### This is version 1.1, released August 31, 2019
+#### This is version 1.2, released August 25, 2020
 
 Change log:
-* Added the `--haploid` option to score genome assemblies from haploid species.
+* Restructured multiprocessing scheme; removed `-i` option.
 
+###### Version 1.1 (August 19,2019): Added the `--haploid` option to score genome assemblies from haploid species.
 ###### Version 1.0 (April 19, 2019): Release coincides with publication. No major changes.
 ###### Version Beta 1.2 (November 04, 2018): Added bed output option with `--bed` and redesigned the website.
 ###### Version Beta 1.1 (October 14, 2018): Implemented in-house genotype likelihood calculations with `--pileup` input.
@@ -37,7 +38,7 @@ Change log:
 ## Installation
 
 Simply download the program and run it. You may want to add the Referee folder to your $PATH variable for ease of use.
-### The only dependency is Python 2.7 or higher
+### The only dependency is Python 3+
 
 ## Usage
 
@@ -62,10 +63,11 @@ If you have pre-calculated genotype log likelihoods as input, exclude the `--pil
 | Option | Description | 
 | ------ | ----------- |
 | -gl | A single pileup file or a single file containing log genotype likelihoods for every site in your genome with reads mapped to it. Can be gzip compressed or not. If using pre-calculated log likelihoods, see the important information below regarding the order of the columns in the file. Note: Only one of `-gl` or `-i` can be specified.|
-| -i | A file containing paths to multiple pileup files or multiple genotype log likelihood files. One file path per line. Note: Only one of `-gl` or `-i` can be specified.|
-| -ref | A FASTA formatted file containing the genome you wish to score. Can be gzip compressed or not. FASTA headers must match the sequence IDs in column one of the pileup or genotype log likelihood file. |
-| -o | Referee will create at least 2 output files: a tab delimited score file and a log file. Use this option to specify a prefix for these file names. Otherwise, they will default to `referee-out-[date]-[time]-[random string]`. If `-i` is specified, this will be the name of the output directory. |
 | --pileup | If this option is set, Referee will read the input file(s) in pileup format and use this info to calculate genotype likelihoods prior to the reference quality score. |
+| -ref | A FASTA formatted file containing the genome you wish to score. Can be gzip compressed or not. FASTA headers must match the sequence IDs in column one of the pileup or genotype log likelihood file. |
+| -o | The desired output directory. Default: `referee-[date]-[time]` |
+| -prefix | Referee will create at least 2 output files: a tab delimited score file and a log file. Use this option to specify a prefix for these file names. Otherwise, they will default to `referee-[date]-[time]`. |
+| --overwrite | By default, if the specified output directory already exists, Referee will exit with a warning. Set this option to bypass this warning and allow Referee to overwrite the files in this directory. |
 | --mapq | If pileup file(s) are given as input, set this to incorporate mapping quality into Referee's quality score calculation. Mapping quality can be output by samtools mpileup with the `-s` option, and will appear in the 7th column of the file. If `--mapq` is not set, mapping qualities will be ignored even if they are present. |
 | --fastq | Referee outputs quality scores for every position in tab delimited format (see below), but with this option scores can also be output in FASTQ format. Scores will be converted to [ASCII](https://en.wikipedia.org/wiki/ASCII) characters: score + 35 = ASCII char. Note 1: If `--correct` is set, corrected bases will appear as lower case. Note 2: This option cannot be set with `--mapped`. |
 | --bed | Referee can output scores in binned BED format for visualizing tracks of scores in most genome browsers. One .bed file will be created for each scaffold scored and these will be placed in a directory ending with -bed-files. Note: This option cannot be set with `--mapped`. |
@@ -74,3 +76,4 @@ If you have pre-calculated genotype log likelihoods as input, exclude the `--pil
 | --mapped | Only report scores for sites with reads mapped to them. Note: This option cannot be set with `--fastq` or `--bed`. |
 | --quiet | Set this option to prevent Referee from printing out runtime statistics for each step. |
 | -p | The number of processes Referee can use. |
+| -l | The number of input lines read per process. Default: 100000. Decreasing this number may improve memory usage at the cost of slightly higher run times. |
