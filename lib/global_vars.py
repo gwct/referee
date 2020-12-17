@@ -40,11 +40,14 @@ def init():
         'out-prefix' : "",
         'out-dir' : "",
         'out-tab' : "",
+        'out-summary' : "",
+        'out-fa' : "",
         'out-fq' : "",
         'bed-dir' : "",
         # Output locations
 
         'fastq-opt' : False,
+        'fasta-opt' : False,
         
         'bed-opt' : False,
         'correct-opt' : False,
@@ -56,8 +59,16 @@ def init():
 
         'ref' : "",
         'scaff-lens' : {},
+        'scaffs-written' : [],
+        'num-scaffs' : "NA",
+        'num-pos' : "NA",
         'genotypes' : ["AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT"],
         'haploid-gt' : ["A","T","C","G"],
+        
+        'cur-fasta-seq' : "",
+        'fasta-line-len' : 60,
+        'scaff-errs' : 0,
+        'scaff-unmapped' : 0,
         
         'cur-fastq-seq' : "",
         'cur-fastq-scores' : "",
@@ -96,11 +107,35 @@ def init():
         'debug' : False,
         'nolog' : False,
         'norun' : False,
-        'exit-code' : 0
+        'exit-code' : 0,
         # Internal stuff
+
+        'hist' : { 1 : {'min' : -3, 'max' : -3, 'count' : 0}, 
+                    2 : {'min' : -2, 'max' : -2, 'count' : 0}, 
+                    3 : {'min' : -1, 'max' : -1, 'count' : 0}, 
+                    4 : {'min' : 0, 'max' : 0, 'count' : 0}, 
+                    5 : {'min' : 1, 'max' : 10, 'count' : 0}, 
+                    6 : { 'min' : 11, 'max' : 20, 'count' : 0}, 
+                    7 : {'min' : 21, 'max' : 30, 'count' : 0}, 
+                    8 : { 'min' : 31, 'max' : 40, 'count' : 0}, 
+                    9 : {'min' : 41, 'max' : 50, 'count' : 0}, 
+                    10 : {'min' : 51, 'max' : 60, 'count' : 0}, 
+                    11 : {'min' : 61, 'max' : 70, 'count' : 0}, 
+                    12 : {'min' : 71, 'max' : 80, 'count' : 0}, 
+                    13 : {'min' : 81, 'max' : 90, 'count' : 0}, 
+                    14 : {'min' : 91, 'max' : 91, 'count' : 0}, 
+        },
+        'num-corrected' : 0,
+
+        'err-types' : { 'AT' : 0, 'AC' : 0, 'AG' : 0, 
+                        'TA' : 0, 'TC' : 0, 'TG' : 0, 
+                        'CT' : 0, 'CA' : 0, 'CG' : 0, 
+                        'GT' : 0, 'GC' : 0, 'GA' : 0,
+                        'NA' : 0, 'NT' : 0, 'NC' : 0, 'NG' : 0        
+        }
     }
 
     globs['logfilename'] = "referee-" + globs['startdatetime'] + ".errlog";
-    # Temporary logfile for errors that occur before the log file optoins are parsed.
+    # Temporary logfile for errors that occur before the log file options are parsed.
 
     return globs;

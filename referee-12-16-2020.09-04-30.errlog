@@ -1,0 +1,7 @@
+
+ -----------------------------------------------------------------------------------------
+|**Error OP2: Cannot find reference file! A genome file in FASTA format is required (-r). |
+ -----------------------------------------------------------------------------------------
+
+
+Script call: /mnt/beegfs/gt156213e/referee-dev/referee/referee.py -gl tests/data/test.pileup --pileup -d tests/out/ -prefix test-out -p 4 --pileup

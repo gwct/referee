@@ -1,0 +1,7 @@
+
+ -------------------------------------------------------------------------------------------------------------------------------------
+|**Error OP7: Output directory already exists. Please specify --overwrite if you wish to overwrite the previous referee files within. |
+ -------------------------------------------------------------------------------------------------------------------------------------
+
+
+Script call: referee.py -gl tests/data/test.pileup --pileup -ref tests/data/test.fa -d tests/out/ -prefix test-out --fastq --fasta --bed --correct --raw -p 8

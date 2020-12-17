@@ -244,7 +244,7 @@ def refCalc(line_chunk, globs):
 
         else:
         # If the input type is pre-calculated genotype likelihoods, just parse the line and pass it to calcScore.
-            scaff, pos, gl_list = line[0], int(line[1]), line[2:];
+            gl_list = line[2:];
             #gls = { globs['genotypes'][x] : math.exp(float(gl_list[x])) for x in range(len(gl_list)) };
             log_gls = { globs['genotypes'][x] : float(gl_list[x]) for x in range(len(gl_list)) };
             # Parse the info from the current line -- scaffold, position, genotype likelihoods.

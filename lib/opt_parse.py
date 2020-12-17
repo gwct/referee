@@ -29,6 +29,7 @@ def optParse(globs):
 	# User params
 	parser.add_argument("--pileup", dest="pileup_flag", help="Set this option if your input file(s) are in pileup format and Referee will calculate genotype likelihoods for you.", action="store_true", default=False);
 	parser.add_argument("--fastq", dest="fastq_flag", help="Set this option to output in FASTQ format in addition to the default tab delimited format.", action="store_true", default=False);
+	parser.add_argument("--fasta", dest="fasta_flag", help="Set this option to output the corrected sequence in FASTA format in addition to the default tab delimited format. Can only be set with --corrected.", action="store_true", default=False);
 	parser.add_argument("--bed", dest="bed_flag", help="Set this option to output in BED format in addition to the default tab delimited format. BED files can be viewed as tracks in genome browsers.", action="store_true", default=False);
 	parser.add_argument("--haploid", dest="haploid_flag", help="Set this option if your input data are from a haploid species. Referee will limit its likelihood calculations to the four haploid genotypes. Can only be used with --pileup.", action="store_true", default=False);
 	parser.add_argument("--correct", dest="correct_flag", help="Set this option to allow Referee to suggest alternate reference bases for sites that score 0.", action="store_true", default=False);
@@ -110,6 +111,12 @@ def optParse(globs):
 		globs['correct-opt'] = True;
 	# Checking the correct option.
 
+	if args.fasta_flag:
+		if not globs['correct-opt']:
+			RC.errorOut("OP7", "--correct must be set to generate --fasta output, otherwise it's just a copy of the input file.", globs);
+		globs['fasta-opt'] = True;
+	# Checking the correct option.
+
 	if args.raw_flag:
 		globs['raw-opt'] = True;
 	# Checking the raw score option.
@@ -141,9 +148,12 @@ def optParse(globs):
 	globs['out-dir'] = args.outdir;
 	# Output directory
 
-	globs['out-tab'] = os.path.join(globs['out-dir'], globs['out-prefix'] + ".txt");
+	globs['out-tab'] = os.path.join(globs['out-dir'], globs['out-prefix'] + ".tab");
+	globs['out-summary'] = os.path.join(globs['out-dir'], globs['out-prefix'] + "-summary.txt");
 	if globs['fastq-opt']:
 		globs['out-fq']  = os.path.join(globs['out-dir'], globs['out-prefix'] + ".fq");
+	if globs['fasta-opt']:
+		globs['out-fa']  = os.path.join(globs['out-dir'], globs['out-prefix'] + "-corrected.fa");
 	if globs['bed-opt']:
 		globs['bed-dir'] = os.path.join(globs['out-dir'], globs['out-prefix'] + "-bed");
 		if not os.path.isdir(globs['bed-dir']):
@@ -241,6 +251,16 @@ def startProg(globs):
 		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --fastq", pad) + 
 					RC.spacedOut("False", pad) + 
 					"Not writing output in FASTQ format.");
+	# Reporting the fastq option.
+
+	if globs['fasta-opt']:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --fasta", pad) + 
+					RC.spacedOut("True", pad) + 
+					"Writing corrected output in FASTA format in addition to tab delimited: " + globs['out-fq']);
+	else:
+		RC.printWrite(globs['logfilename'], start_v, RC.spacedOut("# --fasta", pad) + 
+					RC.spacedOut("False", pad) + 
+					"Not writing corrected output in FASTA format.");
 	# Reporting the fastq option.
 
 	if globs['bed-opt']:

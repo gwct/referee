@@ -116,7 +116,6 @@ def report_step(globs, step, step_start_time, step_status, start=False):
 			sys.stdout.write("".join(out_line));
 			sys.stdout.flush();
 
-
 		else:
 			step_elapsed = str(round(cur_time - step_start_time, 5));
 			out_line = [ step_status, prog_elapsed, step_elapsed ];
@@ -195,7 +194,7 @@ def fastaReadInd(i_name, globs):
 	# Can't get the FASTA indexing to work on .gz files... just going to throw an error if -ref is .gz for now.
 
 	with reader(i_name, "r") as infile:
-		fasta, first, curlist = {}, False, [];
+		fasta, first, curlist, first_scaff = {}, False, [], False;
 		line = "blah";
 		while line != '':
 			line = infile.readline();
@@ -207,6 +206,8 @@ def fastaReadInd(i_name, globs):
 					curlist = [];
 
 				cur_title = line[1:].strip().split(" ")[0];
+				if not first_scaff:
+					first_scaff = cur_title;
 				curtitlestart = infile.tell() - len(line);
 				curtitleend = infile.tell() - 1;
 				curseqstart = infile.tell();
@@ -221,7 +222,7 @@ def fastaReadInd(i_name, globs):
 		curlist.append(curseqend);
 		fasta[cur_title] = curlist;
 
-	return fasta;
+	return fasta, first_scaff;
 		
 #############################################################################
 

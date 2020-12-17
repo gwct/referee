@@ -1,6 +1,13 @@
 # Referee
 ### Quality scoring for reference genomes
 
+[![OS](https://gwct.github.io/referee/img/badges/osbadge.svg)](#Installation)
+[![Language](https://gwct.github.io/referee/img/badges/pybadge.svg)](https://www.python.org/)
+[![Build Status](https://travis-ci.org/gwct/referee.svg?branch=master)](https://travis-ci.org/gwct/referee)
+[![codecov](https://codecov.io/gh/gwct/referee/branch/master/graph/badge.svg?token=3U2K65R611)](https://codecov.io/gh/gwct/referee)
+![GitHub last commit](https://img.shields.io/github/last-commit/gwct/referee)
+[![License](https://img.shields.io/github/license/gwct/referee)](https://github.com/gwct/referee/LICENSE)
+
 ## Authors
 #### Gregg Thomas and Matthew Hahn
 

@@ -1,0 +1,7 @@
+
+ -------------------------------------------------------------------------------------------------------------------------------------
+|**Error OP7: Output directory already exists. Please specify --overwrite if you wish to overwrite the previous referee files within. |
+ -------------------------------------------------------------------------------------------------------------------------------------
+
+
+Script call: /mnt/beegfs/gt156213e/referee-dev/referee/referee.py -gl tests/data/test.pileup --pileup -ref tests/data/test.fa -d tests/out/ -prefix test-out -p 4
