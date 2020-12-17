@@ -4,5 +4,5 @@ Rplots.pdf
 ~$*
 .Rhistory
 *.o*
-tests/out/
+tests/out*
 *.errlog
