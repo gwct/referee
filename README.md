@@ -1,6 +1,6 @@
 <p align="center"><img align="center" width="217" height="175" src="https://gwct.github.io/referee/img/ref-logo.png"></p>
 
-<p align="center" style="font-size:2.5em">Referee</p>
+# Referee
 
 ## Quality scoring for reference genomes
 
